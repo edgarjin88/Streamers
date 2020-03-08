@@ -1,0 +1,6 @@
+uploads
+path
+.env
+
+node_modules
+.next
