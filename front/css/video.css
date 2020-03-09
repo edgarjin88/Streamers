@@ -1,37 +1,11 @@
-import styled from "styled-components";
-import { createGlobalStyle } from "styled-components";
-
-//styled component의 문법에 주의 하자.
-// sc-ASDkd2 같은 클래스로 바꿔서 클라스 중복을 피해 준다. sc는 스타일드 컴포넌츠
-// 스타일드 컴퍼넌트도 서버사이드 렌더링을 해유만 한다.
-// a(), a`` 같은함수이다.
-
-// export const ImgWrapper = styled.div`
-//   padding: 32px;
-//   text-align: center;
-
-//   & img {
-//     margin: 0 auto;
-//     max-height: 750px;
-//   }
-// `;
-
-const GlobalStyle = createGlobalStyle`
-  .container {
-    color: ${props => (props.whiteColor ? "white" : "black")};
-  }
-`;
-
-export const GlobalStyleOne = createGlobalStyle`
-  * {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
 }
 
 html,
-.container {
+body {
   height: 100%;
 }
 
@@ -64,12 +38,12 @@ a {
   color: #111;
 }
 
-.container {
+body {
   display: grid;
   grid: 48px 1fr / 1fr;
 }
 
-.container > header {
+body > header {
   display: grid;
   grid: 1fr / 32px 1fr 28px 28px;
   grid-column-gap: 12px;
@@ -79,7 +53,7 @@ a {
   color: #fff;
 }
 
-.container > header > a {
+body > header > a {
   width: 32px;
   height: 32px;
 }
@@ -93,18 +67,18 @@ a {
 main {
   display: grid;
   grid:
-    "main-video" max-content
+    "video-thumbnail" max-content
     "video-details" max-content
     "related-videos" max-content
     "video-comments" max-content
     / 1fr;
 }
 
-#main-video {
-  grid-area: main-video;
+#video-thumbnail {
+  grid-area: video-thumbnail;
 }
 
-#main-video > img {
+#video-thumbnail > img {
   width: 100%;
   height: 100%;
 }
@@ -299,7 +273,10 @@ main {
   font-weight: bold;
 }
 
-
+#comment-uptick,
+#comment-list-container {
+  display: none;
+}
 
 #comment-form {
   display: grid;
@@ -406,6 +383,7 @@ main {
 }
 
 .response-list {
+  display: none;
   margin-top: 15px;
 }
 
@@ -424,7 +402,7 @@ main {
 @media (min-width: 550px) {
   main {
     grid-template-areas:
-      "main-video"
+      "video-thumbnail"
       "video-details"
       "video-comments"
       "related-videos";
@@ -480,7 +458,7 @@ main {
 }
 
 @media (min-width: 800px) and (orientation: landscape) {
-  .container > header {
+  body > header {
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -490,14 +468,14 @@ main {
 
   main {
     grid:
-      "main-video related-videos" max-content
+      "video-thumbnail related-videos" max-content
       "video-details related-videos" max-content
       "video-comments related-videos" 1fr
       / 1fr 256px;
     margin-top: 48px;
   }
 
-  #relatead-videos {
+  #related-videos {
     padding-left: 8px;
     padding-right: 8px;
     overflow: scroll;
@@ -539,4 +517,6 @@ main {
   }
 }
 
-`;
+body {
+  background-color: black;
+}

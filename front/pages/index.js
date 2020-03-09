@@ -1,15 +1,16 @@
-import Head from "next/head";
+import { IndexGlobalStyle } from "../styles/indexStyle";
+import Header from "../components/Header";
+import IndexMain from "../components/IndexMain";
 import styled from "styled-components";
-import { Button } from "@material-ui/core";
-import Layout from "../components/Layout";
-const Test = styled.div`
-  color: red;
-`;
 
-//  <Button variant="contained" color="primary">
-//    Hello World
-//  </Button>;
+const VideoPage = () => {
+  return (
+    <div className="container">
+      <IndexGlobalStyle />
+      <Header />
+      <IndexMain />
+    </div>
+  );
+};
 
-const Home = () => <Layout></Layout>;
-
-export default Home;
+export default VideoPage;

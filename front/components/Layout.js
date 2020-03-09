@@ -3,17 +3,19 @@
 //child components
 //take the advantages of fragment
 // Each parts should be in <Sections></Sections>
-import Header from "./Header";
-import VideoDetails from "./VideoDetails";
-import RelatedVideos from "./RelatedVideos";
-import VideoComments from "./VideoComments";
 // Each parts should be in <Sections></Sections>
 
+// import Header from "./Header";
+// import VideoDetails from "./VideoDetails";
+// import RelatedVideos from "./RelatedVideos";
+// import VideoComments from "./VideoComments";
 const Layout = () => {
   return (
     <body>
-      <Header />
+      {/* <Header /> */}
       <main></main>
     </body>
   );
 };
+
+export default Layout;

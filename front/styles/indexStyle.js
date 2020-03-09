@@ -1,28 +1,7 @@
 import styled from "styled-components";
 import { createGlobalStyle } from "styled-components";
 
-//styled component의 문법에 주의 하자.
-// sc-ASDkd2 같은 클래스로 바꿔서 클라스 중복을 피해 준다. sc는 스타일드 컴포넌츠
-// 스타일드 컴퍼넌트도 서버사이드 렌더링을 해유만 한다.
-// a(), a`` 같은함수이다.
-
-// export const ImgWrapper = styled.div`
-//   padding: 32px;
-//   text-align: center;
-
-//   & img {
-//     margin: 0 auto;
-//     max-height: 750px;
-//   }
-// `;
-
-const GlobalStyle = createGlobalStyle`
-  .container {
-    color: ${props => (props.whiteColor ? "white" : "black")};
-  }
-`;
-
-export const GlobalStyleOne = createGlobalStyle`
+export const IndexGlobalStyle = createGlobalStyle`
   * {
   margin: 0;
   padding: 0;
@@ -93,21 +72,10 @@ a {
 main {
   display: grid;
   grid:
-    "main-video" max-content
-    "video-details" max-content
     "related-videos" max-content
-    "video-comments" max-content
     / 1fr;
 }
 
-#main-video {
-  grid-area: main-video;
-}
-
-#main-video > img {
-  width: 100%;
-  height: 100%;
-}
 
 #video-details {
   grid-area: video-details;
@@ -424,9 +392,6 @@ main {
 @media (min-width: 550px) {
   main {
     grid-template-areas:
-      "main-video"
-      "video-details"
-      "video-comments"
       "related-videos";
   }
 
@@ -487,56 +452,24 @@ main {
     right: 0;
     height: 48px;
   }
-
-  main {
+    main {
     grid:
-      "main-video related-videos" max-content
-      "video-details related-videos" max-content
-      "video-comments related-videos" 1fr
-      / 1fr 256px;
-    margin-top: 48px;
+      "left-side-bar related-videos related-videos related-videos"
+      / 256px 1fr 1fr 1fr;
+    
+
   }
 
-  #relatead-videos {
-    padding-left: 8px;
-    padding-right: 8px;
-    overflow: scroll;
-    position: fixed;
-    width: 256px;
-    top: 48px;
-    right: 0;
-    bottom: 0;
+
+  #left-side-bar{
+    grid-area : left-side-bar;
+    background-color: grey;
+    color: red;
+    position:fixed;
+    width: 256px; 
+    height: 100vh
   }
 
-  #related-videos > ul {
-    grid-template-columns: 1fr;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  #related-videos > ul > li img {
-    height: 135px;
-    min-height: inherit;
-    max-height: inherit;
-  }
-
-  #video-comments {
-    border-bottom: 0;
-  }
-}
-
-@media (min-width: 1280px) and (orientation: landscape) {
-  main {
-    grid-template-columns: 1fr 500px;
-  }
-
-  #related-videos {
-    width: 500px;
-  }
-
-  #related-videos > ul {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 `;
