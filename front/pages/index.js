@@ -1,16 +1,15 @@
 import { IndexGlobalStyle } from "../styles/indexStyle";
-import Header from "../components/Header";
 import IndexMain from "../components/IndexMain";
-import styled from "styled-components";
+import HideBar from "../components/HideBar";
 
-const VideoPage = () => {
+const Index = () => {
   return (
     <div className="container">
       <IndexGlobalStyle />
-      <Header />
+      <HideBar />
       <IndexMain />
     </div>
   );
 };
 
-export default VideoPage;
+export default Index;

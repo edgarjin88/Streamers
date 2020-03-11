@@ -1,28 +1,13 @@
 import styled from "styled-components";
 import { createGlobalStyle } from "styled-components";
 
-//styled component의 문법에 주의 하자.
-// sc-ASDkd2 같은 클래스로 바꿔서 클라스 중복을 피해 준다. sc는 스타일드 컴포넌츠
-// 스타일드 컴퍼넌트도 서버사이드 렌더링을 해유만 한다.
-// a(), a`` 같은함수이다.
-
-// export const ImgWrapper = styled.div`
-//   padding: 32px;
-//   text-align: center;
-
-//   & img {
-//     margin: 0 auto;
-//     max-height: 750px;
-//   }
-// `;
-
 const GlobalStyle = createGlobalStyle`
   .container {
     color: ${props => (props.whiteColor ? "white" : "black")};
   }
 `;
 
-export const GlobalStyleOne = createGlobalStyle`
+export const ProfileGlobalStyle = createGlobalStyle`
   * {
   margin: 0;
   padding: 0;
@@ -66,7 +51,7 @@ a {
 
 .container {
   display: grid;
-  grid: 48px 1fr / 1fr;
+  grid: 48px 1fr 1fr / 1fr;
 }
 
 .container > header {

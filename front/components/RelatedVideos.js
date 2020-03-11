@@ -2,6 +2,9 @@ const RelatedVideos = () => {
   const headerPart = () => (
     <header>
       <div>Up next-next video screenshot to be added</div>
+      <div>
+        decide wether to show or not dynamically dependnig on redux state
+      </div>
       <div>Autoplay</div>
       <button>
         <span className="autoplay-slider"></span>
@@ -67,3 +70,4 @@ const RelatedVideos = () => {
 };
 
 export default RelatedVideos;
+

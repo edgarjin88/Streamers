@@ -1,13 +1,13 @@
-import { GlobalStyleOne } from "../styles/styles";
+import { ProfileGlobalStyle } from "../styles/profileStyle";
+import ProfileMain from "../components/ProfileMain";
 import HideBar from "../components/HideBar";
-import Main from "../components/Main";
 
 const VideoPage = () => {
   return (
     <div className="container">
-      <GlobalStyleOne />
+      <ProfileGlobalStyle />
       <HideBar />
-      <Main />
+      <ProfileMain />
     </div>
   );
 };
