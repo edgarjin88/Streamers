@@ -1,13 +1,16 @@
 import { IndexGlobalStyle } from "../styles/indexStyle";
-import IndexMain from "../components/IndexMain";
+
 import HideBar from "../components/HideBar";
+import RelatedVideos from "../components/RelatedVideos";
 
 const Index = () => {
   return (
     <div className="container">
       <IndexGlobalStyle />
       <HideBar />
-      <IndexMain />
+      <main>
+        <RelatedVideos />
+      </main>
     </div>
   );
 };

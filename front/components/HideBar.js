@@ -4,8 +4,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import Box from "@material-ui/core/Box";
-import Container from "@material-ui/core/Container";
 
 import Slide from "@material-ui/core/Slide";
 
@@ -31,7 +29,6 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import MyVideo from "@material-ui/icons/OndemandVideo";
@@ -39,6 +36,8 @@ import MessageIcon from "@material-ui/icons/Forum";
 import LogOut from "@material-ui/icons/ExitToApp";
 import SettingsIcon from "@material-ui/icons/Settings";
 import PolicyIcon from "@material-ui/icons/Policy";
+
+import Link from "next/link";
 
 const HideOnScroll = props => {
   const { children, window } = props;
@@ -125,8 +124,8 @@ const useStyles = makeStyles(theme => ({
     })
   },
   menuButton: {
-    marginRight: theme.spacing(2),
-    size: "large"
+    marginRight: theme.spacing(2)
+    // size: "large"
   },
   hide: {
     display: "none"
@@ -291,10 +290,16 @@ export default function HideAppBar(props) {
                 edge="start"
                 className={clsx(classes.menuButton, open && classes.hide)}
               >
-                <MenuIcon style={{ fontSize: "30px" }} />
+                <MenuIcon
+                  style={{
+                    fontSize: "30px"
+                  }}
+                />
               </IconButton>
               <Typography className={classes.title} variant="h4" noWrap>
-                Streamers
+                <Link href="/index">
+                  <a>Streamers</a>
+                </Link>
               </Typography>
               <div className={classes.search}>
                 <div>
