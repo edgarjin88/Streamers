@@ -44,6 +44,7 @@ a {
 }
 
 .container {
+
   display: grid;
   grid: 48px 1fr / 1fr;
 }

@@ -54,9 +54,12 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexGrow: 1
+    // width: "300px"
   },
   toolBar: {
-    display: "flex"
+    display: "flex",
+    justifyContent: "center",
+    width: "80%"
   },
   title: {
     marginLeft: "20px",
@@ -281,7 +284,11 @@ export default function HideAppBar(props) {
           >
             <Toolbar
               className={classes.toolBar}
-              style={{ padding: "0 20px 0 20px" }}
+              style={{
+                padding: "0 20px 0 20px",
+                width: "80%",
+                placeSelf: "center"
+              }}
             >
               <IconButton
                 color="inherit"

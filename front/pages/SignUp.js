@@ -69,7 +69,6 @@ export default function SignInSide() {
   const classes = useStyles();
 
   /////////Logic //////////
-  /////////Logic //////////
 
   const dispatch = useDispatch();
   const { isSigningUp, me, isSignedUp } = useSelector(state => state.user);
@@ -103,29 +102,31 @@ export default function SignInSide() {
     event.persist();
     if (event.target.name === "term") {
       setTerm(!term);
-      setValues({ ...values, termError: term });
     }
-
     setValues(prevState => {
       return {
         ...prevState,
-        [event.target.name]: event.target.value,
-        // termError: !term,
-        emailError: !validateEmail(email),
-        nicknameError: !nickname,
-        passwordError: !password
+        [event.target.name]: event.target.value
       };
     });
   };
 
   useEffect(() => {
-    setValues(() => {
-      const check = password !== passwordCheck;
-      return { ...values, passwordCheckError: check };
-    });
-  }, [password, passwordCheck]);
+    if (nickname || password || email) {
+      setValues(prevState => {
+        const check = password !== passwordCheck;
+        return {
+          ...prevState,
+          passwordCheckError: check,
+          emailError: !validateEmail(email),
+          nicknameError: !nickname,
+          passwordError: !password,
+          termError: !term
+        };
+      });
+    }
+  }, [nickname, password, passwordCheck, email, term]);
 
-  console.log("values ", values);
   // useEffect(() => {
   //   if (me) {
   //     alert("Now you logged in, moving to the main page.");
@@ -171,8 +172,6 @@ export default function SignInSide() {
   if (me) {
     return null;
   }
-
-  /////////Logic //////////
 
   return (
     <Grid container component="main" className={classes.root}>
