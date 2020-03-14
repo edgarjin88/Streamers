@@ -70,4 +70,3 @@ const RelatedVideos = () => {
 };
 
 export default RelatedVideos;
-

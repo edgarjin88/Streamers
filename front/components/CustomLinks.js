@@ -20,16 +20,10 @@ const StyledLink = styled.a`
   }
 `;
 
-// to have three different styles.
-//no hover,
-//puls + twisting
-//no decoration as well.
 const CustomLink = props => {
   return (
     <Link href={props.href}>
-      <StyledLink>
-        <a>{props.text}</a>
-      </StyledLink>
+      <StyledLink>{props.text}</StyledLink>
     </Link>
   );
 };

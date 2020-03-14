@@ -1,17 +1,19 @@
 import React from "react";
 import Helmet from "react-helmet";
-import Document, { Head, Main, NextScript } from "next/document";
+import Document, { Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 import { ServerStyleSheets as MaterialUiServerStyleSheets } from "@material-ui/core/styles";
 
 class MyDocument extends Document {
   static getInitialProps(context) {
+    console.log("initiall props fired");
     const sheet = new ServerStyleSheet();
     const materialUI = new MaterialUiServerStyleSheets();
     try {
-      const page = context.renderPage(App => props =>
-        sheet.collectStyles(materialUI.collect(<App {...props} />))
-      );
+      const page = context.renderPage(App => props => {
+        console.log("props in document :", props);
+        return sheet.collectStyles(materialUI.collect(<App {...props} />));
+      });
 
       const styleTags = sheet.getStyleElement();
       return { ...page, helmet: Helmet.renderStatic(), styleTags };
