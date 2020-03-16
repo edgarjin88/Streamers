@@ -1,5 +1,5 @@
-import { all, fork, takeLatest, put, throttle, call } from 'redux-saga/effects';
-import axios from 'axios';
+import { all, fork, takeLatest, put, throttle, call } from "redux-saga/effects";
+import axios from "axios";
 import {
   ADD_POST_FAILURE,
   ADD_POST_REQUEST,
@@ -33,67 +33,53 @@ import {
   UNLIKE_POST_SUCCESS,
   UPLOAD_IMAGES_FAILURE,
   UPLOAD_IMAGES_REQUEST,
-  UPLOAD_IMAGES_SUCCESS, LOAD_POST_SUCCESS, LOAD_POST_FAILURE, LOAD_POST_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
+  LOAD_POST_SUCCESS,
+  LOAD_POST_FAILURE,
+  LOAD_POST_REQUEST,
   UPLOAD_PROFILE_REQUEST,
   UPLOAD_PROFILE_FAILURE,
   UPLOAD_PROFILE_SUCCESS,
-  EDIT_POST_REQUEST, 
+  EDIT_POST_REQUEST,
   EDIT_POST_FAILURE,
   EDIT_POST_SUCCESS
-} from '../reducers/post';
+} from "../reducers/post";
 
+import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 
-import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+const https = require("https");
 
-// const path = require('path')
-// const fs = require('fs')
-// var certsPath = path.join(__dirname, 'path', 'to');
-// const https = require('https')
-// const http = require('http')
+const httpsAgent =
+  process.env.NODE_ENV === "production"
+    ? new https.Agent({
+        rejectUnauthorized: false
+        // cert: fs.readFileSync(path.join(__dirname,'sumontee.com.crt')),
+        // key: fs.readFileSync(path.join(__dirname,'sumontee_com_key.txt'))
+      })
+    : undefined;
 
-// const options ={
-//     key: fs.readFileSync(path.join(certsPath, 'sumontee_com_key.txt')),
-   
-//     cert: fs.readFileSync(path.join(certsPath, 'sumontee.com.crt')),
-   
-//     ca: fs.readFileSync(path.join(certsPath, 'sumontee.com.ca-bundle'))
-// }
-
-// const path = require('path')
-// const fs = require('fs')
-const https = require('https')
-// let certsPath = path.join(__dirname, '/');
-
-const httpsAgent = process.env.NODE_ENV === "production" ? new https.Agent({
-  rejectUnauthorized: false,
-  // cert: fs.readFileSync(path.join(__dirname,'sumontee.com.crt')),
-  // key: fs.readFileSync(path.join(__dirname,'sumontee_com_key.txt'))
-  
-}) : undefined
-
-
-function addPostAPI(postData) { //이경우 이게 formdata가 보내주는 정보가 된다. 
-  return axios.post('/post', postData, {
+function addPostAPI(postData) {
+  return axios.post("/post", postData, {
     httpsAgent,
-    withCredentials: true,
+    withCredentials: true
   });
 }
 
 function* addPost(action) {
   try {
     const result = yield call(addPostAPI, action.data);
-    yield put({ 
+    yield put({
       type: ADD_POST_SUCCESS,
-      data: result.data,
+      data: result.data
     });
-    yield put({ 
-      type: ADD_POST_TO_ME,  
-      data: result.data.id,
+    yield put({
+      type: ADD_POST_TO_ME,
+      data: result.data.id
     });
   } catch (e) {
     yield put({
       type: ADD_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -103,59 +89,63 @@ function* watchAddPost() {
 }
 
 function loadMainPostsAPI(lastId = 0, limit = 10) {
-  return axios.get(`/posts?lastId=${lastId}&limit=${limit}`, {httpsAgent, 
-    withCredentials: true});
-  //lastId=0가 들어감에 주의하자. 개시글이 하나도 없는 경우가 있기 때문이다.이경우에는 서버쪽에서는 처음부터 불러온다.  
+  return axios.get(`/posts?lastId=${lastId}&limit=${limit}`, {
+    httpsAgent,
+    withCredentials: true
+  });
+  //lastId=0 as a default value otherwise, sequelize can make an error with the value "undefined"
 }
 
-function* loadMainPosts(action) { 
-
+function* loadMainPosts(action) {
   try {
     const result = yield call(loadMainPostsAPI, action.lastId);
     yield put({
       type: LOAD_MAIN_POSTS_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     yield put({
       type: LOAD_MAIN_POSTS_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
 
 function* watchLoadMainPosts() {
-  yield throttle(2000, LOAD_MAIN_POSTS_REQUEST, loadMainPosts); 
-  
+  yield throttle(2000, LOAD_MAIN_POSTS_REQUEST, loadMainPosts);
 }
 
 function loadHashtagPostsAPI(tag, lastId) {
-  return axios.get(`/hashtag/${encodeURIComponent(tag)}?lastId=${lastId}&limit=10`, {httpsAgent, 
-    withCredentials: true}); 
+  return axios.get(
+    `/hashtag/${encodeURIComponent(tag)}?lastId=${lastId}&limit=10`,
+    { httpsAgent, withCredentials: true }
+  );
 }
 
 function* loadHashtagPosts(action) {
   try {
     const result = yield call(loadHashtagPostsAPI, action.data, action.lastId);
     yield put({
-      type: LOAD_HASHTAG_POSTS_SUCCESS, 
-      data: result.data,
+      type: LOAD_HASHTAG_POSTS_SUCCESS,
+      data: result.data
     });
   } catch (e) {
     yield put({
       type: LOAD_HASHTAG_POSTS_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
 
 function* watchLoadHashtagPosts() {
-  yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts); 
+  yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
 }
 
-function loadUserPostsAPI(id) { 
-  return axios.get(`/user/${id || 0}/posts`, {httpsAgent, 
-    withCredentials: true}); 
+function loadUserPostsAPI(id) {
+  return axios.get(`/user/${id || 0}/posts`, {
+    httpsAgent,
+    withCredentials: true
+  });
 }
 
 function* loadUserPosts(action) {
@@ -163,12 +153,12 @@ function* loadUserPosts(action) {
     const result = yield call(loadUserPostsAPI, action.data);
     yield put({
       type: LOAD_USER_POSTS_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     yield put({
       type: LOAD_USER_POSTS_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -178,10 +168,14 @@ function* watchLoadUserPosts() {
 }
 
 function addCommentAPI(data) {
-  return axios.post(`/post/${data.postId}/comment`, { content: data.content}, {
-    withCredentials: true,
-    httpsAgent
-  });
+  return axios.post(
+    `/post/${data.postId}/comment`,
+    { content: data.content },
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
 }
 
 function* addComment(action) {
@@ -191,14 +185,14 @@ function* addComment(action) {
       type: ADD_COMMENT_SUCCESS,
       data: {
         postId: action.data.postId,
-        comment: result.data,
-      },
+        comment: result.data
+      }
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: ADD_COMMENT_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -208,24 +202,27 @@ function* watchAddComment() {
 }
 
 function loadCommentsAPI(postId) {
-  return axios.get(`/post/${postId}/comments`, {httpsAgent, withCredentials: true});
+  return axios.get(`/post/${postId}/comments`, {
+    httpsAgent,
+    withCredentials: true
+  });
 }
 
-function* loadComments(action) { 
+function* loadComments(action) {
   try {
     const result = yield call(loadCommentsAPI, action.data);
     yield put({
       type: LOAD_COMMENTS_SUCCESS,
       data: {
         postId: action.data,
-        comments: result.data,
-      },
+        comments: result.data
+      }
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_COMMENTS_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -235,7 +232,7 @@ function* watchLoadComments() {
 }
 
 function uploadImagesAPI(formData) {
-  return axios.post('/post/images', formData, {
+  return axios.post("/post/images", formData, {
     withCredentials: true,
     httpsAgent
   });
@@ -246,13 +243,13 @@ function* uploadImages(action) {
     const result = yield call(uploadImagesAPI, action.data);
     yield put({
       type: UPLOAD_IMAGES_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UPLOAD_IMAGES_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -261,9 +258,8 @@ function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
 
-
 function uploadProfileImagesAPI(formData) {
-  return axios.post('/post/profile', formData, {
+  return axios.post("/post/profile", formData, {
     withCredentials: true,
     httpsAgent
   });
@@ -274,13 +270,13 @@ function* uploadProfileImages(action) {
     const result = yield call(uploadProfileImagesAPI, action.data);
     yield put({
       type: UPLOAD_PROFILE_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UPLOAD_PROFILE_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -289,13 +285,15 @@ function* watchUploadProfileImages() {
   yield takeLatest(UPLOAD_PROFILE_REQUEST, uploadProfileImages);
 }
 
-
-
 function likePostAPI(postId) {
-  return axios.post(`/post/${postId}/like`, {}, {   
-    withCredentials: true,
-    httpsAgent
-  });
+  return axios.post(
+    `/post/${postId}/like`,
+    {},
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
 }
 
 function* likePost(action) {
@@ -305,14 +303,14 @@ function* likePost(action) {
       type: LIKE_POST_SUCCESS,
       data: {
         postId: action.data,
-        userId: result.data.userId,
-      },
+        userId: result.data.userId
+      }
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LIKE_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -322,7 +320,7 @@ function* watchLikePost() {
 }
 
 function unlikePostAPI(postId) {
-  return axios.delete(`/post/${postId}/like`, { // delete  에 주의
+  return axios.delete(`/post/${postId}/like`, {
     withCredentials: true,
     httpsAgent
   });
@@ -335,14 +333,14 @@ function* unlikePost(action) {
       type: UNLIKE_POST_SUCCESS,
       data: {
         postId: action.data,
-        userId: result.data.userId,
-      },
+        userId: result.data.userId
+      }
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UNLIKE_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -352,10 +350,14 @@ function* watchUnlikePost() {
 }
 
 function retweetAPI(postId) {
-  return axios.post(`/post/${postId}/retweet`, {}, {
-    withCredentials: true,
-    httpsAgent
-  });
+  return axios.post(
+    `/post/${postId}/retweet`,
+    {},
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
 }
 
 function* retweet(action) {
@@ -363,13 +365,13 @@ function* retweet(action) {
     const result = yield call(retweetAPI, action.data);
     yield put({
       type: RETWEET_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: RETWEET_FAILURE,
-      error: e,
+      error: e
     });
     alert(e.response && e.response.data);
   }
@@ -380,7 +382,8 @@ function* watchRetweet() {
 }
 
 function removePostAPI(postId) {
-  return axios.delete(`/post/${postId}`, { // delete!
+  return axios.delete(`/post/${postId}`, {
+    // delete!
     withCredentials: true,
     httpsAgent
   });
@@ -391,17 +394,17 @@ function* removePost(action) {
     const result = yield call(removePostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: result.data,
+      data: result.data
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: REMOVE_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -410,13 +413,15 @@ function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
 
-
-
 function editPostAPI(postId, content) {
-  return axios.patch(`/post/${postId}`,{content}, {
-    withCredentials: true,
-    httpsAgent
-  });
+  return axios.patch(
+    `/post/${postId}`,
+    { content },
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
 }
 
 function* editPost(action) {
@@ -431,7 +436,7 @@ function* editPost(action) {
     console.error(e);
     yield put({
       type: EDIT_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -440,13 +445,8 @@ function* watchEditPost() {
   yield takeLatest(EDIT_POST_REQUEST, editPost);
 }
 
-
-
-
-
-
 function loadPostAPI(postId) {
-  return axios.get(`/post/${postId}`, {httpsAgent, withCredentials: true});
+  return axios.get(`/post/${postId}`, { httpsAgent, withCredentials: true });
 }
 
 function* loadPost(action) {
@@ -454,13 +454,13 @@ function* loadPost(action) {
     const result = yield call(loadPostAPI, action.data);
     yield put({
       type: LOAD_POST_SUCCESS,
-      data: result.data,
+      data: result.data
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_POST_FAILURE,
-      error: e,
+      error: e
     });
   }
 }
@@ -484,6 +484,6 @@ export default function* postSaga() {
     fork(watchRetweet),
     fork(watchRemovePost),
     fork(watchEditPost),
-    fork(watchLoadPost),
+    fork(watchLoadPost)
   ]);
 }

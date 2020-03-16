@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
     width: "80%"
   },
   title: {
-    marginLeft: "20px",
+    // marginLeft: "20px",
     flexGrow: 0.8,
     justifySelf: "flex-start",
     display: "none",

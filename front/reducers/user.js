@@ -124,7 +124,6 @@ export default (state = initialState, action) => {
       }
       case FOLLOW_USER_SUCCESS: {
         draft.me.Followings.unshift({ id: action.data });
-        //me 정보 안에 내가 팔로잉하는 사람들. unshift를 해도 되나?
         break;
       }
       case FOLLOW_USER_FAILURE: {
@@ -153,7 +152,7 @@ export default (state = initialState, action) => {
         break;
       }
       case LOAD_FOLLOWERS_REQUEST: {
-        draft.followerList = !action.offset ? [] : draft.followerList; //decide readmore
+        draft.followerList = !action.offset ? [] : draft.followerList; //decide readmore //0 == undefined
         draft.hasMoreFollower = action.offset ? draft.hasMoreFollower : true;
         break;
       }
@@ -168,8 +167,7 @@ export default (state = initialState, action) => {
         break;
       }
       case LOAD_FOLLOWINGS_REQUEST: {
-        //load가 있다는 점! 삼단으로 간다는점!
-        draft.followingList = !action.offset ? [] : draft.followingList; // 이부분이 state에 추가된다.
+        draft.followingList = !action.offset ? [] : draft.followingList;
         draft.hasMoreFollowing = action.offset ? draft.hasMoreFollowing : true;
         break;
       }

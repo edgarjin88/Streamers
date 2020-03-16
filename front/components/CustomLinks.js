@@ -20,6 +20,7 @@ const StyledLink = styled.a`
   }
 `;
 
+//props, dynamic color change
 const CustomLink = props => {
   return (
     <Link href={props.href}>

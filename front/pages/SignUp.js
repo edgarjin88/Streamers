@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Router from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { SIGN_UP_REQUEST } from "../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
@@ -12,66 +13,20 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import styled from "styled-components";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.min.css";
+
+import { SignUpError, useStyles } from "../styles/SigniningStyle";
+// to be moved to styling folder later.
 
 import Link from "../components/CustomLinks";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link href="/" text="Streamers.com" /> {new Date().getFullYear()}
-    </Typography>
-  );
-}
-
-const SignUpError = styled.div`
-  color: red;
-`;
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: "100vh"
-  },
-  image: {
-    backgroundImage: "url(https://source.unsplash.com/random)",
-    backgroundRepeat: "no-repeat",
-    backgroundColor:
-      theme.palette.type === "dark"
-        ? theme.palette.grey[900]
-        : theme.palette.grey[50],
-    backgroundSize: "cover",
-    backgroundPosition: "center"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main
-  },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1)
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2)
-  }
-}));
+import Copyright from "../components/Copyright";
+import { validateEmail } from "../helpers/loginHelpers";
 
 export default function SignInSide() {
+  //  render part can be a separate component.
   const classes = useStyles();
-
   /////////Logic //////////
-
   const dispatch = useDispatch();
-  const { isSigningUp, me, isSignedUp } = useSelector(state => state.user);
+  const { isSigningUp, isSignedUp } = useSelector(state => state.user);
 
   const [values, setValues] = useState({
     email: "",
@@ -127,23 +82,12 @@ export default function SignInSide() {
     }
   }, [nickname, password, passwordCheck, email, term]);
 
-  // useEffect(() => {
-  //   if (me) {
-  //     alert("Now you logged in, moving to the main page.");
-  //     Router.push("/");
-  //   }
-  // }, [me && me.id]);
-
-  // useEffect(() => {
-  //   if (isSignedUp) {
-  //     alert("You are signed up :). Please log in");
-  //     Router.push("/");
-  //   }
-  // }, [isSignedUp]);
-  const validateEmail = email => {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
+  useEffect(() => {
+    if (isSignedUp) {
+      alert("You are signed up :). Please log in");
+      Router.push("/signin");
+    }
+  }, [isSignedUp]);
 
   const onSubmit = e => {
     e.preventDefault();
@@ -168,10 +112,6 @@ export default function SignInSide() {
       });
     }
   };
-
-  if (me) {
-    return null;
-  }
 
   return (
     <Grid container component="main" className={classes.root}>
