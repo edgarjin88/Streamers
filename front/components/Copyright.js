@@ -1,7 +1,7 @@
 import Typography from "@material-ui/core/Typography";
 import Link from "./CustomLinks";
-
-const Copyright = () => {
+import { memo } from "react";
+const Copyright = memo(function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
@@ -10,5 +10,5 @@ const Copyright = () => {
       {"."}
     </Typography>
   );
-};
+});
 export default Copyright;

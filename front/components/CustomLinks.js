@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 
@@ -21,12 +22,12 @@ const StyledLink = styled.a`
 `;
 
 //props, dynamic color change
-const CustomLink = props => {
+const CustomLink = memo(function CustomLink(props) {
   return (
     <Link href={props.href}>
       <StyledLink>{props.text}</StyledLink>
     </Link>
   );
-};
+});
 
 export default CustomLink;
