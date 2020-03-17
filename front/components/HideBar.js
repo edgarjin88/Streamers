@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -36,6 +36,7 @@ import MessageIcon from "@material-ui/icons/Forum";
 import LogOut from "@material-ui/icons/ExitToApp";
 import SettingsIcon from "@material-ui/icons/Settings";
 import PolicyIcon from "@material-ui/icons/Policy";
+import { Backdrop } from "@material-ui/core";
 
 import Link from "next/link";
 
@@ -182,17 +183,20 @@ const useStyles = makeStyles(theme => ({
 export default function HideAppBar(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [backDrop, setBackDrop] = useState(false);
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const handleDrawerOpen = () => {
     setOpen(true);
+    setBackDrop(true);
   };
 
   const handleDrawerClose = () => {
     setOpen(false);
+    setBackDrop(false);
   };
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -273,6 +277,11 @@ export default function HideAppBar(props) {
     <React.Fragment>
       <div className={classes.root}>
         <CssBaseline />
+        <Backdrop
+          style={{ backgroundColor: "rgba(19, 19, 20, 0.72)", zIndex: 200 }}
+          open={backDrop}
+        />
+
         <HideOnScroll {...props}>
           {/* <AppBar color="inherit"> */}
           <AppBar
@@ -364,7 +373,6 @@ export default function HideAppBar(props) {
             </Toolbar>
           </AppBar>
         </HideOnScroll>
-
         <Drawer
           className={classes.drawer}
           variant="persistent"

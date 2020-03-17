@@ -7,7 +7,8 @@ const Index = () => {
   return (
     <div className="container">
       <IndexGlobalStyle />
-      <HideBar />
+      <HideBar style={{ zIndex: 3000 }} />
+
       <main>
         <RelatedVideos />
       </main>

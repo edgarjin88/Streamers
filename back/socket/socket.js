@@ -1,23 +1,20 @@
 module.exports = io => {
   io.on("connection", function(socket) {
-    socket.on("NewClient", function() {
-      if (clients < 2) {
-        //check the client number
-        if (clients == 1) {
-          this.emit("CreatePeer"); // 이경우 CreatePee를 송출한다.
-          //이거 받아서  MakePeer를 만든다. 처음 들어온 사람에게 적용.
-        }
-      } else this.emit("SessionActive"); //두명이면 session active
-      clients++; //client nubmer to be increased  //이거는 셋을 해놔야 할듯.
-    });
+    // socket.on("NewClient", function() {
+    //   if (clients < 2) {
+    //     //check the client number
+    //     if (clients == 1) {
+    //       this.emit("CreatePeer"); //
+    //     }
+    //   } else this.emit("SessionActive"); // session active
+    //   clients++; //client nubmer to be increased  //
+    // });
 
     socket.on("messageToServer", msg => {
-      // console.log('msg from client', msg);
       socket.to(msg.room).emit("messageFromServer", msg);
     });
 
     socket.on("ready", function(req) {
-      // console.log('this is req', req);
       socket.join(req.chat_room); //will be postId
       socket.join(req.signal_room);
       console.log("shake socketid", socket.id);

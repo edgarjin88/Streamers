@@ -1,13 +1,11 @@
 import Typography from "@material-ui/core/Typography";
-import Link from "../components/CustomLinks";
+import Link from "./CustomLinks";
 
 const Copyright = () => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="#">
-        Streamers.com
-      </Link>{" "}
+      <Link color="inherit" href="#" text="Streamers.com"></Link>{" "}
       {new Date().getFullYear()}
       {"."}
     </Typography>

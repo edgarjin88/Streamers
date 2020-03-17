@@ -14,7 +14,6 @@ const passportConfig = require("./passport");
 const db = require("./models");
 const userAPIRouter = require("./routes/user");
 const postAPIRouter = require("./routes/post");
-const roomAPIRouter = require("./routes/room");
 const postsAPIRouter = require("./routes/posts");
 const hashtagAPIRouter = require("./routes/hashtag");
 
@@ -26,15 +25,20 @@ var certsPath = path.join(__dirname, "path", "to");
 const options =
   process.env.NODE_ENV === "production"
     ? {
-        key: fs.readFileSync(path.join(certsPath, "api_siteName_com_key.txt")),
+        key: fs.readFileSync(
+          path.join(certsPath, "api_websiteName_com_key.txt")
+        ),
 
-        cert: fs.readFileSync(path.join(certsPath, "api.siteName.com.crt")),
+        cert: fs.readFileSync(path.join(certsPath, "api.websiteName.com.crt")),
 
-        ca: fs.readFileSync(path.join(certsPath, "api.siteName.com.ca-bundle"))
+        ca: fs.readFileSync(
+          path.join(certsPath, "api.websiteName.com.ca-bundle")
+        )
       }
     : null;
 
 dotenv.config();
+//////////////////////For socket IO
 const app = express();
 
 const server =
@@ -73,10 +77,6 @@ if (prod) {
   );
 }
 
-app.get("/", (req, res) => {
-  res.send("test server working");
-});
-
 app.use("/", express.static("uploads")); //static file directory setting
 
 app.use(express.json());
@@ -90,9 +90,9 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? false : false,
-      domain: prod && ".siteName.com" // without '.'  api.sumotee won't work. For subdomain as well.
+      domain: prod && ".websiteName.com" // without '.'  api.sumotee won't work. For subdomain as well.
     },
-    name: "siteName" //cookie name to change. Name of cookie from browser
+    name: "websiteName" //cookie name to change. Name of cookie from browser
   })
 );
 app.use(passport.initialize()); //I will be initialized everytime. In real product, to be cached.
@@ -102,7 +102,6 @@ app.use(passport.session());
 app.use("/api/user", userAPIRouter);
 app.use("/api/post", postAPIRouter);
 app.use("/api/posts", postsAPIRouter);
-app.use("/api/room", roomAPIRouter);
 app.use("/api/hashtag", hashtagAPIRouter);
 
 server.listen(prod ? 443 : PORT, () =>
