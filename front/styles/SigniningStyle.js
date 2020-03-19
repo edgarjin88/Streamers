@@ -6,7 +6,8 @@ export const SignUpError = styled.div`
 
 export const useStyles = makeStyles(theme => ({
   root: {
-    height: "100vh"
+    height: "100vh",
+    overflow: "hidden"
   },
   image: {
     backgroundImage: "url(https://source.unsplash.com/random)",

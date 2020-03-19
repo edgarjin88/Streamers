@@ -130,7 +130,8 @@ export const MemoTerm = memo(function MemoTerm({
 export const MemoSubmit = memo(function MemoSubmit({
   onSubmit,
   className,
-  isSigningUp
+  isSigningUp,
+  text
 }) {
   return (
     <>
@@ -149,7 +150,7 @@ export const MemoSubmit = memo(function MemoSubmit({
             style={{ marginRight: "20px" }}
           />
         )}
-        Sign Up
+        {text}
       </Button>
     </>
   );

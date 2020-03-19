@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-
 import Slide from "@material-ui/core/Slide";
 
-import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
@@ -19,7 +20,6 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
-
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
@@ -39,7 +39,12 @@ import PolicyIcon from "@material-ui/icons/Policy";
 import { Backdrop } from "@material-ui/core";
 
 import Link from "next/link";
+import { useStyles } from "../styles/HideBarStyle";
 
+//actions
+import { LOG_OUT_REQUEST } from "../reducers/user";
+
+///////// stylings to be seperated
 const HideOnScroll = props => {
   const { children, window } = props;
   const trigger = useScrollTrigger({ target: window ? window() : undefined });
@@ -50,137 +55,20 @@ const HideOnScroll = props => {
   );
 };
 
-const drawerWidth = 240;
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-    flexGrow: 1
-    // width: "300px"
-  },
-  toolBar: {
-    display: "flex",
-    justifyContent: "center",
-    width: "80%"
-  },
-  title: {
-    // marginLeft: "20px",
-    flexGrow: 0.8,
-    justifySelf: "flex-start",
-    display: "none",
-    [theme.breakpoints.up("sm")]: {
-      display: "block"
-    }
-  },
-  search: {
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    justifyContent: "flex-end",
-    backgroundColor: fade(theme.palette.common.white, 0.15),
-    "&:hover": {
-      backgroundColor: fade(theme.palette.common.white, 0.25)
-    },
-
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(3),
-      width: "auto"
-    }
-  },
-  searchIcon: {
-    width: theme.spacing(7),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  inputRoot: {
-    color: "inherit",
-    backgroundColor: "inherit"
-  },
-  inputInput: {
-    display: "flex",
-    padding: theme.spacing(1, 1, 1, 7),
-
-    transition: theme.transitions.create("width"),
-    width: "80%",
-    [theme.breakpoints.up("sm")]: {
-      width: 120,
-      "&:focus": {
-        width: 200
-      }
-    }
-  },
-
-  appBar: {
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
-  menuButton: {
-    marginRight: theme.spacing(2)
-    // size: "large"
-  },
-  hide: {
-    display: "none"
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0
-  },
-  drawerPaper: {
-    width: drawerWidth
-  },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-end"
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    marginLeft: -drawerWidth
-  },
-  contentShift: {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    }),
-    marginLeft: 0
-  },
-
-  ///icons
-  sectionDesktop: {
-    display: "none",
-    [theme.breakpoints.up("md")]: {
-      display: "flex"
-    }
-  },
-  sectionMobile: {
-    display: "flex",
-    [theme.breakpoints.up("md")]: {
-      display: "none"
-    }
-  }
-}));
+///////// stylings to be seperated
+///////// stylings to be seperated
 
 export default function HideAppBar(props) {
+  const { me } = useSelector(state => state.user);
+  const { profilePhoto } = useSelector(state => state.post);
+
+  const dispatch = useDispatch();
+  const onLogout = useCallback(() => {
+    dispatch({
+      type: LOG_OUT_REQUEST
+    });
+  }, []);
+
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -419,7 +307,9 @@ export default function HideAppBar(props) {
               (text, index) => (
                 <ListItem button key={text}>
                   <ListItemIcon>
-                    {(text === "Log out" && <LogOut fontSize="large" />) ||
+                    {(text === "Log out" && (
+                      <LogOut onClick={onLogout} fontSize="large" />
+                    )) ||
                       (text === "Settings" && (
                         <SettingsIcon fontSize="large" />
                       )) ||

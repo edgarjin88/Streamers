@@ -8,8 +8,8 @@ import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
 
+import Typography from "@material-ui/core/Typography";
 import Toaster from "../components/Toaster";
 import { useStyles } from "../styles/SigniningStyle";
 // to be moved to styling folder later.
@@ -91,23 +91,22 @@ export default function SignInSide() {
 
   useEffect(() => {
     if (isSignedUp) {
-      // alert("You are signed up :). Please sign in now");
       setTimeout(() => {
         Router.push("/signin");
       }, 2000);
     }
   }, [isSignedUp]);
 
-  const onSubmit = useCallback(e => {
+  const onSubmit = e => {
     e.preventDefault();
-
     if (
       !termError &&
       !passwordError &&
-      passwordCheckError &&
+      !passwordCheckError &&
       email &&
       nickname
     ) {
+      console.log("onsubmit fired");
       console.log("dispatch fired");
       return dispatch({
         type: SIGN_UP_REQUEST,
@@ -128,7 +127,7 @@ export default function SignInSide() {
         passwordError: !password
       };
     });
-  }, []);
+  };
 
   const handleMemoEmail = useCallback(
     e => {
@@ -174,7 +173,7 @@ export default function SignInSide() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign Up
           </Typography>
           <form className={classes.form} noValidate>
             <MemoEmail
@@ -213,6 +212,7 @@ export default function SignInSide() {
             />
             <MemoSubmit
               onSubmit={onSubmit}
+              text="Sign Up"
               className={classes.submit}
               isSigningUp={isSigningUp}
             />
