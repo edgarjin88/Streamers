@@ -44,6 +44,9 @@ import { useStyles } from "../styles/HideBarStyle";
 //actions
 import { LOG_OUT_REQUEST } from "../reducers/user";
 
+import { Drawers } from "./SubHideBarComponents";
+import { OPEN_DRAWER, CLOSE_DRAWER } from "../reducers/menu";
+
 ///////// stylings to be seperated
 const HideOnScroll = props => {
   const { children, window } = props;
@@ -59,33 +62,28 @@ const HideOnScroll = props => {
 ///////// stylings to be seperated
 
 export default function HideAppBar(props) {
+  const theme = useTheme();
+
   const { me } = useSelector(state => state.user);
   const { profilePhoto } = useSelector(state => state.post);
 
   const dispatch = useDispatch();
-  const onLogout = useCallback(() => {
-    dispatch({
-      type: LOG_OUT_REQUEST
-    });
-  }, []);
 
+  // OPEN_DRAWER;
+
+  const handleDrawerOpen = () => {
+    dispatch({
+      type: OPEN_DRAWER
+    });
+  };
   const classes = useStyles();
-  const theme = useTheme();
+
   const [open, setOpen] = useState(false);
   const [backDrop, setBackDrop] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-    setBackDrop(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-    setBackDrop(false);
-  };
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -261,7 +259,9 @@ export default function HideAppBar(props) {
             </Toolbar>
           </AppBar>
         </HideOnScroll>
-        <Drawer
+        <Drawers theme={theme} classes={classes} />
+
+        {/* <Drawer
           className={classes.drawer}
           variant="persistent"
           anchor="left"
@@ -269,63 +269,8 @@ export default function HideAppBar(props) {
           classes={{
             paper: classes.drawerPaper
           }}
-        >
-          <div className={classes.drawerHeader}>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === "ltr" ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            {["My Profile", "My Video", "Messages", "Drafts"].map(
-              (text, index) => (
-                <ListItem button key={text}>
-                  <ListItemIcon>
-                    {(text === "My Profile" && (
-                      <AccountCircleIcon fontSize="large" />
-                    )) ||
-                      (text === "My Video" && <MyVideo fontSize="large" />) ||
-                      (text === "Messages" && (
-                        <MessageIcon fontSize="large" />
-                      )) ||
-                      (text === "Drafts" && <MyVideo fontSize="large" />)}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="h6">{text}</Typography>}
-                  />
-                </ListItem>
-              )
-            )}
-          </List>
-          <Divider />
-          <List>
-            {["Log out", "Settings", "Privacy and Policies"].map(
-              (text, index) => (
-                <ListItem button key={text}>
-                  <ListItemIcon>
-                    {(text === "Log out" && (
-                      <LogOut onClick={onLogout} fontSize="large" />
-                    )) ||
-                      (text === "Settings" && (
-                        <SettingsIcon fontSize="large" />
-                      )) ||
-                      (text === "Privacy and Policies" && (
-                        <PolicyIcon fontSize="large" />
-                      )) ||
-                      (text === "Drafts" && <MyVideo fontSize="large" />)}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="h6">{text}</Typography>}
-                  />
-                </ListItem>
-              )
-            )}
-          </List>
-        </Drawer>
+        ></Drawer> */}
+
         {renderMobileMenu}
         {renderMenu}
       </div>

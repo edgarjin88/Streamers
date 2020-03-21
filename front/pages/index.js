@@ -1,6 +1,6 @@
 import { IndexGlobalStyle } from "../styles/indexStyle";
 
-import HideBar from "../components/HideBar";
+import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 
 const Index = () => {

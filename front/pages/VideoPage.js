@@ -1,5 +1,5 @@
 import { GlobalStyleOne } from "../styles/styles";
-import HideBar from "../components/HideBar";
+import HideBar from "../containers/HideBar";
 import VideoDetails from "../components/VideoDetails";
 import RelatedVideos from "../components/RelatedVideos";
 import VideoComments from "../components/VideoComments";
