@@ -1,6 +1,6 @@
 import React, { useEffect, useState, memo, useCallback } from "react";
 import Router from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import { SIGN_UP_REQUEST } from "../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,7 +11,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
 import Toaster from "../components/Toaster";
-import { useStyles } from "../styles/SigniningStyle";
+import { useStyles, SignUpError } from "../styles/SigniningStyle";
 // to be moved to styling folder later.
 
 import Link from "../components/CustomLinks";
@@ -23,72 +23,22 @@ import {
   MemoPassword,
   MemoPasswordCheck,
   MemoTerm,
-  MemoSubmit
-} from "../components/MemoForSign";
+  MemoSignUp
+} from "../containers/MemoForSign";
 
 export default function SignInSide() {
-  //make sure only accessible when not logged in
   //make sure only accessible when not logged in
 
   const classes = useStyles();
   /////////Logic //////////
-  const dispatch = useDispatch();
-  const { isSigningUp, isSignedUp } = useSelector(state => state.user);
 
-  const [values, setValues] = useState({
-    email: "",
-    emailError: false,
-    nickname: "",
-    nicknameError: false,
-    password: "",
-    passwordError: false,
-    termError: false,
-    passwordCheck: "",
-    passwordCheckError: false
-  });
-
-  const {
-    nickname,
-    nicknameError,
-    email,
-    emailError,
-    password,
-    passwordError,
-    passwordCheck,
-    passwordCheckError,
-    termError
-  } = values;
-  const [term, setTerm] = useState(false);
-
-  const handleChange = event => {
-    event.persist();
-    if (event.target.name === "term") {
-      setTerm(!term);
-    }
-    setValues(prevState => {
-      return {
-        ...prevState,
-        [event.target.name]: event.target.value
-      };
-    });
-  };
-
-  useEffect(() => {
-    if (nickname || password || email) {
-      setValues(prevState => {
-        const check = password !== passwordCheck;
-        return {
-          ...prevState,
-          passwordCheckError: check,
-          emailError: !validateEmail(email),
-          nicknameError: !nickname,
-          passwordError: !password,
-          termError: !term
-        };
-      });
-    }
-  }, [nickname, password, passwordCheck, email, term]);
-
+  const { isSignedUp, signUpErrorReason } = useSelector(({ user }) => {
+    // console.log("signup error reason: ", signUpErrorReason);
+    return {
+      isSignedUp: user.isSignedUp,
+      signUpErrorReason: user.signUpErrorReason
+    };
+  }, shallowEqual);
   useEffect(() => {
     if (isSignedUp) {
       setTimeout(() => {
@@ -96,71 +46,6 @@ export default function SignInSide() {
       }, 2000);
     }
   }, [isSignedUp]);
-
-  const onSubmit = e => {
-    e.preventDefault();
-    if (
-      !termError &&
-      !passwordError &&
-      !passwordCheckError &&
-      email &&
-      nickname
-    ) {
-      console.log("onsubmit fired");
-      console.log("dispatch fired");
-      return dispatch({
-        type: SIGN_UP_REQUEST,
-        data: {
-          userId: email,
-          password,
-          nickname
-        }
-      });
-    }
-
-    setValues(() => {
-      return {
-        ...values,
-        termError: !term,
-        emailError: !validateEmail(email),
-        nicknameError: !nickname,
-        passwordError: !password
-      };
-    });
-  };
-
-  const handleMemoEmail = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [email]
-  );
-
-  const handleMemoNickname = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [nickname]
-  );
-  const handleMemoPassword = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [password]
-  );
-
-  const handleMemoPasswordCheck = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [passwordCheck]
-  );
-  const handleMemoTerm = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [term]
-  );
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -176,28 +61,13 @@ export default function SignInSide() {
             Sign Up
           </Typography>
           <form className={classes.form} noValidate>
-            <MemoEmail
-              emailError={emailError}
-              handleChange={handleMemoEmail}
-              email={email}
-            />
-            <MemoNickname
-              handleChange={handleMemoNickname}
-              nickname={nickname}
-              nicknameError={nicknameError}
-            />
-            <MemoPassword
-              password={password}
-              handleChange={handleMemoPassword}
-              passwordError={passwordError}
-            />
+            <MemoEmail />
+            <MemoNickname />
+            <MemoPassword />
 
-            <MemoPasswordCheck
-              handleChange={handleMemoPasswordCheck}
-              passwordCheck={passwordCheck}
-              passwordCheckError={passwordCheckError}
-            />
+            <MemoPasswordCheck />
 
+            <MemoTerm />
             {isSignedUp && (
               <Toaster
                 message="You are signed up :). Please sign in now! "
@@ -205,17 +75,16 @@ export default function SignInSide() {
                 whereTo="/signin"
               />
             )}
-            <MemoTerm
-              handleChange={handleMemoTerm}
-              term={term}
-              termError={termError}
-            />
-            <MemoSubmit
-              onSubmit={onSubmit}
-              text="Sign Up"
-              className={classes.submit}
-              isSigningUp={isSigningUp}
-            />
+
+            {signUpErrorReason && (
+              <Toaster
+                message={signUpErrorReason}
+                type="error"
+                whereTo={false}
+              />
+            )}
+
+            <MemoSignUp className={classes.submit} />
 
             <Grid container>
               <Grid item>

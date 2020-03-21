@@ -28,38 +28,32 @@ export const SET_TERM_ERROR = "SET_TERM_ERROR";
 // export const OPEN_BACKDROP = "OPEN_BACKDROP";
 // export const CLOSE_BACKDROP = "CLOSE_BACKDROP";
 
-// export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
-// export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
-
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
       case SET_NICKNAME: {
-        draft.nickname = action.payload;
-        draft.nicknameError = !!!action.payload;
+        draft.nickname = action.data;
+        draft.nicknameError = !!!action.data;
         break;
       }
-      // case SET_NICKNAME_ERROR: {
-      //   draft.nicknameError = action.nicknameError;
-      //   break;
-      // }
+
       case SET_EMAIL: {
-        draft.email = action.payload;
-        draft.emailError = !validateEmail(action.payload);
+        draft.email = action.data;
+        draft.emailError = !validateEmail(action.data);
         break;
       }
       case SET_PASSWORD: {
-        draft.password = action.payload;
-        draft.passwordError = !!!action.payload;
+        draft.password = action.data;
+        draft.passwordError = !!!action.data;
         break;
       }
       case SET_PASSWORD_CHECK: {
-        draft.passwordCheck = action.payload;
+        draft.passwordCheck = action.data;
         draft.passwordCheckError = draft.password !== draft.passwordCheck;
         break;
       }
       case SET_TERM: {
-        draft.term = action.payload;
+        draft.term = action.data;
         draft.termError = !draft.term;
         break;
       }

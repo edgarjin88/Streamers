@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
+
 import { LOG_IN_REQUEST } from "../reducers/user";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -17,8 +18,8 @@ import { useStyles } from "../styles/SigniningStyle";
 
 import Link from "../components/CustomLinks";
 import Copyright from "../components/Copyright";
-import { validateEmail } from "../helpers/loginHelpers";
-import { MemoEmail, MemoPassword, MemoSubmit } from "../components/MemoForSign";
+
+import { MemoEmail, MemoPassword, MemoSignIn } from "../containers/MemoForSign";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -26,43 +27,8 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
-  const { isLoggingIn, me, logInErrorReason } = useSelector(
-    state => state.user
-  );
-  const dispatch = useDispatch();
-
-  const [values, setValues] = useState({
-    email: "",
-    emailError: false,
-    nicknameError: false,
-    password: "",
-    passwordError: false
-  });
-
-  const { email, emailError, password, passwordError } = values;
-
-  const handleChange = event => {
-    event.persist();
-
-    setValues(prevState => {
-      return {
-        ...prevState,
-        [event.target.name]: event.target.value
-      };
-    });
-  };
-
-  useEffect(() => {
-    if (password || email) {
-      setValues(prevState => {
-        return {
-          ...prevState,
-          emailError: !validateEmail(email),
-          passwordError: !password
-        };
-      });
-    }
-  }, [password, email]);
+  const { me, logInErrorReason } = useSelector(state => state.user);
+  //No shallow comparison required here.
 
   useEffect(() => {
     if (me) {
@@ -71,43 +37,6 @@ export default function SignInSide() {
       }, 2000);
     }
   }, [me]);
-
-  const onSubmit = e => {
-    e.preventDefault();
-
-    if (!passwordError && !emailError) {
-      console.log("onsubmit fired");
-      return dispatch({
-        type: LOG_IN_REQUEST,
-        data: {
-          userId: email,
-          password
-        }
-      });
-    }
-
-    setValues(() => {
-      return {
-        ...values,
-        emailError: !validateEmail(email),
-        passwordError: !password
-      };
-    });
-  };
-
-  const handleMemoEmail = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [email]
-  );
-
-  const handleMemoPassword = useCallback(
-    e => {
-      handleChange(e);
-    },
-    [password]
-  );
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -123,17 +52,9 @@ export default function SignInSide() {
             Sign In
           </Typography>
           <form className={classes.form} noValidate>
-            <MemoEmail
-              emailError={emailError}
-              handleChange={handleMemoEmail}
-              email={email}
-            />
+            <MemoEmail />
 
-            <MemoPassword
-              password={password}
-              handleChange={handleMemoPassword}
-              passwordError={passwordError}
-            />
+            <MemoPassword />
 
             {me && (
               <Toaster message="Login Success!" type="success" whereTo="/" />
@@ -147,12 +68,7 @@ export default function SignInSide() {
               />
             )}
 
-            <MemoSubmit
-              onSubmit={onSubmit}
-              text="Sign In"
-              className={classes.submit}
-              isSigningUp={isLoggingIn}
-            />
+            <MemoSignIn className={classes.submit} />
 
             <Grid container>
               <Grid item xs>

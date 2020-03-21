@@ -1,7 +1,8 @@
-import React, { useEffect, useState, memo, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { SIGN_UP_REQUEST } from "../reducers/user";
+import { LOG_IN_REQUEST } from "../reducers/user";
+
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
@@ -17,14 +18,7 @@ import { useStyles } from "../styles/SigniningStyle";
 import Link from "../components/CustomLinks";
 import Copyright from "../components/Copyright";
 import { validateEmail } from "../helpers/loginHelpers";
-import {
-  MemoEmail,
-  MemoNickname,
-  MemoPassword,
-  MemoPasswordCheck,
-  MemoTerm,
-  MemoSubmit
-} from "../containers/MemoForSign";
+import { MemoEmail, MemoPassword, MemoSubmit } from "../components/MemoForSign";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -32,34 +26,62 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
+  const { isLoggingIn, me, logInErrorReason } = useSelector(
+    state => state.user
+  );
   const dispatch = useDispatch();
-  const { isSigningUp, isSignedUp } = useSelector(state => state.user);
+
+  const [values, setValues] = useState({
+    email: "",
+    emailError: false,
+    nicknameError: false,
+    password: "",
+    passwordError: false
+  });
+
+  const { email, emailError, password, passwordError } = values;
+
+  const handleChange = event => {
+    event.persist();
+
+    setValues(prevState => {
+      return {
+        ...prevState,
+        [event.target.name]: event.target.value
+      };
+    });
+  };
 
   useEffect(() => {
-    if (isSignedUp) {
+    if (password || email) {
+      setValues(prevState => {
+        return {
+          ...prevState,
+          emailError: !validateEmail(email),
+          passwordError: !password
+        };
+      });
+    }
+  }, [password, email]);
+
+  useEffect(() => {
+    if (me) {
       setTimeout(() => {
-        Router.push("/signin");
+        Router.push("/");
       }, 2000);
     }
-  }, [isSignedUp]);
+  }, [me]);
 
   const onSubmit = e => {
     e.preventDefault();
-    if (
-      !termError &&
-      !passwordError &&
-      !passwordCheckError &&
-      email &&
-      nickname
-    ) {
+
+    if (!passwordError && !emailError) {
       console.log("onsubmit fired");
-      console.log("dispatch fired");
       return dispatch({
-        type: SIGN_UP_REQUEST,
+        type: LOG_IN_REQUEST,
         data: {
           userId: email,
-          password,
-          nickname
+          password
         }
       });
     }
@@ -67,13 +89,25 @@ export default function SignInSide() {
     setValues(() => {
       return {
         ...values,
-        termError: !term,
         emailError: !validateEmail(email),
-        nicknameError: !nickname,
         passwordError: !password
       };
     });
   };
+
+  const handleMemoEmail = useCallback(
+    e => {
+      handleChange(e);
+    },
+    [email]
+  );
+
+  const handleMemoPassword = useCallback(
+    e => {
+      handleChange(e);
+    },
+    [password]
+  );
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -86,33 +120,50 @@ export default function SignInSide() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign Up
+            Sign In
           </Typography>
           <form className={classes.form} noValidate>
-            <MemoEmail />
-            <MemoNickname />
-            <MemoPassword />
+            <MemoEmail
+              emailError={emailError}
+              handleChange={handleMemoEmail}
+              email={email}
+            />
 
-            <MemoPasswordCheck />
+            <MemoPassword
+              password={password}
+              handleChange={handleMemoPassword}
+              passwordError={passwordError}
+            />
 
-            {isSignedUp && (
+            {me && (
+              <Toaster message="Login Success!" type="success" whereTo="/" />
+            )}
+
+            {logInErrorReason && (
               <Toaster
-                message="You are signed up :). Please sign in now! "
-                type="success"
-                whereTo="/signin"
+                message={logInErrorReason}
+                type="error"
+                whereTo={false}
               />
             )}
-            <MemoTerm />
+
             <MemoSubmit
               onSubmit={onSubmit}
-              text="Sign Up"
+              text="Sign In"
               className={classes.submit}
-              isSigningUp={isSigningUp}
+              isSigningUp={isLoggingIn}
             />
 
             <Grid container>
+              <Grid item xs>
+                <Link href={"/passwordre"} text="For got password?" />
+              </Grid>
+
               <Grid item>
-                <Link href={"signin"} text="Already a member? Sign in!" />
+                <Link
+                  href={"signup"}
+                  text="Don't have an account? Sign Up here."
+                />
               </Grid>
             </Grid>
             <Box mt={5}>

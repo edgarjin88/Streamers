@@ -30,7 +30,7 @@ export const MemoEmail = memo(function MemoEmail() {
   const handleChange = e =>
     dispatch({
       type: SET_EMAIL,
-      payload: e.target.value
+      data: e.target.value
     });
   return (
     <>
@@ -47,7 +47,7 @@ export const MemoEmail = memo(function MemoEmail() {
         onChange={handleChange}
         autoFocus
       />
-      ;
+
       {emailError && (
         <SignUpError>Please enter proper email address</SignUpError>
       )}
@@ -67,7 +67,7 @@ export const MemoNickname = memo(function MemoNickname() {
   const handleChange = e =>
     dispatch({
       type: SET_NICKNAME,
-      payload: e.target.value
+      data: e.target.value
     });
   return (
     <>
@@ -93,7 +93,7 @@ export const MemoPassword = memo(function MemoPassword() {
   const handleChange = e =>
     dispatch({
       type: SET_PASSWORD,
-      payload: e.target.value
+      data: e.target.value
     });
 
   return (
@@ -127,7 +127,7 @@ export const MemoPasswordCheck = memo(function MemoPasswordCheck() {
   const handleChange = e =>
     dispatch({
       type: SET_PASSWORD_CHECK,
-      payload: e.target.value
+      data: e.target.value
     });
   return (
     <>
@@ -158,10 +158,10 @@ export const MemoTerm = memo(function MemoTerm() {
     };
   }, shallowEqual);
 
-  const handleChange = e =>
+  const handleChange = () =>
     dispatch({
       type: SET_TERM,
-      payload: !term
+      data: !term
     });
   return (
     <>
@@ -177,6 +177,54 @@ export const MemoTerm = memo(function MemoTerm() {
         label="I read and agree to the terms and conditions"
       />
       {termError && <SignUpError>You have to agree to terms. </SignUpError>}
+    </>
+  );
+});
+
+export const MemoSignIn = memo(function MemoSignIn({ className }) {
+  const dispatch = useDispatch();
+  const { isLoggingIn } = useSelector(state => state.user, shallowEqual);
+  const { email, emailError, password, passwordError } = useSelector(
+    ({ input }) => {
+      return {
+        email: input.email,
+        emailError: input.emailError,
+        password: input.password,
+        passwordError: input.passwordError
+      };
+    },
+    shallowEqual
+  );
+
+  const onSignIn = () => {
+    if (!emailError && !passwordError && email && password) {
+      return dispatch({
+        type: LOG_IN_REQUEST,
+        data: {
+          userId: email,
+          password
+        }
+      });
+    }
+  };
+  return (
+    <>
+      <Button
+        fullWidth
+        variant="contained"
+        color="primary"
+        className={className}
+        onClick={onSignIn}
+      >
+        {isLoggingIn && (
+          <CircularProgress
+            color="secondary"
+            size={20}
+            style={{ marginRight: "20px" }}
+          />
+        )}
+        Sign In
+      </Button>
     </>
   );
 });
@@ -212,10 +260,8 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
       termError: input.termError
     };
   }, shallowEqual);
-  // isSigningUp
 
-  const onSignUp = e => {
-    // e.preventDefault()
+  const onSignUp = () => {
     if (
       !emailError &&
       !nicknameError &&
@@ -228,8 +274,6 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
       passwordCheck &&
       term
     ) {
-      console.log("onsubmit fired");
-      console.log("dispatch fired");
       return dispatch({
         type: SIGN_UP_REQUEST,
         data: {

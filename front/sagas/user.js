@@ -83,10 +83,10 @@ function* signUp(action) {
       type: SIGN_UP_SUCCESS
     });
   } catch (e) {
-    console.error(e);
+    console.error("this is error for signup action", e.response);
     yield put({
       type: SIGN_UP_FAILURE,
-      error: e
+      reason: e.response && e.response.data
     });
   }
 }
@@ -174,7 +174,6 @@ function* follow(action) {
       data: result.data
     });
   } catch (e) {
-    console.error(e);
     yield put({
       type: FOLLOW_USER_FAILURE,
       error: e

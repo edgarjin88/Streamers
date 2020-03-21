@@ -20,7 +20,7 @@ router.post("/", async (req, res, next) => {
       }
     });
     if (exUser) {
-      return res.status(403).send("Someone already using the ID"); //sned == strings or buffer
+      return res.status(401).send("Someone is already using the ID"); //sned == strings or buffer
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 12); // salt to be 10~13
     const newUser = await db.User.create({
