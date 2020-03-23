@@ -4,7 +4,30 @@ const passport = require("passport");
 const db = require("../models");
 const { isLoggedIn } = require("./middleware");
 
+const sgMail = require("@sendgrid/mail");
+const jwt = require("jsonwebtoken");
+
+const expressJWT = require("express-jwt");
+const _ = require("lodash");
+// const fetch = require("node-fetch");
+require("dotenv").config();
+
 const router = express.Router();
+
+const { accountActivation, signup } = require("../controllers/auth");
+
+// router.post("/users", async (req, res) => {
+//   const user = new User(req.body);
+
+//   try {
+//     await user.save();
+//     sendWelcomeEmail(user.email, user.name);
+//     const token = await user.generateAuthToken();
+//     res.status(201).send({ user, token });
+//   } catch (e) {
+//     res.status(400).send(e);
+//   }
+// });
 
 router.get("/", isLoggedIn, (req, res) => {
   // /api/user/
@@ -12,30 +35,35 @@ router.get("/", isLoggedIn, (req, res) => {
   delete user.password; //password
   return res.json(user);
 });
-router.post("/", async (req, res, next) => {
-  try {
-    const exUser = await db.User.findOne({
-      where: {
-        userId: req.body.userId
-      }
-    });
-    if (exUser) {
-      return res.status(401).send("Someone is already using the ID"); //sned == strings or buffer
-    }
-    const hashedPassword = await bcrypt.hash(req.body.password, 12); // salt to be 10~13
-    const newUser = await db.User.create({
-      nickname: req.body.nickname,
-      userId: req.body.userId,
-      password: hashedPassword
-    });
-    console.log(newUser);
-    return res.status(200).json(newUser);
-  } catch (e) {
-    console.error(e);
 
-    return next(e);
-  }
-});
+router.post("/", signup);
+router.post("/account-activation", accountActivation);
+
+// router.post("/", async (req, res, next) => {
+//next here is for error.
+//   try {
+//     const exUser = await db.User.findOne({
+//       where: {
+//         userId: req.body.userId
+//       }
+//     });
+//     if (exUser) {
+//       return res.status(401).send("Someone is already using the ID");
+//     }
+//     const hashedPassword = await bcrypt.hash(req.body.password, 12); // salt to be 10~13
+//     const newUser = await db.User.create({
+//       nickname: req.body.nickname,
+//       userId: req.body.userId,
+//       password: hashedPassword
+//     });
+//     console.log(newUser);
+//     return res.status(200).json(newUser);
+//   } catch (e) {
+//     console.error(e);
+
+//     return next(e);
+//   }
+// });
 
 router.get("/:id", async (req, res, next) => {
   try {
@@ -269,5 +297,44 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
     next(e);
   }
 });
+
+router.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email"
+    ]
+  })
+);
+
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/http://localhost:3000/signin"
+  }),
+  (req, res) => {
+    console.log("fired here");
+    res.redirect("http://localhost:3000/");
+  }
+);
+
+router.get(
+  "/auth/facebook",
+  passport.authenticate("facebook", {
+    scope: ["public_profile", "email"]
+  })
+);
+
+router.get(
+  "/auth/facebook/callback",
+  passport.authenticate("facebook", {
+    failureRedirect: "/http://localhost:3000/signin"
+  }),
+  (req, res) => {
+    console.log("fired here");
+    res.redirect("http://localhost:3000/");
+  }
+);
 
 module.exports = router;

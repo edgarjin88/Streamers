@@ -1,7 +1,9 @@
 const passport = require("passport");
 const db = require("../models");
 const local = require("./local");
-
+const google = require("./google");
+const facebook = require("./facebook");
+// const twitter = require("./twitter");
 module.exports = () => {
   passport.serializeUser((user, done) => {
     console.log("serializeUser fired");
@@ -40,6 +42,9 @@ module.exports = () => {
   });
 
   local();
+  google();
+  facebook();
+  // twitter();
 };
 
 //deserialize to be cached

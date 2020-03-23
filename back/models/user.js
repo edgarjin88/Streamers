@@ -3,21 +3,30 @@ module.exports = (sequelize, DataTypes) => {
     "User",
     {
       nickname: {
-        type: DataTypes.STRING(30),
-        allowNull: false
+        type: DataTypes.STRING(100),
+        allowNull: true
+      },
+      provider: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        defaultValue: "local"
+      },
+      OAuthID: {
+        type: DataTypes.STRING(100),
+        allowNull: true
       },
       profilePhoto: {
         type: DataTypes.TEXT,
         allowNull: true
       },
       userId: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.STRING(100),
         allowNull: false,
         unique: true // Has to be unique
       },
       password: {
-        type: DataTypes.STRING(100), //
-        allowNull: false
+        type: DataTypes.STRING(200), //
+        allowNull: true
       }
     },
     {
