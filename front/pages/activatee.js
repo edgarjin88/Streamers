@@ -16,6 +16,7 @@ import { useStyles, SignUpError } from "../styles/SigniningStyle";
 
 import Link from "../components/CustomLinks";
 import Copyright from "../components/Copyright";
+import { validateEmail } from "../helpers/loginHelpers";
 import {
   MemoEmail,
   MemoNickname,
@@ -25,28 +26,32 @@ import {
   MemoSignUp
 } from "../containers/MemoForSign";
 
-import LinearDeterminate from "../components/Progressbar";
+import jwt from "jsonwebtoken";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
 
   const classes = useStyles();
   /////////Logic //////////
+  //get token, and move to signin page. toaster.
+  // when submit, use redux again. just token. It is OK.
+  //make some more components with memo.
 
-  const { isSignedUp, signUpErrorReason } = useSelector(({ user }) => {
-    // console.log("signup error reason: ", signUpErrorReason);
-    return {
-      isSignedUp: user.isSignedUp,
-      signUpErrorReason: user.signUpErrorReason
-    };
-  }, shallowEqual);
-  useEffect(() => {
-    if (isSignedUp) {
-      setTimeout(() => {
-        Router.push("/signin");
-      }, 6000);
-    }
-  }, [isSignedUp]);
+  // useEffect(() => {
+  //   let token = match.params.token;
+  //   let { name } = jwt.decode(token);
+  //   // console.log(token);
+  //   if (token) {
+  //     setValues({ ...values, name, token });
+  //   }
+  // }, []);
+
+  const activationLink = () => (
+    <div className="text-center">
+      <h1 className="p-5">Hey userID, Ready to activate your account?</h1>
+      <button className="btn btn-outline-primary">Activate Account</button>
+    </div>
+  );
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -59,34 +64,11 @@ export default function SignInSide() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign Up
+            Hi userID, Good to see you again!. Activate your account here.
           </Typography>
           <form className={classes.form} noValidate>
-            <MemoEmail />
-            <MemoNickname />
-            <MemoPassword />
-
-            <MemoPasswordCheck />
-
-            <MemoTerm />
-            {isSignedUp && (
-              <Toaster
-                message={`An email sent to your registered email. Please follow the instruction to activate your account`}
-                type="success"
-                whereTo="/signin"
-              />
-            )}
-
-            {signUpErrorReason && (
-              <Toaster
-                message={signUpErrorReason}
-                type="error"
-                whereTo={false}
-              />
-            )}
-
+            {activationLink()}
             <MemoSignUp className={classes.submit} />
-            {isSignedUp && <LinearDeterminate />}
             <Grid container>
               <Grid item>
                 <Link href={"signin"} text="Already a member? Sign in!" />

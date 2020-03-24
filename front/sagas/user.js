@@ -30,11 +30,15 @@ import {
   SIGN_UP_SUCCESS,
   UNFOLLOW_USER_FAILURE,
   UNFOLLOW_USER_REQUEST,
-  UNFOLLOW_USER_SUCCESS
+  UNFOLLOW_USER_SUCCESS,
+  ACTIVATION_REQUEST,
+  ACTIVATION_SUCCESS,
+  ACTIVATION_FAILURE
 } from "../reducers/user";
 
 const https = require("https");
 
+//https agent not required here. delete them all.
 const httpsAgent =
   process.env.NODE_ENV === "production"
     ? new https.Agent({
@@ -327,6 +331,31 @@ function* editNickname(action) {
 function* watchEditNickname() {
   yield takeEvery(EDIT_NICKNAME_REQUEST, editNickname);
 }
+function activationAPI(userInfo) {
+  return axios.post("/user/account-activation", userInfo);
+  //userinfo = {token: token}
+}
+
+function* activationRequest(action) {
+  try {
+    const result = yield call(activationAPI, action.data);
+    yield put({
+      type: ACTIVATION_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error("this is error for activation action", e.response);
+
+    yield put({
+      type: ACTIVATION_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchActivationRequest() {
+  yield takeEvery(ACTIVATION_REQUEST, activationRequest);
+}
 
 export default function* userSaga() {
   yield all([
@@ -339,6 +368,7 @@ export default function* userSaga() {
     fork(watchLoadFollowers),
     fork(watchLoadFollowings),
     fork(watchRemoveFollower),
-    fork(watchEditNickname)
+    fork(watchEditNickname),
+    fork(watchActivationRequest)
   ]);
 }

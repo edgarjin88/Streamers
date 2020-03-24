@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
-import { useSelector, shallowEqual } from "react-redux";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 
 import { LOG_IN_REQUEST } from "../reducers/user";
+import { CLEAR_INPUT_FIELDS } from "../reducers/input";
 
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -28,8 +29,13 @@ export default function SignInSide() {
   const classes = useStyles();
   /////////Logic //////////
   const { me, logInErrorReason } = useSelector(state => state.user);
+  const dispatch = useDispatch();
   //No shallow comparison required here.
-
+  useEffect(() => {
+    dispatch({
+      type: CLEAR_INPUT_FIELDS
+    });
+  }, []);
   useEffect(() => {
     if (me) {
       setTimeout(() => {

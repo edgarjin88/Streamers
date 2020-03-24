@@ -1,5 +1,6 @@
 import produce from "immer";
 import { validateEmail } from "../helpers/loginHelpers";
+import { SIGN_UP_SUCCESS } from "./user";
 
 export const initialState = {
   email: "",
@@ -25,12 +26,27 @@ export const SET_PASSWORD_CHECK = "SET_PASSWORD_CHECK";
 export const SET_PASSWORD_CHECK_ERROR = "SET_PASSWORD_CHECK_ERROR";
 export const SET_TERM = "SET_TERM";
 export const SET_TERM_ERROR = "SET_TERM_ERROR";
+
+export const CLEAR_INPUT_FIELDS = "CLEAR_INPUT_FIELDS";
 // export const OPEN_BACKDROP = "OPEN_BACKDROP";
 // export const CLOSE_BACKDROP = "CLOSE_BACKDROP";
 
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case CLEAR_INPUT_FIELDS: {
+        (draft.email = ""),
+          (draft.emailError = false),
+          (draft.nickname = ""),
+          (draft.nicknameError = false),
+          (draft.password = ""),
+          (draft.passwordError = false),
+          (draft.passwordCheck = ""),
+          (draft.passwordCheckError = false),
+          (draft.term = false),
+          (draft.termError = false);
+        break;
+      }
       case SET_NICKNAME: {
         draft.nickname = action.data;
         draft.nicknameError = !!!action.data;

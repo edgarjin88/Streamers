@@ -3,10 +3,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import Router from "next/router";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -16,6 +13,10 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function CustomizedSnackbars({ message, type, whereTo }) {
   const classes = useStyles();
@@ -38,7 +39,12 @@ export default function CustomizedSnackbars({ message, type, whereTo }) {
 
   return (
     <div className={classes.root}>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={handleClose}
+      >
         <Alert onClose={handleClose} severity={type}>
           {message}
         </Alert>

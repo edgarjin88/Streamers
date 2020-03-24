@@ -5,6 +5,7 @@ export const initialState = {
   isLoggingIn: false,
   logInErrorReason: "",
   isSignedUp: false,
+  // signUpSuccessMessage: 'false',
   isSigningUp: false,
   signUpErrorReason: "",
   me: null,
@@ -14,7 +15,10 @@ export const initialState = {
   isEditingNickname: false,
   editNicknameErrorReason: "",
   hasMoreFollower: false,
-  hasMoreFollowing: false
+  hasMoreFollowing: false,
+  isActivating: false,
+  isActivated: false,
+  activationErrorReason: ""
 };
 
 export const SIGN_UP_REQUEST = "SIGN_UP_REQUEST";
@@ -59,10 +63,35 @@ export const EDIT_NICKNAME_FAILURE = "EDIT_NICKNAME_FAILURE";
 
 export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
 export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
+export const ACTIVATION_REQUEST = "ACTIVATION_REQUEST";
+export const ACTIVATION_SUCCESS = "ACTIVATION_SUCCESS";
+export const ACTIVATION_FAILURE = "ACTIVATION_FAILURE";
 
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case ACTIVATION_REQUEST: {
+        draft.isActivating = true;
+        draft.isActivated = false;
+        draft.activationErrorReason = "";
+        break;
+      }
+      case ACTIVATION_SUCCESS: {
+        debugger;
+        draft.isActivating = false;
+        draft.isActivated = true;
+        draft.activationErrorReason = "";
+        console.log("activation success : data:", action);
+        // draft.me = action.data;
+        break;
+      }
+      case ACTIVATION_FAILURE: {
+        draft.isActivating = false;
+        draft.isActivated = false;
+        draft.activationErrorReason = action.reason;
+        draft.me = null;
+        break;
+      }
       case LOG_IN_REQUEST: {
         draft.isLoggingIn = true;
         draft.logInErrorReason = "";

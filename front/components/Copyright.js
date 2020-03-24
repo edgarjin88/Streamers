@@ -5,7 +5,7 @@ const Copyright = memo(function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="#" text="Streamers.com"></Link>{" "}
+      <Link color="#55c57a" href="#" text="Streamers.com"></Link>{" "}
       {new Date().getFullYear()}
       {"."}
     </Typography>

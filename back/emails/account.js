@@ -35,9 +35,11 @@ exports.signup = async (req, res) => {
   const emailData = {
     from: process.env.EMAIL_FROM,
     to: userId,
-    subject: `Account activation link`,
+    subject: `Account activation link for Streamers.com`,
     html: `
-                <h1>Please use the following link to activate your account</h1>
+                <h1>Wellcome to Streamers ${userId}!</h1>
+                <p>In order to activate your Streamers account, please click the below link. </p>
+                <hr />
                 <p>${process.env.CLIENT_URL}/auth/activate/${token}</p>
                 <hr />
                 <p>This email may contain sensetive information</p>

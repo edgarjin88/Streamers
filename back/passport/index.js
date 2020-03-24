@@ -34,7 +34,7 @@ module.exports = () => {
           }
         ]
       });
-      return done(null, user); // req.user
+      return done(null, user);
     } catch (e) {
       console.error(e);
       return done(e);

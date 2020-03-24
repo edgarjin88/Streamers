@@ -306,3 +306,52 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
     </>
   );
 });
+
+// export const ActivationButton = ({className})=> {
+//   const dispatch = useDispatch();
+//   const { isLoggingIn } = useSelector(state => state.user, shallowEqual);
+//   const { email, emailError, password, passwordError } = useSelector(
+//     ({ input }) => {
+//       return {
+//         email: input.email,
+//         emailError: input.emailError,
+//         password: input.password,
+//         passwordError: input.passwordError
+//       };
+//     },
+//     shallowEqual
+//   );
+
+//   const onSignIn = () => {
+//     if (!emailError && !passwordError && email && password) {
+//       return dispatch({
+//         type: LOG_IN_REQUEST,
+//         data: {
+//           userId: email,
+//           password
+//         }
+//       });
+//     }
+//   };
+//   return (
+//     <>
+//       <Button
+//         fullWidth
+//         variant="contained"
+//         color="primary"
+//         className={className}
+//         onClick={onSignIn}
+//       >
+//         {isLoggingIn && (
+//           <CircularProgress
+//             color="secondary"
+//             size={20}
+//             style={{ marginRight: "20px" }}
+//           />
+//         )}
+//         Sign In
+//       </Button>
+//     </>
+//   );
+// })
+// }
