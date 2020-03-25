@@ -33,7 +33,10 @@ import {
   UNFOLLOW_USER_SUCCESS,
   ACTIVATION_REQUEST,
   ACTIVATION_SUCCESS,
-  ACTIVATION_FAILURE
+  ACTIVATION_FAILURE,
+  PASSWORD_RESET_FAILURE,
+  PASSWORD_RESET_SUCCESS,
+  PASSWORD_RESET_REQUEST
 } from "../reducers/user";
 
 const https = require("https");
@@ -331,6 +334,7 @@ function* editNickname(action) {
 function* watchEditNickname() {
   yield takeEvery(EDIT_NICKNAME_REQUEST, editNickname);
 }
+
 function activationAPI(userInfo) {
   return axios.post("/user/account-activation", userInfo);
   //userinfo = {token: token}
@@ -357,6 +361,32 @@ function* watchActivationRequest() {
   yield takeEvery(ACTIVATION_REQUEST, activationRequest);
 }
 
+function passwordResetAPI(password) {
+  return axios.post("/user/passwordreset", password);
+  //userinfo = {token: token}
+}
+
+function* passwordResetRequest(action) {
+  try {
+    const result = yield call(passwordResetAPI, action.data);
+    yield put({
+      type: PASSWORD_RESET_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error("this is error for PASSWORD_RESET action", e.response);
+
+    yield put({
+      type: PASSWORD_RESET_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchPasswordReset() {
+  yield takeEvery(PASSWORD_RESET_REQUEST, passwordResetRequest);
+}
+
 export default function* userSaga() {
   yield all([
     fork(watchLogIn),
@@ -369,6 +399,7 @@ export default function* userSaga() {
     fork(watchLoadFollowings),
     fork(watchRemoveFollower),
     fork(watchEditNickname),
-    fork(watchActivationRequest)
+    fork(watchActivationRequest),
+    fork(watchPasswordReset)
   ]);
 }

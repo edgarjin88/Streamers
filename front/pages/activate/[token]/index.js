@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import Router from "next/router";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { SIGN_UP_REQUEST } from "../../../reducers/user";
@@ -18,6 +19,7 @@ import { CustomButton1 } from "../../../components/CustomButtons";
 import Copyright from "../../../components/Copyright";
 
 import jwt from "jsonwebtoken";
+import LinearDeterminate from "../../../components/Progressbar";
 
 import { ACTIVATION_REQUEST } from "../../../reducers/user";
 export default function SignInSide() {
@@ -34,13 +36,11 @@ export default function SignInSide() {
   //make some more components with memo.
 
   let { nickname, userId, password } = jwt.decode(token);
-  // console.log(token);
-
   const activationLink = () => (
     <div className="text-center">
       <div className="p-5" style={{ height: "7rem", margin: "auto" }}>
         Hey <strong>{nickname}</strong>, are you ready to enjoy? Click the
-        Activate button below to activate your account
+        Activation button below to activate your account
       </div>
     </div>
   );
@@ -65,6 +65,15 @@ export default function SignInSide() {
     },
     shallowEqual
   );
+
+  useEffect(() => {
+    if (isActivated) {
+      setTimeout(() => {
+        Router.push("/signin");
+      }, 6000);
+    }
+  }, [isActivated]);
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -79,7 +88,6 @@ export default function SignInSide() {
             Activate your STREAMERS account.
           </Typography>
 
-          {/* {JSON.stringify(activationErrorReason)} */}
           <form className={classes.form} noValidate>
             {activationLink()}
 
@@ -92,23 +100,24 @@ export default function SignInSide() {
             >
               <CustomButton1
                 onClick={handleClick}
-                // href={"#"}
-
-                text="Click to activate your account!"
+                text={
+                  isActivated
+                    ? "Your account is activated!"
+                    : "Click to activate your account!"
+                }
                 size="1.4rem"
-                // backgroundColor="yellow"
                 color="#ff3300"
               />
             </div>
+            {isActivated && <LinearDeterminate />}
 
             {isActivated && (
               <Toaster
-                message={`Activation Success. Enjoy STREAMERS! `}
+                message={`Activation Success. Signin and enjoy STREAMERS! `}
                 type="success"
-                whereTo={false}
+                whereTo={"/signin"}
               />
             )}
-
             {activationErrorReason && (
               <Toaster
                 message={activationErrorReason}
@@ -116,7 +125,6 @@ export default function SignInSide() {
                 whereTo={false}
               />
             )}
-
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>

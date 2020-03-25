@@ -14,7 +14,11 @@ require("dotenv").config();
 
 const router = express.Router();
 
-const { accountActivation, signup } = require("../controllers/auth");
+const {
+  accountActivation,
+  signup,
+  passwordReset
+} = require("../controllers/auth");
 
 router.get("/", isLoggedIn, (req, res) => {
   // /api/user/
@@ -25,32 +29,7 @@ router.get("/", isLoggedIn, (req, res) => {
 
 router.post("/", signup);
 router.post("/account-activation", accountActivation);
-
-// router.post("/", async (req, res, next) => {
-//next here is for error.
-//   try {
-//     const exUser = await db.User.findOne({
-//       where: {
-//         userId: req.body.userId
-//       }
-//     });
-//     if (exUser) {
-//       return res.status(401).send("Someone is already using the ID");
-//     }
-//     const hashedPassword = await bcrypt.hash(req.body.password, 12); // salt to be 10~13
-//     const newUser = await db.User.create({
-//       nickname: req.body.nickname,
-//       userId: req.body.userId,
-//       password: hashedPassword
-//     });
-//     console.log(newUser);
-//     return res.status(200).json(newUser);
-//   } catch (e) {
-//     console.error(e);
-
-//     return next(e);
-//   }
-// });
+router.post("/passwordreset", passwordReset);
 
 router.get("/:id", async (req, res, next) => {
   try {

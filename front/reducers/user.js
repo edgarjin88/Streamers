@@ -18,6 +18,8 @@ export const initialState = {
   hasMoreFollowing: false,
   isActivating: false,
   isActivated: false,
+  resetPasswordSuccess: false,
+  resetPasswordErrorReason: "",
   activationErrorReason: ""
 };
 
@@ -67,9 +69,28 @@ export const ACTIVATION_REQUEST = "ACTIVATION_REQUEST";
 export const ACTIVATION_SUCCESS = "ACTIVATION_SUCCESS";
 export const ACTIVATION_FAILURE = "ACTIVATION_FAILURE";
 
+export const PASSWORD_RESET_REQUEST = "PASSWORD_RESET_REQUEST";
+export const PASSWORD_RESET_FAILURE = "PASSWORD_RESET_FAILURE";
+export const PASSWORD_RESET_SUCCESS = "PASSWORD_RESET_SUCCESS";
+
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case PASSWORD_RESET_REQUEST: {
+        draft.resetPasswordSuccess = false;
+        draft.resetPasswordErrorReason = "";
+        break;
+      }
+      case PASSWORD_RESET_FAILURE: {
+        draft.resetPasswordSuccess = false;
+        draft.resetPasswordErrorReason = action.reason;
+        break;
+      }
+      case PASSWORD_RESET_SUCCESS: {
+        draft.resetPasswordSuccess = action.data;
+        draft.resetPasswordErrorReason = "";
+        break;
+      }
       case ACTIVATION_REQUEST: {
         draft.isActivating = true;
         draft.isActivated = false;
@@ -77,7 +98,6 @@ export default (state = initialState, action) => {
         break;
       }
       case ACTIVATION_SUCCESS: {
-        debugger;
         draft.isActivating = false;
         draft.isActivated = true;
         draft.activationErrorReason = "";
