@@ -39,7 +39,7 @@ export default function SignInSide() {
   const classes = useStyles();
   /////////Logic //////////
   const dispatch = useDispatch();
-  const { isSigningUp, isSignedUp } = useSelector(state => state.user);
+  const { isLoading, isSignedUp } = useSelector(state => state.user);
 
   const [values, setValues] = useState({
     email: "",
@@ -220,7 +220,7 @@ export default function SignInSide() {
               onSubmit={onSubmit}
               text="Sign Up"
               className={classes.submit}
-              isSigningUp={isSigningUp}
+              isLoading={isLoading}
             />
 
             <Redux />

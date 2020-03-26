@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING(200), //
         allowNull: true
+      },
+      resetPasswordLink: {
+        type: DataTypes.STRING(400),
+        default: "",
+        allowNull: true
       }
     },
     {

@@ -130,7 +130,7 @@ export const MemoTerm = memo(function MemoTerm({
 export const MemoSubmit = memo(function MemoSubmit({
   onSubmit,
   className,
-  isSigningUp,
+  isLoading,
   text
 }) {
   return (
@@ -143,7 +143,7 @@ export const MemoSubmit = memo(function MemoSubmit({
         className={className}
         onClick={onSubmit}
       >
-        {isSigningUp && (
+        {isLoading && (
           <CircularProgress
             color="secondary"
             size={20}

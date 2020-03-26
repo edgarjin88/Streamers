@@ -1,12 +1,8 @@
 import produce from "immer";
 
 export const initialState = {
-  isLoggingOut: false,
-  isLoggingIn: false,
   logInErrorReason: "",
   isSignedUp: false,
-  // signUpSuccessMessage: 'false',
-  isSigningUp: false,
   signUpErrorReason: "",
   me: null,
   followingList: [],
@@ -16,11 +12,13 @@ export const initialState = {
   editNicknameErrorReason: "",
   hasMoreFollower: false,
   hasMoreFollowing: false,
-  isActivating: false,
   isActivated: false,
   resetPasswordSuccess: false,
   resetPasswordErrorReason: "",
-  activationErrorReason: ""
+  activationErrorReason: "",
+  confirmPasswordReset: false,
+  confirmPasswordResetErrorReason: "",
+  isLoading: false
 };
 
 export const SIGN_UP_REQUEST = "SIGN_UP_REQUEST";
@@ -73,32 +71,60 @@ export const PASSWORD_RESET_REQUEST = "PASSWORD_RESET_REQUEST";
 export const PASSWORD_RESET_FAILURE = "PASSWORD_RESET_FAILURE";
 export const PASSWORD_RESET_SUCCESS = "PASSWORD_RESET_SUCCESS";
 
+export const CONFIRM_PASSWORD_RESET_REQUEST = "CONFIRM_PASSWORD_RESET_REQUEST";
+export const CONFIRM_PASSWORD_RESET_FAILURE = "CONFIRM_PASSWORD_RESET_FAILURE";
+export const CONFIRM_PASSWORD_RESET_SUCCESS = "CONFIRM_PASSWORD_RESET_SUCCESS";
+
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
       case PASSWORD_RESET_REQUEST: {
+        draft.confirmPasswordReset = false;
+        draft.confirmPasswordResetErrorReason = "";
+        draft.isLoading = true;
+        break;
+      }
+      case PASSWORD_RESET_FAILURE: {
+        draft.confirmPasswordReset = false;
+        draft.confirmPasswordResetErrorReason = action.reason;
+        draft.isLoading = false;
+
+        break;
+      }
+      case PASSWORD_RESET_SUCCESS: {
+        draft.confirmPasswordReset = action.data;
+        draft.confirmPasswordResetErrorReason = "";
+        draft.isLoading = false;
+
+        break;
+      }
+      case PASSWORD_RESET_REQUEST: {
         draft.resetPasswordSuccess = false;
         draft.resetPasswordErrorReason = "";
+        draft.isLoading = true;
         break;
       }
       case PASSWORD_RESET_FAILURE: {
         draft.resetPasswordSuccess = false;
         draft.resetPasswordErrorReason = action.reason;
+        draft.isLoading = false;
+
         break;
       }
       case PASSWORD_RESET_SUCCESS: {
         draft.resetPasswordSuccess = action.data;
         draft.resetPasswordErrorReason = "";
+        draft.isLoading = false;
         break;
       }
       case ACTIVATION_REQUEST: {
-        draft.isActivating = true;
+        draft.isLoading = true;
         draft.isActivated = false;
         draft.activationErrorReason = "";
         break;
       }
       case ACTIVATION_SUCCESS: {
-        draft.isActivating = false;
+        draft.isLoading = false;
         draft.isActivated = true;
         draft.activationErrorReason = "";
         console.log("activation success : data:", action);
@@ -106,51 +132,51 @@ export default (state = initialState, action) => {
         break;
       }
       case ACTIVATION_FAILURE: {
-        draft.isActivating = false;
+        draft.isLoading = false;
         draft.isActivated = false;
         draft.activationErrorReason = action.reason;
         draft.me = null;
         break;
       }
       case LOG_IN_REQUEST: {
-        draft.isLoggingIn = true;
+        draft.isLoading = true;
         draft.logInErrorReason = "";
         break;
       }
       case LOG_IN_SUCCESS: {
-        draft.isLoggingIn = false;
+        draft.isLoading = false;
         draft.logInErrorReason = "";
         draft.me = action.data;
         break;
       }
       case LOG_IN_FAILURE: {
-        draft.isLoggingIn = false;
+        draft.isLoading = false;
         draft.logInErrorReason = action.reason;
         draft.me = null;
         break;
       }
       case LOG_OUT_REQUEST: {
-        draft.isLoggingOut = true;
+        draft.isLoading = true;
         break;
       }
       case LOG_OUT_SUCCESS: {
-        draft.isLoggingOut = false;
+        draft.isLoading = false;
         draft.me = null;
         break;
       }
       case SIGN_UP_REQUEST: {
         draft.isSignedUp = false;
-        draft.isSigningUp = true;
+        draft.isLoading = true;
         draft.signUpErrorReason = "";
         break;
       }
       case SIGN_UP_SUCCESS: {
-        draft.isSigningUp = false;
+        draft.isLoading = false;
         draft.isSignedUp = true;
         break;
       }
       case SIGN_UP_FAILURE: {
-        draft.isSigningUp = false;
+        draft.isLoading = false;
         draft.signUpErrorReason = action.reason;
         break;
       }

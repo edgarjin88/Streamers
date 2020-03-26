@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Router from "next/router";
 
 import TextField from "@material-ui/core/TextField";
 import { SignUpError } from "../styles/SigniningStyle";
@@ -19,7 +20,114 @@ import {
   SET_TERM_ERROR,
   SET_NICKNAME_ERROR
 } from "../reducers/input";
-import { SIGN_UP_REQUEST, LOG_IN_REQUEST } from "../reducers/user";
+import {
+  SIGN_UP_REQUEST,
+  LOG_IN_REQUEST,
+  PASSWORD_RESET_REQUEST,
+  CONFIRM_PASSWORD_RESET_REQUEST
+} from "../reducers/user";
+import { StyledButton1 } from "../components/CustomButtons";
+
+export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
+  userId
+}) {
+  // let { userId } = jwt.decode(token);
+  const dispatch = useDispatch();
+
+  const {
+    password,
+    passwordCheck,
+    passwordError,
+    passwordCheckError
+  } = useSelector(({ input }) => {
+    return {
+      password: input.password,
+      passwordCheck: input.passwordCheck,
+      passwordError: input.passwordError,
+      passwordCheckError: input.passwordCheckError
+    };
+  }, shallowEqual);
+
+  const handleClick = e => {
+    if (!password) {
+      console.log("password change confirm fired");
+      dispatch({
+        type: SET_PASSWORD_ERROR
+      });
+    }
+    if (password && passwordCheck && !passwordError && !passwordCheckError) {
+      dispatch({
+        type: CONFIRM_PASSWORD_RESET_REQUEST,
+        data: {
+          userId,
+          password
+        }
+      });
+    }
+  };
+
+  const { isActivated, isLoading, activationErrorReason } = useSelector(
+    ({ user }) => {
+      return {
+        isActivated: user.isActivated,
+        isLoading: user.isLoading,
+        activationErrorReason: user.activationErrorReason
+      };
+    },
+    shallowEqual
+  );
+
+  return (
+    <>
+      <StyledButton1
+        type="button"
+        onClick={handleClick}
+        size="1.5rem"
+        color="#ff3300"
+      >
+        Confirm
+      </StyledButton1>
+    </>
+  );
+});
+
+export const MemoSubmitPasswordReset = memo(function MemoSubmitPasswordReset() {
+  // let { userId } = jwt.decode(token);
+  const dispatch = useDispatch();
+  const { email, emailError } = useSelector(({ input }) => {
+    return {
+      email: input.email,
+      emailError: input.emailError
+    };
+  }, shallowEqual);
+  const handleClick = e => {
+    e.preventDefault();
+    if (email && !emailError) {
+      return dispatch({
+        type: PASSWORD_RESET_REQUEST,
+        data: {
+          userId: email
+        }
+      });
+    } else {
+      return dispatch({
+        type: SET_EMAIL_ERROR
+      });
+    }
+  };
+  return (
+    <>
+      <StyledButton1
+        type="button"
+        onClick={handleClick}
+        size="1.5rem"
+        color="#ff3300"
+      >
+        Send a password recovery link
+      </StyledButton1>
+    </>
+  );
+});
 
 export const MemoEmail = memo(function MemoEmail() {
   const dispatch = useDispatch();
@@ -88,7 +196,9 @@ export const MemoNickname = memo(function MemoNickname() {
 
 export const MemoPassword = memo(function MemoPassword() {
   const dispatch = useDispatch();
-  const password = useSelector(({ input }) => input.password, shallowEqual);
+  const { password, passwordError } = useSelector(({ input }) => {
+    return { password: input.password, passwordError: input.passwordError };
+  }, shallowEqual);
 
   const handleChange = e =>
     dispatch({
@@ -110,7 +220,7 @@ export const MemoPassword = memo(function MemoPassword() {
         autoComplete="current-password"
         onChange={handleChange}
       />
-      {/* {passwordError && <SignUpError>Please enter your password</SignUpError>} */}
+      {passwordError && <SignUpError>Please enter your password</SignUpError>}
     </>
   );
 });
@@ -183,7 +293,7 @@ export const MemoTerm = memo(function MemoTerm() {
 
 export const MemoSignIn = memo(function MemoSignIn({ className }) {
   const dispatch = useDispatch();
-  const { isLoggingIn } = useSelector(state => state.user, shallowEqual);
+  const { isLoading } = useSelector(state => state.user, shallowEqual);
   const { email, emailError, password, passwordError } = useSelector(
     ({ input }) => {
       return {
@@ -216,7 +326,7 @@ export const MemoSignIn = memo(function MemoSignIn({ className }) {
         className={className}
         onClick={onSignIn}
       >
-        {isLoggingIn && (
+        {isLoading && (
           <CircularProgress
             color="secondary"
             size={20}
@@ -309,7 +419,7 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
 
 // export const ActivationButton = ({className})=> {
 //   const dispatch = useDispatch();
-//   const { isLoggingIn } = useSelector(state => state.user, shallowEqual);
+//   const { isLoading } = useSelector(state => state.user, shallowEqual);
 //   const { email, emailError, password, passwordError } = useSelector(
 //     ({ input }) => {
 //       return {
@@ -342,7 +452,7 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
 //         className={className}
 //         onClick={onSignIn}
 //       >
-//         {isLoggingIn && (
+//         {isLoading && (
 //           <CircularProgress
 //             color="secondary"
 //             size={20}

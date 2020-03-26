@@ -361,8 +361,8 @@ function* watchActivationRequest() {
   yield takeEvery(ACTIVATION_REQUEST, activationRequest);
 }
 
-function passwordResetAPI(password) {
-  return axios.post("/user/passwordreset", password);
+function passwordResetAPI(userId) {
+  return axios.post("/user/passwordreset", userId);
   //userinfo = {token: token}
 }
 

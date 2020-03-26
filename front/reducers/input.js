@@ -34,6 +34,10 @@ export const CLEAR_INPUT_FIELDS = "CLEAR_INPUT_FIELDS";
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case SET_EMAIL_ERROR: {
+        draft.emailError = true;
+        break;
+      }
       case CLEAR_INPUT_FIELDS: {
         (draft.email = ""),
           (draft.emailError = false),
@@ -61,6 +65,10 @@ export default (state = initialState, action) => {
       case SET_PASSWORD: {
         draft.password = action.data;
         draft.passwordError = !!!action.data;
+        break;
+      }
+      case SET_PASSWORD_ERROR: {
+        draft.passwordError = true;
         break;
       }
       case SET_PASSWORD_CHECK: {

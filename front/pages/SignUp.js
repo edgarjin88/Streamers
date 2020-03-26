@@ -33,20 +33,20 @@ export default function SignInSide() {
   const classes = useStyles();
   /////////Logic //////////
 
-  const { isSignedUp, signUpErrorReason } = useSelector(({ user }) => {
+  const { isLoading, signUpErrorReason } = useSelector(({ user }) => {
     // console.log("signup error reason: ", signUpErrorReason);
     return {
-      isSignedUp: user.isSignedUp,
+      isLoading: user.isLoading,
       signUpErrorReason: user.signUpErrorReason
     };
   }, shallowEqual);
   useEffect(() => {
-    if (isSignedUp) {
+    if (isLoading) {
       setTimeout(() => {
         Router.push("/signin");
       }, 6000);
     }
-  }, [isSignedUp]);
+  }, [isLoading]);
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -69,7 +69,7 @@ export default function SignInSide() {
             <MemoPasswordCheck />
 
             <MemoTerm />
-            {isSignedUp && (
+            {isLoading && (
               <Toaster
                 message={`An email sent to your registered email. Please follow the instruction to activate your account`}
                 type="success"
@@ -86,7 +86,7 @@ export default function SignInSide() {
             )}
 
             <MemoSignUp className={classes.submit} />
-            {isSignedUp && <LinearDeterminate />}
+            {isLoading && <LinearDeterminate />}
             <Grid container>
               <Grid item>
                 <Link href={"signin"} text="Already a member? Sign in!" />

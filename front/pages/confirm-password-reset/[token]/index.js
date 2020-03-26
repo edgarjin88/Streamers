@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { SIGN_UP_REQUEST } from "../../../reducers/user";
+import { CONFIRM_PASSWORD_RESET_REQUEST } from "../../../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
@@ -15,13 +15,19 @@ import Toaster from "../../../components/Toaster";
 import { useStyles } from "../../../styles/SigniningStyle";
 // to be moved to styling folder later.
 
-import { CustomButton1 } from "../../../components/CustomButtons";
+import { StyledButton1 } from "../../../components/CustomButtons";
 import Copyright from "../../../components/Copyright";
 
 import jwt from "jsonwebtoken";
 import LinearDeterminate from "../../../components/Progressbar";
 
 import { ACTIVATION_REQUEST } from "../../../reducers/user";
+import {
+  MemoEmail,
+  MemoPassword,
+  MemoPasswordCheck,
+  MemoConfirmPasswordReset
+} from "../../../containers/MemoForSign";
 export default function SignInSide() {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -34,45 +40,52 @@ export default function SignInSide() {
   //get token, and move to signin page. toaster.
   // when submit, use redux again. just token. It is OK.
   //make some more components with memo.
+  let { userId } = jwt.decode(token);
 
-  let { nickname, userId, password } = jwt.decode(token);
-  const activationLink = () => (
-    <div className="text-center">
-      <div className="p-5" style={{ height: "7rem", margin: "auto" }}>
-        Hey <strong>{nickname}</strong>, are you ready to enjoy? Click the
-        Activation button below to activate your account
-      </div>
-    </div>
-  );
-  const handleClick = e => {
-    e.preventDefault();
-    console.log("data  !!!!!!!!!:", userId, password, nickname);
-    dispatch({
-      type: ACTIVATION_REQUEST,
-      data: {
-        token
-      }
-    });
-  };
+  // const {
+  //   password,
+  //   passwordCheck,
+  //   passwordError,
+  //   passwordCheckError
+  // } = useSelector(({ input }) => {
+  //   return {
+  //     password: input.password,
+  //     passwordCheck: input.passwordCheck,
+  //     passwordError: input.passwordError,
+  //     passwordCheckError: input.passwordCheckError
+  //   };
+  // }, shallowEqual);
+  // const handleClick = e => {
+  //   e.preventDefault();
+  //   if (password && passwordCheck && !passwordError && passwordCheckError)
+  //     dispatch({
+  //       type: CONFIRM_PASSWORD_RESET_REQUEST,
+  //       data: {
+  //         userId: userId,
+  //         password: password
+  //       }
+  //     });
+  // };
 
-  const { isActivated, isLoading, activationErrorReason } = useSelector(
-    ({ user }) => {
-      return {
-        isActivated: user.isActivated,
-        isLoading: user.isLoading,
-        activationErrorReason: user.activationErrorReason
-      };
-    },
-    shallowEqual
-  );
+  const {
+    confirmPasswordReset,
+    isLoading,
+    confirmPasswordResetErrorReason
+  } = useSelector(({ user }) => {
+    return {
+      confirmPasswordReset: user.confirmPasswordReset,
+      isLoading: user.isLoading,
+      confirmPasswordResetErrorReason: user.confirmPasswordResetErrorReason
+    };
+  }, shallowEqual);
 
   useEffect(() => {
-    if (isActivated) {
+    if (confirmPasswordReset) {
       setTimeout(() => {
         Router.push("/signin");
       }, 6000);
     }
-  }, [isActivated]);
+  }, [confirmPasswordReset]);
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -85,12 +98,13 @@ export default function SignInSide() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Activate your STREAMERS account.
+            Now, you can reset the password of your STREAMERS account{" "}
+            <strong>{userId}</strong>.
           </Typography>
-
+          {/* <MemoEmail /> */}
+          <MemoPassword />
+          <MemoPasswordCheck />
           <form className={classes.form} noValidate>
-            {activationLink()}
-
             <div
               style={{
                 display: "flex",
@@ -98,33 +112,25 @@ export default function SignInSide() {
                 border: "none"
               }}
             >
-              <CustomButton1
-                onClick={handleClick}
-                text={
-                  isActivated
-                    ? "Your account is activated!"
-                    : "Click to activate your account!"
-                }
-                size="1.4rem"
-                color="#ff3300"
-              />
+              <MemoConfirmPasswordReset userId={userId} />
             </div>
-            {isActivated && <LinearDeterminate />}
+            {confirmPasswordReset && <LinearDeterminate />}
 
-            {isActivated && (
+            {confirmPasswordReset && (
               <Toaster
                 message={`Activation Success. Signin and enjoy STREAMERS! `}
                 type="success"
                 whereTo={"/signin"}
               />
             )}
-            {activationErrorReason && (
+            {confirmPasswordResetErrorReason && (
               <Toaster
-                message={activationErrorReason}
+                message={confirmPasswordResetErrorReason}
                 type="error"
                 whereTo={false}
               />
             )}
+            {/* {JSON.stringify(token)} */}
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>

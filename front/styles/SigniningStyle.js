@@ -2,6 +2,20 @@ import { makeStyles } from "@material-ui/core/styles";
 import styled from "styled-components";
 export const SignUpError = styled.div`
   color: red;
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 0.5s;
+
+  @keyframes fadeInOpacity {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 `;
 
 export const useStyles = makeStyles(theme => ({

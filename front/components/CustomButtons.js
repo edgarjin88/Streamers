@@ -2,10 +2,11 @@ import React, { memo } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 
-const StyledButton = styled.button`
+export const StyledButton1 = styled.button`
   color: ${({ color }) => (color ? color : "#55c57a")};
   font-size: ${({ size }) => (size ? size : "inherit")};
   cursor: pointer;
+  margin-top: 1rem;
   background-color: transparent;
   display: inline-block;
   text-decoration: none;
@@ -32,10 +33,10 @@ const StyledButton = styled.button`
 `;
 
 //props, dynamic color change
-export const CustomButton1 = ({ text, size, color, onClick }) => {
-  return (
-    <StyledButton onClick={onClick} type="button" color={color} size={size}>
-      {text}
-    </StyledButton>
-  );
-};
+// export const CustomButton1 = ({ text, size, color, onClick }) => {
+//   return (
+//     <StyledButton onClick={onClick} type="button" color={color} size={size}>
+//       {text}
+//     </StyledButton>
+//   );
+// };
