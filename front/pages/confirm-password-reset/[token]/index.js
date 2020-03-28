@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { CONFIRM_PASSWORD_RESET_REQUEST } from "../../../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
@@ -15,13 +14,11 @@ import Toaster from "../../../components/Toaster";
 import { useStyles } from "../../../styles/SigniningStyle";
 // to be moved to styling folder later.
 
-import { StyledButton1 } from "../../../components/CustomButtons";
 import Copyright from "../../../components/Copyright";
 
 import jwt from "jsonwebtoken";
 import LinearDeterminate from "../../../components/Progressbar";
 
-import { ACTIVATION_REQUEST } from "../../../reducers/user";
 import {
   MemoEmail,
   MemoPassword,
@@ -36,36 +33,8 @@ export default function SignInSide() {
   //make sure only accessible when not logged in
 
   const classes = useStyles();
-  /////////Logic //////////
-  //get token, and move to signin page. toaster.
-  // when submit, use redux again. just token. It is OK.
-  //make some more components with memo.
-  let { userId } = jwt.decode(token);
 
-  // const {
-  //   password,
-  //   passwordCheck,
-  //   passwordError,
-  //   passwordCheckError
-  // } = useSelector(({ input }) => {
-  //   return {
-  //     password: input.password,
-  //     passwordCheck: input.passwordCheck,
-  //     passwordError: input.passwordError,
-  //     passwordCheckError: input.passwordCheckError
-  //   };
-  // }, shallowEqual);
-  // const handleClick = e => {
-  //   e.preventDefault();
-  //   if (password && passwordCheck && !passwordError && passwordCheckError)
-  //     dispatch({
-  //       type: CONFIRM_PASSWORD_RESET_REQUEST,
-  //       data: {
-  //         userId: userId,
-  //         password: password
-  //       }
-  //     });
-  // };
+  let { userId } = jwt.decode(token);
 
   const {
     confirmPasswordReset,
@@ -130,7 +99,6 @@ export default function SignInSide() {
                 whereTo={false}
               />
             )}
-            {/* {JSON.stringify(token)} */}
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>

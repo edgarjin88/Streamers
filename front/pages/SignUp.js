@@ -1,7 +1,6 @@
-import React, { useEffect, useState, memo, useCallback } from "react";
+import React, { useEffect } from "react";
 import Router from "next/router";
 import { useSelector, shallowEqual } from "react-redux";
-import { SIGN_UP_REQUEST } from "../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
@@ -11,7 +10,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
 import Toaster from "../components/Toaster";
-import { useStyles, SignUpError } from "../styles/SigniningStyle";
+import { useStyles } from "../styles/SigniningStyle";
 // to be moved to styling folder later.
 
 import Link from "../components/CustomLinks";
@@ -34,7 +33,6 @@ export default function SignInSide() {
   /////////Logic //////////
 
   const { isLoading, signUpErrorReason } = useSelector(({ user }) => {
-    // console.log("signup error reason: ", signUpErrorReason);
     return {
       isLoading: user.isLoading,
       signUpErrorReason: user.signUpErrorReason

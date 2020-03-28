@@ -44,11 +44,6 @@ export const SignUpError = styled.div`
   }
 `;
 
-// display: inline-block;
-//   visibility: ${props => props.out ? 'hidden' : 'visible'};
-//   animation: ${props => props.out ? fadeOut : fadeIn} 1s linear;
-//   transition: visibility 1s linear;
-
 export const useStyles = makeStyles(theme => ({
   root: {
     height: "100vh",

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -30,8 +30,11 @@ import { useStyles } from "../styles/HideBarStyle";
 //actions
 import { LOG_OUT_REQUEST } from "../reducers/user";
 
-import { Drawers } from "./SubHideBarComponents";
+import { Drawers } from "./Drawers";
 import { OPEN_DRAWER, CLOSE_DRAWER } from "../reducers/menu";
+import { SignInButton } from "./SignInButton";
+import { MemoSearchInput, MemoMenuIcon } from "./MenuBarComponents";
+import { LogoAndName } from "../components/MenuComponents";
 
 ///////// stylings to be seperated
 const HideOnScroll = props => {
@@ -45,27 +48,20 @@ const HideOnScroll = props => {
 };
 
 ///////// stylings to be seperated
-///////// stylings to be seperated
 
 export default function HideAppBar(props) {
   const theme = useTheme();
 
   const { me } = useSelector(state => state.user);
-  const { profilePhoto } = useSelector(state => state.post);
+  const { backDrop } = useSelector(({ menu }) => {
+    return { backDrop: menu.backDrop };
+  }, shallowEqual);
 
   const dispatch = useDispatch();
 
-  // OPEN_DRAWER;
-
-  const handleDrawerOpen = () => {
-    dispatch({
-      type: OPEN_DRAWER
-    });
-  };
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
-  const [backDrop, setBackDrop] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
@@ -104,6 +100,7 @@ export default function HideAppBar(props) {
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
     </Menu>
   );
+
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <Menu
@@ -150,12 +147,11 @@ export default function HideAppBar(props) {
       <div className={classes.root}>
         <CssBaseline />
         <Backdrop
-          style={{ backgroundColor: "rgba(19, 19, 20, 0.72)", zIndex: 200 }}
+          style={{ backgroundColor: "rgba(19, 19, 20, 0.72)", zIndex: 300 }}
           open={backDrop}
         />
 
         <HideOnScroll {...props}>
-          {/* <AppBar color="inherit"> */}
           <AppBar
             position="fixed"
             color="inherit"
@@ -171,24 +167,9 @@ export default function HideAppBar(props) {
                 placeSelf: "center"
               }}
             >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                className={clsx(classes.menuButton, open && classes.hide)}
-              >
-                <MenuIcon
-                  style={{
-                    fontSize: "30px"
-                  }}
-                />
-              </IconButton>
-              <Typography className={classes.title} variant="h4" noWrap>
-                <Link href="/index">
-                  <a>Streamers</a>
-                </Link>
-              </Typography>
+              {/* memoMenu */}
+              <MemoMenuIcon />
+              <LogoAndName />
               <div className={classes.search}>
                 <div>
                   <SearchIcon
@@ -196,66 +177,54 @@ export default function HideAppBar(props) {
                     className={classes.searchIcon}
                   />
                 </div>
-                <InputBase
-                  style={{ fontSize: "15px", fontWeight: "bold" }}
-                  placeholder="Search…"
-                  classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput
-                  }}
-                  inputProps={{ "aria-label": "search" }}
-                />
+                <MemoSearchInput />
               </div>
-              <div className={classes.sectionDesktop}>
-                <IconButton aria-label="show 4 new mails" color="inherit">
-                  <Badge badgeContent={4} color="secondary">
-                    <MailIcon fontSize="large" />
-                  </Badge>
-                </IconButton>
-                <IconButton
-                  aria-label="show 17 new notifications"
-                  color="inherit"
-                >
-                  <Badge badgeContent={17} color="secondary">
-                    <NotificationsIcon fontSize="large" />
-                  </Badge>
-                </IconButton>
-                <IconButton
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-controls={menuId}
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <AccountCircle fontSize="large" />
-                </IconButton>
-              </div>
-              <div className={classes.sectionMobile}>
-                <IconButton
-                  aria-label="show more"
-                  aria-controls={mobileMenuId}
-                  aria-haspopup="true"
-                  onClick={handleMobileMenuOpen}
-                  color="inherit"
-                >
-                  <MoreIcon fontSize="large" />
-                </IconButton>
-              </div>
+              {me ? (
+                <div className={classes.sectionDesktop}>
+                  <IconButton aria-label="show 4 new mails" color="inherit">
+                    <Badge badgeContent={4} color="secondary">
+                      <MailIcon fontSize="large" />
+                    </Badge>
+                  </IconButton>
+                  <IconButton
+                    aria-label="show 17 new notifications"
+                    color="inherit"
+                  >
+                    <Badge badgeContent={17} color="secondary">
+                      <NotificationsIcon fontSize="large" />
+                    </Badge>
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="account of current user"
+                    aria-controls={menuId}
+                    aria-haspopup="true"
+                    onClick={handleProfileMenuOpen}
+                    color="inherit"
+                  >
+                    <AccountCircle fontSize="large" />
+                  </IconButton>
+                </div>
+              ) : (
+                <SignInButton />
+              )}
+              {me && (
+                <div className={classes.sectionMobile}>
+                  <IconButton
+                    aria-label="show more"
+                    aria-controls={mobileMenuId}
+                    aria-haspopup="true"
+                    onClick={handleMobileMenuOpen}
+                    color="inherit"
+                  >
+                    <MoreIcon fontSize="large" />
+                  </IconButton>
+                </div>
+              )}
             </Toolbar>
           </AppBar>
         </HideOnScroll>
         <Drawers theme={theme} classes={classes} />
-
-        {/* <Drawer
-          className={classes.drawer}
-          variant="persistent"
-          anchor="left"
-          open={open}
-          classes={{
-            paper: classes.drawerPaper
-          }}
-        ></Drawer> */}
 
         {renderMobileMenu}
         {renderMenu}

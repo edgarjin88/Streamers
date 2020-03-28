@@ -17,10 +17,10 @@ export const initialState = {
   untouchedPassword: true,
   untouchedPasswordCheck: true,
   untouchedNickname: true,
-  untouchedEmail: true
+  untouchedEmail: true,
+  searchValue: ""
 };
 
-//use effect 같은 애들은 onsubmit action 발행했을 때 리셋하는 걸로 가자.
 export const SET_NICKNAME = "SET_NICKNAME";
 export const SET_NICKNAME_ERROR = "SET_NICKNAME_ERROR";
 export const SET_EMAIL = "SET_EMAIL";
@@ -31,6 +31,7 @@ export const SET_PASSWORD_CHECK = "SET_PASSWORD_CHECK";
 export const SET_PASSWORD_CHECK_ERROR = "SET_PASSWORD_CHECK_ERROR";
 export const SET_TERM = "SET_TERM";
 export const SET_TERM_ERROR = "SET_TERM_ERROR";
+export const SET_SEARCH_VALUE = "SET_SEARCH_VALUE";
 
 export const CLEAR_INPUT_FIELDS = "CLEAR_INPUT_FIELDS";
 // export const OPEN_BACKDROP = "OPEN_BACKDROP";
@@ -39,6 +40,10 @@ export const CLEAR_INPUT_FIELDS = "CLEAR_INPUT_FIELDS";
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case SET_SEARCH_VALUE: {
+        draft.searchValue = action.data;
+        break;
+      }
       case SET_EMAIL_ERROR: {
         draft.emailError = true;
         break;

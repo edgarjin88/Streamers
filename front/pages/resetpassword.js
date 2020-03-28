@@ -1,10 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
-import Router, { useRouter } from "next/router";
-import { useSelector, useDispatch, shallowEqual } from "react-redux";
-
-import { LOG_IN_REQUEST, PASSWORD_RESET_REQUEST } from "../reducers/user";
-import { CLEAR_INPUT_FIELDS } from "../reducers/input";
-import jwt from "jsonwebtoken";
+import React from "react";
+import { useSelector, shallowEqual } from "react-redux";
 
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -27,17 +22,8 @@ import {
   MemoSubmitPasswordReset
 } from "../containers/MemoForSign";
 
-// import {
-//   TwitterOAUTH,
-//   FacebookOAUTH,
-//   LinkedInOAUTH,
-//   GoogleOAUTH,
-//   InstagramOAUTH
-// } from "../containers/SocialIcons";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
 
-// import { faCoffee } from "@fortawesome/free-solid-svg-icons";
-// @fortawesome/free-brands-svg-icons
 export default function SignInSide() {
   const classes = useStyles();
   /////Logic //////////
@@ -50,7 +36,6 @@ export default function SignInSide() {
     },
     shallowEqual
   );
-  // const Ico = <FontAwesomeIcon icon={faCoffee} />;
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -87,13 +72,9 @@ export default function SignInSide() {
               }}
             >
               <MemoSubmitPasswordReset />
-              {/* <Ico />
-               */}
             </div>
-            {/* <FacebookOAUTH />  */}
             <SocialLinks />
 
-            {/* <FontAwesomeIcon /> */}
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>
