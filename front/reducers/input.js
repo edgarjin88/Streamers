@@ -12,7 +12,12 @@ export const initialState = {
   passwordCheck: "",
   passwordCheckError: false,
   term: false,
-  termError: false
+  termError: false,
+  untouchedTerm: true,
+  untouchedPassword: true,
+  untouchedPasswordCheck: true,
+  untouchedNickname: true,
+  untouchedEmail: true
 };
 
 //use effect 같은 애들은 onsubmit action 발행했을 때 리셋하는 걸로 가자.
@@ -54,17 +59,22 @@ export default (state = initialState, action) => {
       case SET_NICKNAME: {
         draft.nickname = action.data;
         draft.nicknameError = !!!action.data;
+        draft.untouchedNickname = false;
         break;
       }
 
       case SET_EMAIL: {
         draft.email = action.data;
         draft.emailError = !validateEmail(action.data);
+        draft.untouchedEmail = false;
+
         break;
       }
       case SET_PASSWORD: {
         draft.password = action.data;
         draft.passwordError = !!!action.data;
+        draft.untouchedPassword = false;
+
         break;
       }
       case SET_PASSWORD_ERROR: {
@@ -74,11 +84,15 @@ export default (state = initialState, action) => {
       case SET_PASSWORD_CHECK: {
         draft.passwordCheck = action.data;
         draft.passwordCheckError = draft.password !== draft.passwordCheck;
+        draft.untouchedPasswordCheck = false;
+
         break;
       }
       case SET_TERM: {
         draft.term = action.data;
         draft.termError = !draft.term;
+        draft.untouchedTerm = false;
+
         break;
       }
 

@@ -131,8 +131,12 @@ export const MemoSubmitPasswordReset = memo(function MemoSubmitPasswordReset() {
 
 export const MemoEmail = memo(function MemoEmail() {
   const dispatch = useDispatch();
-  const { email, emailError } = useSelector(({ input }) => {
-    return { email: input.email, emailError: input.emailError };
+  const { email, emailError, untouchedEmail } = useSelector(({ input }) => {
+    return {
+      email: input.email,
+      emailError: input.emailError,
+      untouchedEmail: input.untouchedEmail
+    };
   }, shallowEqual);
 
   const handleChange = e =>
@@ -155,22 +159,30 @@ export const MemoEmail = memo(function MemoEmail() {
         onChange={handleChange}
         autoFocus
       />
-
-      {emailError && (
-        <SignUpError>Please enter proper email address</SignUpError>
-      )}
+      {/* {JSON.stringify} */}
+      {
+        <SignUpError
+          show={untouchedEmail ? "untouched" : emailError ? true : false}
+        >
+          Please enter proper email address
+        </SignUpError>
+      }
     </>
   );
 });
 
 export const MemoNickname = memo(function MemoNickname() {
   const dispatch = useDispatch();
-  const { nickname, nicknameError } = useSelector(({ input }) => {
-    return {
-      nickname: input.nickname,
-      nicknameError: input.nicknameError
-    };
-  }, shallowEqual);
+  const { nickname, nicknameError, untouchedNickname } = useSelector(
+    ({ input }) => {
+      return {
+        nickname: input.nickname,
+        nicknameError: input.nicknameError,
+        untouchedNickname: input.untouchedNickname
+      };
+    },
+    shallowEqual
+  );
 
   const handleChange = e =>
     dispatch({
@@ -189,16 +201,29 @@ export const MemoNickname = memo(function MemoNickname() {
         name="nickname"
         onChange={handleChange}
       />
-      {nicknameError && <SignUpError>Please enter Nick Name</SignUpError>}
+      {
+        <SignUpError
+          show={untouchedNickname ? "untouched" : nicknameError ? true : false}
+        >
+          Please enter Nick Name
+        </SignUpError>
+      }
     </>
   );
 });
 
 export const MemoPassword = memo(function MemoPassword() {
   const dispatch = useDispatch();
-  const { password, passwordError } = useSelector(({ input }) => {
-    return { password: input.password, passwordError: input.passwordError };
-  }, shallowEqual);
+  const { password, passwordError, untouchedPassword } = useSelector(
+    ({ input }) => {
+      return {
+        password: input.password,
+        passwordError: input.passwordError,
+        untouchedPassword: input.untouchedPassword
+      };
+    },
+    shallowEqual
+  );
 
   const handleChange = e =>
     dispatch({
@@ -220,17 +245,28 @@ export const MemoPassword = memo(function MemoPassword() {
         autoComplete="current-password"
         onChange={handleChange}
       />
-      {passwordError && <SignUpError>Please enter your password</SignUpError>}
+      {
+        <SignUpError
+          show={untouchedPassword ? "untouched" : passwordError ? true : false}
+        >
+          Please enter your password
+        </SignUpError>
+      }
     </>
   );
 });
 
 export const MemoPasswordCheck = memo(function MemoPasswordCheck() {
   const dispatch = useDispatch();
-  const { passwordCheck, passwordCheckError } = useSelector(({ input }) => {
+  const {
+    passwordCheck,
+    passwordCheckError,
+    untouchedPasswordCheck
+  } = useSelector(({ input }) => {
     return {
       passwordCheck: input.passwordCheck,
-      passwordCheckError: input.passwordCheckError
+      passwordCheckError: input.passwordCheckError,
+      untouchedPasswordCheck: input.untouchedPasswordCheck
     };
   }, shallowEqual);
 
@@ -253,18 +289,29 @@ export const MemoPasswordCheck = memo(function MemoPasswordCheck() {
         onChange={handleChange}
       />
 
-      {passwordCheckError && (
-        <SignUpError>Entered password does not match.</SignUpError>
-      )}
+      {
+        <SignUpError
+          show={
+            untouchedPasswordCheck
+              ? "untouched"
+              : passwordCheckError
+              ? true
+              : false
+          }
+        >
+          Entered password does not match.
+        </SignUpError>
+      }
     </>
   );
 });
 export const MemoTerm = memo(function MemoTerm() {
   const dispatch = useDispatch();
-  const { term, termError } = useSelector(({ input }) => {
+  const { term, termError, untouchedTerm } = useSelector(({ input }) => {
     return {
       term: input.term,
-      termError: input.termError
+      termError: input.termError,
+      untouchedTerm: input.untouchedTerm
     };
   }, shallowEqual);
 
@@ -286,7 +333,13 @@ export const MemoTerm = memo(function MemoTerm() {
         }
         label="I read and agree to the terms and conditions"
       />
-      {termError && <SignUpError>You have to agree to terms. </SignUpError>}
+      {
+        <SignUpError
+          show={untouchedTerm ? "untouched" : termError ? true : false}
+        >
+          You have to agree to terms.{" "}
+        </SignUpError>
+      }
     </>
   );
 });
@@ -416,52 +469,3 @@ export const MemoSignUp = memo(function MemoSignUp({ className }) {
     </>
   );
 });
-
-// export const ActivationButton = ({className})=> {
-//   const dispatch = useDispatch();
-//   const { isLoading } = useSelector(state => state.user, shallowEqual);
-//   const { email, emailError, password, passwordError } = useSelector(
-//     ({ input }) => {
-//       return {
-//         email: input.email,
-//         emailError: input.emailError,
-//         password: input.password,
-//         passwordError: input.passwordError
-//       };
-//     },
-//     shallowEqual
-//   );
-
-//   const onSignIn = () => {
-//     if (!emailError && !passwordError && email && password) {
-//       return dispatch({
-//         type: LOG_IN_REQUEST,
-//         data: {
-//           userId: email,
-//           password
-//         }
-//       });
-//     }
-//   };
-//   return (
-//     <>
-//       <Button
-//         fullWidth
-//         variant="contained"
-//         color="primary"
-//         className={className}
-//         onClick={onSignIn}
-//       >
-//         {isLoading && (
-//           <CircularProgress
-//             color="secondary"
-//             size={20}
-//             style={{ marginRight: "20px" }}
-//           />
-//         )}
-//         Sign In
-//       </Button>
-//     </>
-//   );
-// })
-// }

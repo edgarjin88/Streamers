@@ -26,6 +26,18 @@ import {
   MemoSignIn,
   MemoSubmitPasswordReset
 } from "../containers/MemoForSign";
+
+// import {
+//   TwitterOAUTH,
+//   FacebookOAUTH,
+//   LinkedInOAUTH,
+//   GoogleOAUTH,
+//   InstagramOAUTH
+// } from "../containers/SocialIcons";
+import { SocialLinks } from "../containers/SocialIconLinksFlat";
+
+// import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+// @fortawesome/free-brands-svg-icons
 export default function SignInSide() {
   const classes = useStyles();
   /////Logic //////////
@@ -38,7 +50,7 @@ export default function SignInSide() {
     },
     shallowEqual
   );
-
+  // const Ico = <FontAwesomeIcon icon={faCoffee} />;
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -53,7 +65,6 @@ export default function SignInSide() {
           </Typography>
           <form className={classes.form} noValidate>
             <MemoEmail />
-
             {resetPasswordErrorReason && (
               <Toaster
                 message={resetPasswordErrorReason}
@@ -76,8 +87,13 @@ export default function SignInSide() {
               }}
             >
               <MemoSubmitPasswordReset />
+              {/* <Ico />
+               */}
             </div>
+            {/* <FacebookOAUTH />  */}
+            <SocialLinks />
 
+            {/* <FontAwesomeIcon /> */}
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>

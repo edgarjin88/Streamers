@@ -21,21 +21,7 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import clsx from "clsx";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import MyVideo from "@material-ui/icons/OndemandVideo";
-import MessageIcon from "@material-ui/icons/Forum";
-import LogOut from "@material-ui/icons/ExitToApp";
-import SettingsIcon from "@material-ui/icons/Settings";
-import PolicyIcon from "@material-ui/icons/Policy";
 import { Backdrop } from "@material-ui/core";
 
 import Link from "next/link";

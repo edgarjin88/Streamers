@@ -2,21 +2,52 @@ import { makeStyles } from "@material-ui/core/styles";
 import styled from "styled-components";
 export const SignUpError = styled.div`
   color: red;
-  opacity: 1;
-  animation-name: fadeInOpacity;
-  animation-iteration-count: 1;
-  animation-timing-function: ease-in;
-  animation-duration: 0.5s;
+  display: inline-block;
 
+  visibility: ${({ show }) => {
+    return show === "untouched"
+      ? "hidden"
+      : show == true
+      ? "visible"
+      : "hidden";
+  }};
+
+  animation-name: ${({ show }) => {
+    return show === "untouched"
+      ? ""
+      : show === true
+      ? "fadeInOpacity"
+      : "fadeOutOpacity";
+  }};
+  animation-timing-function: ease-in;
+  animation-duration: 0.4s;
+  transition: visibility 1s linear;
   @keyframes fadeInOpacity {
     0% {
       opacity: 0;
+      visibility: hidden;
     }
     100% {
       opacity: 1;
+      visibility: visible;
+    }
+  }
+  @keyframes fadeOutOpacity {
+    0% {
+      opacity: 1;
+      visibility: visible;
+    }
+    100% {
+      opacity: 0;
+      visibility: hidden;
     }
   }
 `;
+
+// display: inline-block;
+//   visibility: ${props => props.out ? 'hidden' : 'visible'};
+//   animation: ${props => props.out ? fadeOut : fadeIn} 1s linear;
+//   transition: visibility 1s linear;
 
 export const useStyles = makeStyles(theme => ({
   root: {
