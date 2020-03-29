@@ -302,5 +302,22 @@ router.get(
     res.redirect("http://localhost:3000/");
   }
 );
+router.get(
+  "/auth/instagram",
+  passport.authenticate("instagram", {
+    scope: ["public_profile", "email"]
+  })
+);
+
+router.get(
+  "/auth/instagram/callback",
+  passport.authenticate("instagram", {
+    failureRedirect: "/http://localhost:3000/signin"
+  }),
+  (req, res) => {
+    console.log("fired here");
+    res.redirect("http://localhost:3000/");
+  }
+);
 
 module.exports = router;

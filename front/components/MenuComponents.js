@@ -1,19 +1,33 @@
 import React, { memo, useState, useCallback } from "react";
 import Typography from "@material-ui/core/Typography";
 import { useStyles } from "../styles/HideBarStyle";
-
+import MovieIcon from "@material-ui/icons/Movie";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
+import VideocamIcon from "@material-ui/icons/Videocam";
+import VideocamTwoToneIcon from "@material-ui/icons/VideocamTwoTone";
 
+import VideocamOutlinedIcon from "@material-ui/icons/VideocamOutlined";
 export const LogoAndName = memo(function LogoAndName() {
   const classes = useStyles();
   // to add animation log later
   return (
     <Typography className={classes.title} variant="h4" noWrap>
       <Link href="/index">
-        <a>Streamers</a>
+        <a
+          style={{
+            display: "flex",
+            justifyItems: "center",
+            alignItems: "center"
+          }}
+        >
+          <VideocamIcon
+            style={{ marginLeft: "15px", fontSize: "35px", color: "black" }}
+          />
+          <strong style={{ color: "orange" }}>STREAMERS</strong>.com
+        </a>
       </Link>
     </Typography>
   );

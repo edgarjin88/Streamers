@@ -31,12 +31,3 @@ export const StyledButton1 = styled.button`
     outline: none;
   }
 `;
-
-//props, dynamic color change
-// export const CustomButton1 = ({ text, size, color, onClick }) => {
-//   return (
-//     <StyledButton onClick={onClick} type="button" color={color} size={size}>
-//       {text}
-//     </StyledButton>
-//   );
-// };

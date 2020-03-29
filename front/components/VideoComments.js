@@ -202,7 +202,7 @@ const VideoComments = () => {
       <button name="showComment" onClick={handleBoolean}>
         Casdjoaisdfji
       </button>
-      {JSON.stringify(showComment)}
+      {/* {JSON.stringify(showComment)} */}
       {renderCommentHeader()}
 
       <div id="comment-list-container">

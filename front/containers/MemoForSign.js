@@ -22,7 +22,7 @@ import {
 } from "../reducers/input";
 import {
   SIGN_UP_REQUEST,
-  LOG_IN_REQUEST,
+  SIGN_IN_REQUEST,
   PASSWORD_RESET_REQUEST,
   CONFIRM_PASSWORD_RESET_REQUEST
 } from "../reducers/user";
@@ -362,7 +362,7 @@ export const MemoSignIn = memo(function MemoSignIn({ className }) {
   const onSignIn = () => {
     if (!emailError && !passwordError && email && password) {
       return dispatch({
-        type: LOG_IN_REQUEST,
+        type: SIGN_IN_REQUEST,
         data: {
           userId: email,
           password

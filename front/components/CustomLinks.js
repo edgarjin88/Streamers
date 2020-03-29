@@ -5,7 +5,7 @@ import styled from "styled-components";
 const StyledLink = styled.a`
   color: ${({ color }) => (color ? color : "#55c57a")};
   font-size: ${({ size }) => (size ? size : "inherit")};
-  cursor: pointer
+  cursor: pointer;
   display: inline-block;
   text-decoration: none;
   border-bottom: 1px solid ${({ color }) => (color ? color : "#55c57a")};
@@ -16,7 +16,7 @@ const StyledLink = styled.a`
     color: #fff;
     box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
-    cursor: pointer
+    cursor: pointer;
   }
   :active {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);

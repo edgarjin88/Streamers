@@ -22,7 +22,7 @@ export const StyledIcon = styled.div`
         opacity: 1;
         display: inline-block;
         width: 10rem;
-        background-color: black;
+        rgba(0, 0, 0, 0.60)
       }
     }
     :active {
@@ -50,11 +50,16 @@ export const StyledIcon = styled.div`
 `;
 export const SignInButton = memo(function SignInButton() {
   return (
-    <StyledIcon title="Sign In">
+    <StyledIcon>
       <div>
         <Link href="/signin">
           <a>
-            <FontAwesomeIcon icon={faSignInAlt} size="3x" />
+            <FontAwesomeIcon
+              color="black"
+              // color="rgba(0, 0, 0, 0.60)"
+              icon={faSignInAlt}
+              size="3x"
+            />
           </a>
         </Link>
       </div>

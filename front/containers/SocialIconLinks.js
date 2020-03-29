@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LOG_OUT_REQUEST } from "../reducers/user";
+import { SIGN_OUT_REQUEST } from "../reducers/user";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

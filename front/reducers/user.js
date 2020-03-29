@@ -1,9 +1,11 @@
 import produce from "immer";
 
 export const initialState = {
-  logInErrorReason: "",
+  signInErrorReason: "",
   isSignedUp: false,
   signUpErrorReason: "",
+  signOutSuccess: false,
+  signOutErrorReason: "",
   me: null,
   followingList: [],
   followerList: [],
@@ -25,17 +27,17 @@ export const SIGN_UP_REQUEST = "SIGN_UP_REQUEST";
 export const SIGN_UP_SUCCESS = "SIGN_UP_SUCCESS";
 export const SIGN_UP_FAILURE = "SIGN_UP_FAILURE";
 
-export const LOG_IN_REQUEST = "LOG_IN_REQUEST";
-export const LOG_IN_SUCCESS = "LOG_IN_SUCCESS";
-export const LOG_IN_FAILURE = "LOG_IN_FAILURE";
+export const SIGN_IN_REQUEST = "SIGN_IN_REQUEST";
+export const SIGN_IN_SUCCESS = "SIGN_IN_SUCCESS";
+export const SIGN_IN_FAILURE = "SIGN_IN_FAILURE";
 
 export const LOAD_USER_REQUEST = "LOAD_USER_REQUEST";
 export const LOAD_USER_SUCCESS = "LOAD_USER_SUCCESS";
 export const LOAD_USER_FAILURE = "LOAD_USER_FAILURE";
 
-export const LOG_OUT_REQUEST = "LOG_OUT_REQUEST";
-export const LOG_OUT_SUCCESS = "LOG_OUT_SUCCESS";
-export const LOG_OUT_FAILURE = "LOG_OUT_FAILURE";
+export const SIGN_OUT_REQUEST = "SIGN_OUT_REQUEST";
+export const SIGN_OUT_SUCCESS = "SIGN_OUT_SUCCESS";
+export const SIGN_OUT_FAILURE = "SIGN_OUT_FAILURE";
 
 export const LOAD_FOLLOWERS_REQUEST = "LOAD_FOLLOWERS_REQUEST";
 export const LOAD_FOLLOWERS_SUCCESS = "LOAD_FOLLOWERS_SUCCESS";
@@ -75,9 +77,15 @@ export const CONFIRM_PASSWORD_RESET_REQUEST = "CONFIRM_PASSWORD_RESET_REQUEST";
 export const CONFIRM_PASSWORD_RESET_FAILURE = "CONFIRM_PASSWORD_RESET_FAILURE";
 export const CONFIRM_PASSWORD_RESET_SUCCESS = "CONFIRM_PASSWORD_RESET_SUCCESS";
 
+export const NULLIFY_SIGN_OUT = "NULLIFY_SIGN_OUT";
+
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case NULLIFY_SIGN_OUT: {
+        draft.signOutSuccess = false;
+        break;
+      }
       case PASSWORD_RESET_REQUEST: {
         draft.confirmPasswordReset = false;
         draft.confirmPasswordResetErrorReason = "";
@@ -138,29 +146,31 @@ export default (state = initialState, action) => {
         draft.me = null;
         break;
       }
-      case LOG_IN_REQUEST: {
+      case SIGN_IN_REQUEST: {
         draft.isLoading = true;
-        draft.logInErrorReason = "";
+        draft.signInErrorReason = "";
         break;
       }
-      case LOG_IN_SUCCESS: {
+      case SIGN_IN_SUCCESS: {
         draft.isLoading = false;
-        draft.logInErrorReason = "";
+        draft.signOutSuccess = false;
+        draft.signInErrorReason = "";
         draft.me = action.data;
         break;
       }
-      case LOG_IN_FAILURE: {
+      case SIGN_IN_FAILURE: {
         draft.isLoading = false;
-        draft.logInErrorReason = action.reason;
+        draft.signInErrorReason = action.reason;
         draft.me = null;
         break;
       }
-      case LOG_OUT_REQUEST: {
+      case SIGN_OUT_REQUEST: {
         draft.isLoading = true;
         break;
       }
-      case LOG_OUT_SUCCESS: {
+      case SIGN_OUT_SUCCESS: {
         draft.isLoading = false;
+        draft.signOutSuccess = true;
         draft.me = null;
         break;
       }
@@ -172,6 +182,7 @@ export default (state = initialState, action) => {
       }
       case SIGN_UP_SUCCESS: {
         draft.isLoading = false;
+        draft.signOutSuccess = false;
         draft.isSignedUp = true;
         break;
       }

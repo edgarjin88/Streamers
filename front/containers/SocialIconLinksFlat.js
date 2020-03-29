@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LOG_OUT_REQUEST } from "../reducers/user";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -77,9 +76,7 @@ export const FacebookOAUTH = () => {
     <>
       <StyledIconList backgroundColor={"#3b5999"}>
         <a href="#">
-          {/* <span> */}
           <FontAwesomeIcon icon={faFacebookF} size="sm" />
-          {/* </span> */}
         </a>
       </StyledIconList>
     </>
@@ -128,15 +125,26 @@ export const InstagramOAUTH = () => {
 
 export const SocialLinks = () => {
   return (
-    <ul
-      style={{ position: "relative", margin: 0, padding: 0, display: "flex" }}
-    >
-      <FacebookOAUTH />
-      {/* <InstagramOAUTH /> */}
-      <GoogleOAUTH />
-      {/* <LinkedInOAUTH /> */}
-      <TwitterOAUTH />
-      <InstagramOAUTH />
-    </ul>
+    <div>
+      <div style={{ textAlign: "center" }}>
+        <strong>Or Sign in With:</strong>
+      </div>
+      <ul
+        style={{
+          position: "relative",
+          margin: 0,
+          padding: 0,
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <FacebookOAUTH />
+        {/* <InstagramOAUTH /> */}
+        <GoogleOAUTH />
+        {/* <LinkedInOAUTH /> */}
+        <TwitterOAUTH />
+        <InstagramOAUTH />
+      </ul>
+    </div>
   );
 };

@@ -3,6 +3,7 @@ const db = require("../models");
 const local = require("./local");
 const google = require("./google");
 const facebook = require("./facebook");
+const instagram = require("./instagram");
 // const twitter = require("./twitter");
 module.exports = () => {
   passport.serializeUser((user, done) => {
@@ -44,6 +45,7 @@ module.exports = () => {
   local();
   google();
   facebook();
+  instagram();
   // twitter();
 };
 

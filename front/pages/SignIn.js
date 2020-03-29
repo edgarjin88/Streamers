@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 
-import { LOG_IN_REQUEST } from "../reducers/user";
+import { SIGN_IN_REQUEST } from "../reducers/user";
 import { CLEAR_INPUT_FIELDS } from "../reducers/input";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -21,6 +21,7 @@ import Link from "../components/CustomLinks";
 import Copyright from "../components/Copyright";
 
 import { MemoEmail, MemoPassword, MemoSignIn } from "../containers/MemoForSign";
+import { SocialLinks } from "../containers/SocialIconLinksFlat";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -59,13 +60,10 @@ export default function SignInSide() {
           </Typography>
           <form className={classes.form} noValidate>
             <MemoEmail />
-
             <MemoPassword />
-
             {me && (
               <Toaster message="Login Success!" type="success" whereTo="/" />
             )}
-
             {logInErrorReason && (
               <Toaster
                 message={logInErrorReason}
@@ -73,12 +71,12 @@ export default function SignInSide() {
                 whereTo={false}
               />
             )}
-
             <MemoSignIn className={classes.submit} />
 
+            <SocialLinks />
             <Grid container>
               <Grid item xs>
-                <Link href={"/passwordre"} text="For got password?" />
+                <Link href={"/resetpassword"} text="For got password?" />
               </Grid>
 
               <Grid item>

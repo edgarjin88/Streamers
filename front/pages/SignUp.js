@@ -25,6 +25,7 @@ import {
 } from "../containers/MemoForSign";
 
 import LinearDeterminate from "../components/Progressbar";
+import { SocialLinks } from "../containers/SocialIconLinksFlat";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -63,9 +64,7 @@ export default function SignInSide() {
             <MemoEmail />
             <MemoNickname />
             <MemoPassword />
-
             <MemoPasswordCheck />
-
             <MemoTerm />
             {isLoading && (
               <Toaster
@@ -74,7 +73,6 @@ export default function SignInSide() {
                 whereTo="/signin"
               />
             )}
-
             {signUpErrorReason && (
               <Toaster
                 message={signUpErrorReason}
@@ -82,9 +80,9 @@ export default function SignInSide() {
                 whereTo={false}
               />
             )}
-
             <MemoSignUp className={classes.submit} />
             {isLoading && <LinearDeterminate />}
+            <SocialLinks />
             <Grid container>
               <Grid item>
                 <Link href={"signin"} text="Already a member? Sign in!" />

@@ -16,12 +16,12 @@ import {
   LOAD_USER_FAILURE,
   LOAD_USER_REQUEST,
   LOAD_USER_SUCCESS,
-  LOG_IN_FAILURE,
-  LOG_IN_REQUEST,
-  LOG_IN_SUCCESS,
-  LOG_OUT_FAILURE,
-  LOG_OUT_REQUEST,
-  LOG_OUT_SUCCESS,
+  SIGN_IN_FAILURE,
+  SIGN_IN_REQUEST,
+  SIGN_IN_SUCCESS,
+  SIGN_OUT_FAILURE,
+  SIGN_OUT_REQUEST,
+  SIGN_OUT_SUCCESS,
   REMOVE_FOLLOWER_FAILURE,
   REMOVE_FOLLOWER_REQUEST,
   REMOVE_FOLLOWER_SUCCESS,
@@ -36,7 +36,8 @@ import {
   ACTIVATION_FAILURE,
   PASSWORD_RESET_FAILURE,
   PASSWORD_RESET_SUCCESS,
-  PASSWORD_RESET_REQUEST
+  PASSWORD_RESET_REQUEST,
+  NULLIFY_SIGN_OUT
 } from "../reducers/user";
 
 const https = require("https");
@@ -60,20 +61,20 @@ function* logIn(action) {
   try {
     const result = yield call(logInAPI, action.data);
     yield put({
-      type: LOG_IN_SUCCESS,
+      type: SIGN_IN_SUCCESS,
       data: result.data
     });
   } catch (e) {
     console.error("this is error for login action", e.response);
     yield put({
-      type: LOG_IN_FAILURE,
+      type: SIGN_IN_FAILURE,
       reason: e.response && e.response.data
     });
   }
 }
 
 function* watchLogIn() {
-  yield takeEvery(LOG_IN_REQUEST, logIn);
+  yield takeEvery(SIGN_IN_REQUEST, logIn);
 }
 
 function signUpAPI(signUpData) {
@@ -118,19 +119,19 @@ function* logOut() {
     yield call(logOutAPI);
     yield put({
       //
-      type: LOG_OUT_SUCCESS
+      type: SIGN_OUT_SUCCESS
     });
   } catch (e) {
     console.error(e);
     yield put({
-      type: LOG_OUT_FAILURE,
+      type: SIGN_OUT_FAILURE,
       error: e
     });
   }
 }
 
 function* watchLogOut() {
-  yield takeEvery(LOG_OUT_REQUEST, logOut);
+  yield takeEvery(SIGN_OUT_REQUEST, logOut);
 }
 
 function loadUserAPI(userId) {

@@ -45,7 +45,11 @@ export default function CustomizedSnackbars({ message, type, whereTo }) {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={handleClose}
       >
-        <Alert onClose={handleClose} severity={type}>
+        <Alert
+          style={{ zIndex: 100000, fontSize: "16px" }}
+          onClose={handleClose}
+          severity={type}
+        >
           {message}
         </Alert>
       </Snackbar>
