@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import Router from "next/router";
-import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-import { SIGN_IN_REQUEST } from "../reducers/user";
 import { CLEAR_INPUT_FIELDS } from "../reducers/input";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -22,6 +21,7 @@ import Copyright from "../components/Copyright";
 
 import { MemoEmail, MemoPassword, MemoSignIn } from "../containers/MemoForSign";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
+import { LogoAndName } from "../components/MenuComponents";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -41,7 +41,7 @@ export default function SignInSide() {
     if (me) {
       setTimeout(() => {
         Router.push("/");
-      }, 2000);
+      }, 6000);
     }
   }, [me]);
 
@@ -52,17 +52,19 @@ export default function SignInSide() {
 
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign In
+          <LogoAndName />
+          <Typography component="h2" variant="h5">
+            Welcome to the excitements!
           </Typography>
           <form className={classes.form} noValidate>
             <MemoEmail />
             <MemoPassword />
             {me && (
-              <Toaster message="Login Success!" type="success" whereTo="/" />
+              <Toaster
+                message="You are signed in succesfully. Redirecting to the main page."
+                type="success"
+                whereTo="/"
+              />
             )}
             {logInErrorReason && (
               <Toaster

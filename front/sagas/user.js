@@ -37,7 +37,15 @@ import {
   PASSWORD_RESET_FAILURE,
   PASSWORD_RESET_SUCCESS,
   PASSWORD_RESET_REQUEST,
-  NULLIFY_SIGN_OUT
+  OAUTH_SIGN_IN_REQUEST,
+  OAUTH_SIGN_IN_SUCCESS,
+  OAUTH_SIGN_IN_FAILURE,
+  CHANGE_PASSWORD_FAILURE,
+  CHANGE_PASSWORD_REQUEST,
+  CHANGE_PASSWORD_SUCCESS,
+  CONFIRM_PASSWORD_RESET_REQUEST,
+  CONFIRM_PASSWORD_RESET_SUCCESS,
+  CONFIRM_PASSWORD_RESET_FAILURE
 } from "../reducers/user";
 
 const https = require("https");
@@ -50,16 +58,16 @@ const httpsAgent =
       })
     : undefined;
 
-function logInAPI(loginData) {
+function signInAPI(loginData) {
   return axios.post("/user/login", loginData, {
     withCredentials: true,
     httpsAgent
   });
 }
 
-function* logIn(action) {
+function* signIn(action) {
   try {
-    const result = yield call(logInAPI, action.data);
+    const result = yield call(signInAPI, action.data);
     yield put({
       type: SIGN_IN_SUCCESS,
       data: result.data
@@ -73,8 +81,8 @@ function* logIn(action) {
   }
 }
 
-function* watchLogIn() {
-  yield takeEvery(SIGN_IN_REQUEST, logIn);
+function* watchSignIn() {
+  yield takeEvery(SIGN_IN_REQUEST, signIn);
 }
 
 function signUpAPI(signUpData) {
@@ -125,7 +133,7 @@ function* logOut() {
     console.error(e);
     yield put({
       type: SIGN_OUT_FAILURE,
-      error: e
+      reason: e.response && e.response.data
     });
   }
 }
@@ -388,9 +396,110 @@ function* watchPasswordReset() {
   yield takeEvery(PASSWORD_RESET_REQUEST, passwordResetRequest);
 }
 
+//wath login 부분 바꾸고,
+//카카오랑 기타등등 다 추가하기.
+//링크 부분만 스트링 인터폴레이션 가능한지 생각해 보기.
+// 결국 익스프레스 설치 해야 한다.
+
+function OauthSignInAPI(loginData) {
+  return axios.get(`/user/auth/${loginData}`, {
+    withCredentials: true,
+    httpsAgent
+  });
+}
+
+function* OauthSignIn(action) {
+  try {
+    const result = yield call(OauthSignInAPI, action.data);
+    yield put({
+      type: OAUTH_SIGN_IN_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error("this is error for login action", e.response);
+    yield put({
+      type: OAUTH_SIGN_IN_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchOauthSignIn() {
+  yield takeEvery(OAUTH_SIGN_IN_REQUEST, OauthSignIn);
+}
+
+function changePasswordAPI(password) {
+  return axios.patch(
+    "/user/password",
+    { password },
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
+}
+
+function* changePassword(action) {
+  console.log("change password fired :", action);
+  try {
+    const result = yield call(changePasswordAPI, action.data);
+    yield put({
+      type: CHANGE_PASSWORD_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error(e);
+
+    yield put({
+      type: CHANGE_PASSWORD_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchChangePassword() {
+  yield takeEvery(CHANGE_PASSWORD_REQUEST, changePassword);
+}
+
+function confirmResetPasswordAPI(data) {
+  return axios.patch("/user/confirm-password-reset", data, {
+    withCredentials: true,
+    httpsAgent
+  });
+}
+
+function* confirmResetPassword(action) {
+  console.log("change password fired :", action);
+  try {
+    const result = yield call(confirmResetPasswordAPI, action.data);
+    yield put({
+      type: CONFIRM_PASSWORD_RESET_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error(
+      "this is error for confirm_PASSWORD_RESET action",
+      e.response
+    );
+
+    // console.error(e.data);
+
+    yield put({
+      type: CONFIRM_PASSWORD_RESET_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchConfirmPasswordReset() {
+  yield takeEvery(CONFIRM_PASSWORD_RESET_REQUEST, confirmResetPassword);
+}
 export default function* userSaga() {
   yield all([
-    fork(watchLogIn),
+    fork(watchConfirmPasswordReset),
+    fork(watchChangePassword),
+    fork(watchOauthSignIn),
+    fork(watchSignIn),
     fork(watchLogOut),
     fork(watchLoadUser),
     fork(watchSignUp),

@@ -25,6 +25,9 @@ import {
   MemoPasswordCheck,
   MemoConfirmPasswordReset
 } from "../../../containers/MemoForSign";
+
+import { SET_RESET_PASSWORD_LINK } from "../../../reducers/input";
+
 export default function SignInSide() {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -49,12 +52,18 @@ export default function SignInSide() {
   }, shallowEqual);
 
   useEffect(() => {
+    if (token) {
+      dispatch({
+        type: SET_RESET_PASSWORD_LINK,
+        data: token
+      });
+    }
     if (confirmPasswordReset) {
       setTimeout(() => {
         Router.push("/signin");
       }, 6000);
     }
-  }, [confirmPasswordReset]);
+  }, [confirmPasswordReset, token]);
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -87,7 +96,7 @@ export default function SignInSide() {
 
             {confirmPasswordReset && (
               <Toaster
-                message={`Activation Success. Signin and enjoy STREAMERS! `}
+                message={`Password changed. Enjoy STREAMERS! `}
                 type="success"
                 whereTo={"/signin"}
               />

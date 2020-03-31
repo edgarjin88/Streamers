@@ -6,26 +6,39 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import Toaster from "../components/Toaster";
-import { NULLIFY_SIGN_OUT } from "../reducers/user";
+import { NULLIFY_SIGN_OUT, NULLIFY_SIGN_IN_SUCCESS } from "../reducers/user";
 
 const Index = () => {
   const dispatch = useDispatch();
-  const { me, signOutSuccess, signoutErrorReason } = useSelector(({ user }) => {
-    return {
-      me: user.me,
-      signOutSuccess: user.signOutSuccess,
-      signoutErrorReason: user.signoutErrorReason
-    };
-  }, shallowEqual);
+  const { me, signOutSuccess, signInSuccess, signoutErrorReason } = useSelector(
+    ({ user }) => {
+      return {
+        me: user.me,
+        signOutSuccess: user.signOutSuccess,
+        signoutErrorReason: user.signoutErrorReason,
+        signInSuccess: user.signInSuccess
+      };
+    },
+    shallowEqual
+  );
 
   useEffect(() => {
     console.log("nulifyfired");
     if (signOutSuccess) {
-      dispatch({
-        type: NULLIFY_SIGN_OUT
-      });
+      setTimeout(() => {
+        dispatch({
+          type: NULLIFY_SIGN_OUT
+        });
+      }, 1000);
     }
-  }, [NULLIFY_SIGN_OUT]);
+    if (signInSuccess) {
+      setTimeout(() => {
+        dispatch({
+          type: NULLIFY_SIGN_IN_SUCCESS
+        });
+      }, 1000);
+    }
+  }, [signOutSuccess, signInSuccess]);
 
   return (
     <div className="container">
@@ -43,6 +56,7 @@ const Index = () => {
           type="success"
         />
       )}
+
       {signoutErrorReason && (
         <Toaster message={signoutErrorReason} whereTo={false} type="error" />
       )}

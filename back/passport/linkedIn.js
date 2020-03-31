@@ -1,5 +1,5 @@
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const LinkedInStrategy = require("passport-linkedin-oauth2").Strategy;
 
 const db = require("../models");
 const { User } = require("../models");
@@ -7,11 +7,13 @@ const { User } = require("../models");
 module.exports = () => {
   console.log("local fired");
   passport.use(
-    new GoogleStrategy(
+    new LinkedInStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECERET,
-        callbackURL: "http://localhost:3003/api/user/auth/google/callback"
+        clientID: process.env.LINKEDIN_CLIENT_ID,
+        clientSecret: process.env.LINKEDIN_CLIENT_SECERET,
+        callbackURL: "http://localhost:3003/api/user/auth/linkedin/callback"
+        // scope: ["r_emailaddress", "r_basicprofile"],
+        // state: true
       },
 
       async (accessToken, refreshToken, profile, done) => {
@@ -20,7 +22,7 @@ module.exports = () => {
           const existingUser = await User.findOne({
             where: {
               OAuthID: profile.id,
-              provider: "google"
+              provider: "linkedIn"
             }
           });
 
@@ -29,13 +31,18 @@ module.exports = () => {
           }
 
           const newUser = await db.User.create({
-            userId: profile._json && profile._json.email,
+            userId: profile.id,
             nickname: profile.displayName,
             OAuthID: profile.id,
-            profilePhoto: profile._json && profile._json.picture,
-            provider: "google"
+            profilePhoto:
+              (profile &&
+                profile.photos &&
+                profile.photos[3] &&
+                profile.photos[3].value) ||
+              null,
+            provider: "linkedIn"
           });
-          console.log("new user from google: ", newUser);
+          console.log("new user from linkedIn: ", newUser);
           return done(null, newUser);
         } catch (error) {
           console.error("error fired :", error);

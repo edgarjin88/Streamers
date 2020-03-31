@@ -9,46 +9,45 @@ require("dotenv").config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-exports.confirmPasswordReset = (req, res) => {
-  const { resetPasswordLink, newPassword } = req.body;
-
-  if (resetPasswordLink) {
-    jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, function(
-      err,
-      decoded
-    ) {
-      if (err) {
-        return res.status(400).json({
-          error: "Expired link. Try again"
-        });
-      }
-
-      User.findOne({ resetPasswordLink }, (err, user) => {
-        if (err || !user) {
-          return res.status(400).json({
-            error: "Something went wrong. Try later"
-          });
-        }
-
-        const updatedFields = {
-          password: newPassword,
-          resetPasswordLink: ""
-        };
-
-        user = _.extend(user, updatedFields);
-
-        user.save((err, result) => {
-          if (err) {
-            return res.status(400).json({
-              error: "Error resetting user password"
-            });
-          }
-          res.json({
-            message: `Great! Now you can login with your new password`
-          });
-        });
-      });
+exports.confirmPasswordReset = async (req, res, next) => {
+  console.log("confirm fired :", req.body);
+  try {
+    const { resetPasswordLink, password } = req.body;
+    console.log("password :", password);
+    console.log("link :", resetPasswordLink);
+    const hashedPassword = await bcrypt.hash(password, 12);
+    console.log("password :", hashedPassword);
+    const exUser = await db.User.findOne({
+      where: { resetPasswordLink: resetPasswordLink }
     });
+
+    console.log(" exUser :", exUser);
+    // if (resetPasswordLink) {
+    //   jwt.verify(
+    //     resetPasswordLink,
+    //     process.env.JWT_RESET_PASSWORD,
+    //     (err, decoded) => {
+    //       if (err) {
+    //         return res.status(400).send("Expired Link. Try again");
+    //       }
+    //     }
+    //   );
+    // } else {
+    // }
+    if (!exUser) {
+      return res
+        .status(400)
+        .send("Cannot find any user with the token. Please try again.");
+    }
+    await exUser.update({
+      password: hashedPassword,
+      resetPasswordLink: ""
+    });
+    return res.send("Updated you passowrd successfully");
+  } catch (e) {
+    console.error(" error confirmation :", e);
+    // next(e);
+    return res.status(400).send(e);
   }
 };
 
@@ -87,7 +86,10 @@ exports.passwordReset = async (req, res) => {
       `
   };
   try {
-    await exUser.update({ resetPassword: token });
+    console.log("updated token :", token);
+    await exUser.update({ resetPasswordLink: token });
+
+    console.log("updated user :", exUser);
     sgMail.send(emailData).then(sent => {
       return res
         .status(200)
@@ -124,7 +126,7 @@ exports.signup = async (req, res) => {
   const emailData = {
     from: process.env.EMAIL_FROM,
     to: userId,
-    subject: `Account activation link`,
+    subject: `Account activation email`,
     html: `
                <h1>Hi ${nickname},  Wellcome to STREAMERS !</h1>
                 <p>In order to activate your STREAMERS account, please click the below link. </p>
@@ -141,7 +143,7 @@ exports.signup = async (req, res) => {
     .then(sent => {
       // console.log('SIGNUP EMAIL SENT', sent)
       return res.send(
-        `Email has been sent to ${userId}. Follow the instruction to activate your account`
+        `Activation email has been sent to ${userId}. Follow the instruction to activate your account`
       );
     })
     .catch(err => {
@@ -187,5 +189,30 @@ exports.accountActivation = (req, res) => {
     });
   } else {
     return res.send("Something went wwrong. Try again");
+  }
+};
+
+exports.passwordChange = async (req, res, next) => {
+  try {
+    console.log("passowr update started :", req.body.password.password);
+    const hashedPassword = await bcrypt.hash(req.body.password.password, 12);
+
+    console.log("user id:", req.user.id);
+    const me = await db.User.findOne({
+      where: {
+        id: req.user.id
+      }
+    });
+    if (!me) {
+      return res.status(400).send("User not found");
+    }
+    await me.update({
+      password: hashedPassword
+    });
+    return res.status(200).send("Password updated successfully");
+  } catch (e) {
+    console.error(e);
+    res.status(400).send("Unable to change password. Please try again later.");
+    // next(e);
   }
 };

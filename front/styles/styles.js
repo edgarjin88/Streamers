@@ -1,11 +1,5 @@
 import { createGlobalStyle } from "styled-components";
 
-// const GlobalStyle = createGlobalStyle`
-//   .container {
-//     color: ${props => (props.whiteColor ? "white" : "black")};
-//   }
-// `;
-
 export const GlobalStyleOne = createGlobalStyle`
   * {
   margin: 0;

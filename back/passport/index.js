@@ -4,6 +4,8 @@ const local = require("./local");
 const google = require("./google");
 const facebook = require("./facebook");
 const instagram = require("./instagram");
+const kakao = require("./kakao");
+const linkedIn = require("./linkedIn");
 // const twitter = require("./twitter");
 module.exports = () => {
   passport.serializeUser((user, done) => {
@@ -46,7 +48,8 @@ module.exports = () => {
   google();
   facebook();
   instagram();
-  // twitter();
+  kakao();
+  linkedIn();
 };
 
 //deserialize to be cached

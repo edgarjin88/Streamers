@@ -17,12 +17,14 @@ const router = express.Router();
 const {
   accountActivation,
   signup,
-  passwordReset
+  passwordReset,
+  passwordChange,
+  confirmPasswordReset
 } = require("../controllers/auth");
 
 router.get("/", isLoggedIn, (req, res) => {
   // /api/user/
-  const user = Object.assign({}, req.user.toJSON()); //.  //change use object from sequelize to json
+  const user = Object.assign({}, req.user.toJSON());
   delete user.password; //password
   return res.json(user);
 });
@@ -245,6 +247,7 @@ router.get("/:id/posts", async (req, res, next) => {
 
 router.patch("/nickname", isLoggedIn, async (req, res, next) => {
   //partial update, isLoggedIn to be checked
+  console.log("nickname body:", req.body);
   try {
     await db.User.update(
       {
@@ -264,6 +267,9 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.patch("/password", isLoggedIn, passwordChange);
+router.patch("/confirm-password-reset", confirmPasswordReset);
+
 router.get(
   "/auth/google",
   passport.authenticate("google", {
@@ -281,7 +287,7 @@ router.get(
   }),
   (req, res) => {
     console.log("fired here");
-    res.redirect("http://localhost:3000/");
+    res.redirect("http://localhost:3000/signin");
   }
 );
 
@@ -299,7 +305,7 @@ router.get(
   }),
   (req, res) => {
     console.log("fired here");
-    res.redirect("http://localhost:3000/");
+    res.redirect("http://localhost:3000/signin");
   }
 );
 router.get(
@@ -312,11 +318,46 @@ router.get(
 router.get(
   "/auth/instagram/callback",
   passport.authenticate("instagram", {
-    failureRedirect: "/http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin"
   }),
   (req, res) => {
     console.log("fired here");
+    res.redirect("http://localhost:3000/signin");
+  }
+);
+router.get(
+  "/auth/kakao",
+  passport.authenticate("kakao", {
+    failureRedirect: "http://localhost:3000/signin"
+  })
+);
+
+router.get(
+  "/auth/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "http://localhost:3000/signin"
+  }),
+  (req, res) => {
+    console.log("kakao fired here");
     res.redirect("http://localhost:3000/");
+  }
+);
+
+router.get(
+  "/auth/linkedin",
+  passport.authenticate("linkedin", {
+    failureRedirect: "http://localhost:3000/signin"
+  })
+);
+
+router.get(
+  "/auth/linkedin/callback",
+  passport.authenticate("linkedin", {
+    failureRedirect: "http://localhost:3000/signin"
+  }),
+  (req, res) => {
+    console.log(" linkedin fired here");
+    res.redirect("http://localhost:3000/signin");
   }
 );
 

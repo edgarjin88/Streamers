@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Router from "next/router";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 import TextField from "@material-ui/core/TextField";
 import { SignUpError } from "../styles/SigniningStyle";
@@ -24,10 +25,79 @@ import {
   SIGN_UP_REQUEST,
   SIGN_IN_REQUEST,
   PASSWORD_RESET_REQUEST,
-  CONFIRM_PASSWORD_RESET_REQUEST
+  CONFIRM_PASSWORD_RESET_REQUEST,
+  CHANGE_PASSWORD_REQUEST,
+  START_CHANGE_PASSWORD
 } from "../reducers/user";
 import { StyledButton1 } from "../components/CustomButtons";
 
+export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
+  className
+}) {
+  const dispatch = useDispatch();
+  const { isLoading, startedChangingPassword, resetPasswordLink } = useSelector(
+    ({ user }) => {
+      return {
+        resetPasswordLink: user.resetPasswordLink,
+        isLoading: user.isLoading,
+        startedChangingPassword: user.startedChangingPassword
+      };
+    },
+    shallowEqual
+  );
+  const {
+    password,
+    passwordError,
+    passwordCheck,
+    passwordCheckError
+  } = useSelector(({ input }) => {
+    return {
+      passwordCheck: input.passwordCheck,
+      passwordCheckError: input.passwordCheckError,
+      password: input.password,
+      passwordError: input.passwordError
+    };
+  }, shallowEqual);
+
+  const handleChangePassword = useCallback(() => {
+    dispatch({
+      type: START_CHANGE_PASSWORD
+    });
+  }, [startedChangingPassword]);
+
+  const handleSavePassword = useCallback(() => {
+    if (password && !passwordError && !passwordCheckError && passwordCheck) {
+      dispatch({
+        type: CHANGE_PASSWORD_REQUEST,
+        data: { password, resetPasswordLink }
+      });
+    }
+  }, [password, passwordCheck]);
+
+  return (
+    <>
+      <Button
+        onClick={
+          startedChangingPassword ? handleSavePassword : handleChangePassword
+        }
+        variant="contained"
+        color="primary"
+        style={{ float: "right" }}
+        // className={classes.button}
+        startIcon={<CloudUploadIcon />}
+      >
+        {startedChangingPassword ? "Save" : "Change Password"}
+      </Button>
+      {startedChangingPassword && (
+        <MemoPasswordCheck size="16px" labelSize="16px" />
+      )}
+    </>
+  );
+});
+
+//
+//
+//
 export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
   userId
 }) {
@@ -38,13 +108,15 @@ export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
     password,
     passwordCheck,
     passwordError,
-    passwordCheckError
+    passwordCheckError,
+    resetPasswordLink
   } = useSelector(({ input }) => {
     return {
       password: input.password,
       passwordCheck: input.passwordCheck,
       passwordError: input.passwordError,
-      passwordCheckError: input.passwordCheckError
+      passwordCheckError: input.passwordCheckError,
+      resetPasswordLink: input.resetPasswordLink
     };
   }, shallowEqual);
 
@@ -59,7 +131,7 @@ export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
       dispatch({
         type: CONFIRM_PASSWORD_RESET_REQUEST,
         data: {
-          userId,
+          resetPasswordLink,
           password
         }
       });
@@ -129,7 +201,11 @@ export const MemoSubmitPasswordReset = memo(function MemoSubmitPasswordReset() {
   );
 });
 
-export const MemoEmail = memo(function MemoEmail() {
+export const MemoEmail = memo(function MemoEmail({
+  profileUserId,
+  size,
+  labelSize
+}) {
   const dispatch = useDispatch();
   const { email, emailError, untouchedEmail } = useSelector(({ input }) => {
     return {
@@ -147,17 +223,24 @@ export const MemoEmail = memo(function MemoEmail() {
   return (
     <>
       <TextField
+        InputProps={{
+          style: { fontSize: size }
+        }}
+        InputLabelProps={{
+          style: { fontSize: labelSize }
+        }}
         margin="normal"
         required={true}
         fullWidth
         type="email"
         id="email"
-        label="Email Address"
-        value={email}
+        label="User ID"
+        value={profileUserId ? profileUserId : email}
         name="email"
         autoComplete="email"
         onChange={handleChange}
         autoFocus
+        disabled={profileUserId}
       />
       {/* {JSON.stringify} */}
       {
@@ -171,7 +254,12 @@ export const MemoEmail = memo(function MemoEmail() {
   );
 });
 
-export const MemoNickname = memo(function MemoNickname() {
+export const MemoNickname = memo(function MemoNickname({
+  size,
+  labelSize,
+  disabled,
+  profileNickname
+}) {
   const dispatch = useDispatch();
   const { nickname, nicknameError, untouchedNickname } = useSelector(
     ({ input }) => {
@@ -192,14 +280,21 @@ export const MemoNickname = memo(function MemoNickname() {
   return (
     <>
       <TextField
+        InputProps={{
+          style: { fontSize: size }
+        }}
+        InputLabelProps={{
+          style: { fontSize: labelSize }
+        }}
         margin="normal"
         required={true}
         fullWidth
         id="nickname"
-        value={nickname}
+        value={untouchedNickname ? profileNickname : nickname}
         label="Nick Name"
         name="nickname"
         onChange={handleChange}
+        disabled={disabled}
       />
       {
         <SignUpError
@@ -212,7 +307,11 @@ export const MemoNickname = memo(function MemoNickname() {
   );
 });
 
-export const MemoPassword = memo(function MemoPassword() {
+export const MemoPassword = memo(function MemoPassword({
+  disabled,
+  size,
+  labelSize
+}) {
   const dispatch = useDispatch();
   const { password, passwordError, untouchedPassword } = useSelector(
     ({ input }) => {
@@ -234,6 +333,13 @@ export const MemoPassword = memo(function MemoPassword() {
   return (
     <>
       <TextField
+        InputProps={{
+          style: { fontSize: size }
+        }}
+        InputLabelProps={{
+          style: { fontSize: labelSize }
+        }}
+        disabled={disabled}
         margin="normal"
         required={true}
         fullWidth
@@ -256,7 +362,10 @@ export const MemoPassword = memo(function MemoPassword() {
   );
 });
 
-export const MemoPasswordCheck = memo(function MemoPasswordCheck() {
+export const MemoPasswordCheck = memo(function MemoPasswordCheck({
+  size,
+  labelSize
+}) {
   const dispatch = useDispatch();
   const {
     passwordCheck,
@@ -278,6 +387,12 @@ export const MemoPasswordCheck = memo(function MemoPasswordCheck() {
   return (
     <>
       <TextField
+        InputProps={{
+          style: { fontSize: size }
+        }}
+        InputLabelProps={{
+          style: { fontSize: labelSize }
+        }}
         margin="normal"
         required={true}
         fullWidth
@@ -333,13 +448,12 @@ export const MemoTerm = memo(function MemoTerm() {
         }
         label="I read and agree to the terms and conditions"
       />
-      {
-        <SignUpError
-          show={untouchedTerm ? "untouched" : termError ? true : false}
-        >
-          You have to agree to terms.{" "}
-        </SignUpError>
-      }
+
+      <SignUpError
+        show={untouchedTerm ? "untouched" : termError ? true : false}
+      >
+        You have to agree to terms.{" "}
+      </SignUpError>
     </>
   );
 });

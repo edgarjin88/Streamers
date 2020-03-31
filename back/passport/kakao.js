@@ -1,5 +1,5 @@
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const KakaoStrategy = require("passport-kakao").Strategy;
 
 const db = require("../models");
 const { User } = require("../models");
@@ -7,20 +7,20 @@ const { User } = require("../models");
 module.exports = () => {
   console.log("local fired");
   passport.use(
-    new GoogleStrategy(
+    new KakaoStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECERET,
-        callbackURL: "http://localhost:3003/api/user/auth/google/callback"
+        clientID: process.env.KAKAO_CLIENT_ID,
+        clientSecret: process.env.KAKAO_CLIENT_SECERET,
+        callbackURL: "http://localhost:3003/api/user/auth/kakao/callback"
       },
 
       async (accessToken, refreshToken, profile, done) => {
-        console.log("profile :", profile);
+        console.log("profile kakao:", profile);
         try {
           const existingUser = await User.findOne({
             where: {
-              OAuthID: profile.id,
-              provider: "google"
+              OAuthID: profile._json.id,
+              provider: "kakao"
             }
           });
 
@@ -29,13 +29,14 @@ module.exports = () => {
           }
 
           const newUser = await db.User.create({
-            userId: profile._json && profile._json.email,
+            userId: profile._json && profile._json.id,
             nickname: profile.displayName,
-            OAuthID: profile.id,
-            profilePhoto: profile._json && profile._json.picture,
-            provider: "google"
+            OAuthID: profile._json && profile._json.id,
+            profilePhoto: profile._json && profile._json.profile_image,
+            thumbnail_image: profile._json && profile._json.thumbnail_image,
+            provider: "kakao"
           });
-          console.log("new user from google: ", newUser);
+          console.log("new user from kakao: ", newUser);
           return done(null, newUser);
         } catch (error) {
           console.error("error fired :", error);

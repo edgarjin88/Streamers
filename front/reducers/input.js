@@ -18,7 +18,10 @@ export const initialState = {
   untouchedPasswordCheck: true,
   untouchedNickname: true,
   untouchedEmail: true,
-  searchValue: ""
+  searchValue: "",
+  startedChangingPassword: true,
+  changePasswordErrorReason: "",
+  resetPasswordLink: ""
 };
 
 export const SET_NICKNAME = "SET_NICKNAME";
@@ -34,12 +37,20 @@ export const SET_TERM_ERROR = "SET_TERM_ERROR";
 export const SET_SEARCH_VALUE = "SET_SEARCH_VALUE";
 
 export const CLEAR_INPUT_FIELDS = "CLEAR_INPUT_FIELDS";
+export const SET_RESET_PASSWORD_LINK = "SET_RESET_PASSWORD_LINK";
+
 // export const OPEN_BACKDROP = "OPEN_BACKDROP";
 // export const CLOSE_BACKDROP = "CLOSE_BACKDROP";
 
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case SET_RESET_PASSWORD_LINK:
+        {
+          draft.resetPasswordLink = action.data;
+        }
+        // draft.nickname = action.data;
+        break;
       case SET_SEARCH_VALUE: {
         draft.searchValue = action.data;
         break;

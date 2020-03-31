@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { SIGN_UP_REQUEST } from "../../../reducers/user";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
@@ -15,7 +14,7 @@ import Toaster from "../../../components/Toaster";
 import { useStyles } from "../../../styles/SigniningStyle";
 // to be moved to styling folder later.
 
-import { CustomButton1 } from "../../../components/CustomButtons";
+import { StyledButton1 } from "../../../components/CustomButtons";
 import Copyright from "../../../components/Copyright";
 
 import jwt from "jsonwebtoken";
@@ -31,9 +30,6 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
-  //get token, and move to signin page. toaster.
-  // when submit, use redux again. just token. It is OK.
-  //make some more components with memo.
 
   let { nickname, userId, password } = jwt.decode(token);
   const activationLink = () => (
@@ -98,16 +94,15 @@ export default function SignInSide() {
                 border: "none"
               }}
             >
-              <CustomButton1
+              <StyledButton1
                 onClick={handleClick}
-                text={
-                  isActivated
-                    ? "Your account is activated!"
-                    : "Click to activate your account!"
-                }
                 size="1.4rem"
                 color="#ff3300"
-              />
+              >
+                {isActivated
+                  ? "Your account is activated!"
+                  : "Click to activate your account!"}
+              </StyledButton1>
             </div>
             {isActivated && <LinearDeterminate />}
 

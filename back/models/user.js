@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(400),
         default: "",
         allowNull: true
+      },
+      description: {
+        type: DataTypes.TEXT,
+        default: "Enter description about you",
+        allowNull: true
       }
     },
     {

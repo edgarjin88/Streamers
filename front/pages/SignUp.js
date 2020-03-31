@@ -26,6 +26,7 @@ import {
 
 import LinearDeterminate from "../components/Progressbar";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
+import { LogoAndName } from "../components/MenuComponents";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
@@ -54,11 +55,9 @@ export default function SignInSide() {
 
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign Up
+          <LogoAndName />
+          <Typography component="h2" variant="h5">
+            Welcome to the excitements!
           </Typography>
           <form className={classes.form} noValidate>
             <MemoEmail />

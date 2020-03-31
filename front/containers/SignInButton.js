@@ -45,7 +45,7 @@ export const StyledIcon = styled.div`
     transform: translate(-50%, 10px);
     border-radius: 5%;
     text-align: center;
-    background-color: grey;
+    background-color: orange;
   }
 `;
 export const SignInButton = memo(function SignInButton() {

@@ -47,7 +47,9 @@ export const SignUpError = styled.div`
 export const useStyles = makeStyles(theme => ({
   root: {
     height: "100vh",
-    overflow: "hidden"
+    overflow: "hidden",
+    maxWidth: "1437px",
+    margin: "auto"
   },
   image: {
     backgroundImage: "url(https://source.unsplash.com/random)",
