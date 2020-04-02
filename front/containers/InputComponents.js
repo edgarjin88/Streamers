@@ -19,7 +19,8 @@ import {
   SET_PASSWORD_CHECK_ERROR,
   SET_TERM,
   SET_TERM_ERROR,
-  SET_NICKNAME_ERROR
+  SET_NICKNAME_ERROR,
+  SET_DESCRIPTION
 } from "../reducers/input";
 import {
   SIGN_UP_REQUEST,
@@ -27,9 +28,219 @@ import {
   PASSWORD_RESET_REQUEST,
   CONFIRM_PASSWORD_RESET_REQUEST,
   CHANGE_PASSWORD_REQUEST,
-  START_CHANGE_PASSWORD
+  START_CHANGE_PASSWORD,
+  START_EDIT_DESCRIPTION,
+  EDIT_DESCRIPTION_REQUEST
 } from "../reducers/user";
 import { StyledButton1 } from "../components/CustomButtons";
+
+import MUIRichTextEditor from "mui-rte";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import {
+  EditorState,
+  convertFromRaw,
+  convertToRaw,
+  ContentState
+} from "draft-js";
+// convertToRaw : data type is RawDraftContentState
+// EditorState : hold all state of texteditor. Immutable object.
+// Editor editor itself.
+// editorState: EditorState.createEmpty() to push back empty state to editor
+
+// editorState back to up date
+// updateEditorState(editorState){
+//   this.ListeningStateChangedEvent({ editorState });
+// }
+// onChange={(this.updateEditorState.bind(this))}
+
+//  const [Ques, setQues] = useState({
+//    answer: "",
+//    question: ""
+//  });
+
+//  const handleChange = prop => event => {
+//    setQues({ ...Ques, [prop]: event.target.value });
+//    console.log(event.target.value);
+//  };
+export const RichTextEditor = () => {
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+  // import {
+  //   EditorState,
+  //   convertFromRaw,
+  //   convertToRaw,
+  //   ContentState
+  // } from "draft-js";
+
+  //   convertFromRaw,
+  //   convertToRaw, 이 두개를 사용 해야 하는 듯.
+
+  console.log("editorState :", editorState);
+  console.log("editorState :", editorState);
+  // getCurrentContent(): ContentState
+  // const handleChange = prop => event => {
+  //   const content = JSON.stringify(convertToRaw(event.getCurrentContent()));
+
+  //   // setQues({ ...Ques, [prop]: content });
+  //   console.log("this is content: ", content);
+  //   console.log("this is evetn: ", evetn);
+  //   console.log("this is props: ", props);
+  // };
+  const handleChange = editorState => {
+    console.log("currnetstate :", editorState.getCurrentContent());
+    setEditorState(editorState);
+  };
+
+  const defaultTheme = createMuiTheme();
+  Object.assign(defaultTheme, {
+    overrides: {
+      MUIRichTextEditor: {
+        root: {
+          marginTop: 20,
+          width: "100%",
+          height: "300px"
+        },
+        editor: {
+          borderBottom: "1px solid red",
+          height: "200px",
+          overflowY: "scroll"
+        }
+      }
+    }
+  });
+  const { description } = useSelector(({ input }) => input);
+  const { startedEditingDescription, userDescription } = useSelector(
+    ({ user }) => {
+      return {
+        startedEditingDescription: user.startedEditingDescription,
+        userDescription: user.description
+      };
+    }
+  );
+  const dispatch = useDispatch();
+  const handleSaveDescription = useCallback(() => {
+    dispatch({
+      type: EDIT_DESCRIPTION_REQUEST,
+      data: description
+    });
+  }, [description, startedEditingDescription]);
+
+  const handleEditDescription = useCallback(() => {
+    dispatch({
+      type: START_EDIT_DESCRIPTION
+    });
+  }, [startedEditingDescription, description]);
+
+  // const handleChange = useCallback(
+  //   e => {
+  //     dispatch({
+  //       type: SET_DESCRIPTION,
+  //       data: e.target.value
+  //     });
+  //   },
+  //   [description]
+  // );
+
+  return (
+    <>
+      <MuiThemeProvider theme={defaultTheme}>
+        <MUIRichTextEditor
+          // className={classes.richText}
+          onChange={handleChange}
+          readOnly={false}
+          toolbar={true}
+          inlineToolbar={true}
+          value={JSON.stringify(convertFromRaw(editorState))}
+          onSave={handleSaveDescription}
+          label="Start typing..."
+          // value={convertToRaw(editorState)}
+        />
+      </MuiThemeProvider>
+      <Button
+        onClick={
+          startedEditingDescription
+            ? handleSaveDescription
+            : handleEditDescription
+        }
+        variant="contained"
+        color="primary"
+        style={{ float: "right" }}
+        // className={classes.button}
+        startIcon={<CloudUploadIcon />}
+      >
+        {!startedEditingDescription ? "Edit Description" : "Save"}
+      </Button>
+    </>
+  );
+};
+
+export const MemoProfileDescription = memo(function MemoProfileDescription() {
+  const { description } = useSelector(({ input }) => input);
+  const { startedEditingDescription, userDescription } = useSelector(
+    ({ user }) => {
+      return {
+        startedEditingDescription: user.startedEditingDescription,
+        userDescription: user.description
+      };
+    }
+  );
+
+  const dispatch = useDispatch();
+  const handleSaveDescription = useCallback(() => {
+    dispatch({
+      type: EDIT_DESCRIPTION_REQUEST,
+      data: description
+    });
+  }, [description, startedEditingDescription]);
+
+  const handleEditDescription = useCallback(() => {
+    dispatch({
+      type: START_EDIT_DESCRIPTION
+    });
+  }, [startedEditingDescription, description]);
+
+  const handleChange = useCallback(
+    e => {
+      dispatch({
+        type: SET_DESCRIPTION,
+        data: e.target.value
+      });
+    },
+    [description]
+  );
+  return (
+    <>
+      {startedEditingDescription && (
+        <TextField
+          id="standard-multiline-static"
+          label="Description"
+          multiline
+          onChange={handleChange}
+          value={userDescription ? userDescription : description}
+          // defaultValue={description}
+          InputProps={{
+            style: { fontSize: "14px" }
+          }}
+          fullWidth
+        />
+      )}
+      <Button
+        onClick={
+          startedEditingDescription
+            ? handleSaveDescription
+            : handleEditDescription
+        }
+        variant="contained"
+        color="primary"
+        style={{ float: "right" }}
+        // className={classes.button}
+        startIcon={<CloudUploadIcon />}
+      >
+        {!startedEditingDescription ? "Edit Description" : "Save"}
+      </Button>
+    </>
+  );
+});
 
 export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
   className
@@ -101,7 +312,6 @@ export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
 export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
   userId
 }) {
-  // let { userId } = jwt.decode(token);
   const dispatch = useDispatch();
 
   const {

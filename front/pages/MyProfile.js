@@ -7,54 +7,67 @@ import Card from "../components/Card";
 import Toaster from "../components/Toaster";
 import {
   NULLIFY_CHANGE_PASSWORD_SUCCESS,
-  NULLIFY_EDIT_NICKNAME_SUCCESS
+  NULLIFY_EDIT_NICKNAME_SUCCESS,
+  NULLIFY_EDIT_DESCRIPTION_SUCCESS
 } from "../reducers/user";
-import { NULLIFY_SIGN_IN_SUCCESS } from "../reducers/user";
-
+import { useRouter } from "next/router";
 const Profile = () => {
-  const dispatch = useDispatch();
-  const { changePasswordSuccess, editNicknameSuccess } = useSelector(
-    ({ user }) => {
-      return {
-        editNicknameSuccess: user.editNicknameSuccess,
-        changePasswordSuccess: user.changePasswordSuccess
-      };
-    },
-    shallowEqual
-  );
+  const Router = useRouter();
 
+  const dispatch = useDispatch();
+  const {
+    changePasswordSuccess,
+    editNicknameSuccess,
+    editDescriptionSuccess,
+    me
+  } = useSelector(({ user }) => {
+    return {
+      editNicknameSuccess: user.editNicknameSuccess,
+      changePasswordSuccess: user.changePasswordSuccess,
+      editDescriptionSuccess: user.editDescriptionSuccess,
+      me: user.me
+    };
+  }, shallowEqual);
+  useEffect(() => {
+    if (!me) {
+      Router.push("/");
+    }
+  });
   useEffect(() => {
     setTimeout(() => {
       dispatch({
         type: changePasswordSuccess
           ? NULLIFY_CHANGE_PASSWORD_SUCCESS
-          : NULLIFY_EDIT_NICKNAME_SUCCESS
+          : editNicknameSuccess
+          ? NULLIFY_EDIT_NICKNAME_SUCCESS
+          : NULLIFY_EDIT_DESCRIPTION_SUCCESS
       });
-    }, 2000);
-  }, [changePasswordSuccess, editNicknameSuccess]);
+    }, 1000);
+  }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
   return (
     <div className="container">
       <GlobalStyleOne />
       <HideBar />
 
       <main>
-        <Card />
+        {me && <Card />}
         <div>
           Dependnig on redux states, login, password change, profile update to
           show.{" "}
         </div>
         <RelatedVideos />
       </main>
-      {changePasswordSuccess && (
+      {(changePasswordSuccess ||
+        editNicknameSuccess ||
+        editDescriptionSuccess) && (
         <Toaster
-          message="Password Updated Successfully"
-          type="success"
-          whereTo={false}
-        />
-      )}
-      {editNicknameSuccess && (
-        <Toaster
-          message="Nickname Updated Successfully"
+          message={
+            changePasswordSuccess
+              ? "Password Updated Successfully"
+              : editNicknameSuccess
+              ? "Nickname Updated Successfully"
+              : "Profile Description Updated Successfully"
+          }
           type="success"
           whereTo={false}
         />

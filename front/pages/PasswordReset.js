@@ -20,7 +20,7 @@ import {
   MemoPassword,
   MemoSignIn,
   MemoSubmitPasswordReset
-} from "../containers/MemoForSign";
+} from "../containers/InputComponents";
 
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
 

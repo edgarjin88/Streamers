@@ -43,6 +43,9 @@ import {
   CHANGE_PASSWORD_FAILURE,
   CHANGE_PASSWORD_REQUEST,
   CHANGE_PASSWORD_SUCCESS,
+  EDIT_DESCRIPTION_FAILURE,
+  EDIT_DESCRIPTION_REQUEST,
+  EDIT_DESCRIPTION_SUCCESS,
   CONFIRM_PASSWORD_RESET_REQUEST,
   CONFIRM_PASSWORD_RESET_SUCCESS,
   CONFIRM_PASSWORD_RESET_FAILURE
@@ -494,8 +497,41 @@ function* confirmResetPassword(action) {
 function* watchConfirmPasswordReset() {
   yield takeEvery(CONFIRM_PASSWORD_RESET_REQUEST, confirmResetPassword);
 }
+
+function editDescriptionAPI(description) {
+  return axios.patch(
+    "/user/description",
+    { description },
+    {
+      withCredentials: true,
+      httpsAgent
+    }
+  );
+}
+
+function* editDescription(action) {
+  try {
+    const result = yield call(editDescriptionAPI, action.data);
+    yield put({
+      type: EDIT_DESCRIPTION_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error(e);
+
+    yield put({
+      type: EDIT_DESCRIPTION_FAILURE,
+      reason: e.response && e.response.data
+    });
+  }
+}
+
+function* watchEditDescription() {
+  yield takeEvery(EDIT_DESCRIPTION_REQUEST, editDescription);
+}
 export default function* userSaga() {
   yield all([
+    fork(watchEditDescription),
     fork(watchConfirmPasswordReset),
     fork(watchChangePassword),
     fork(watchOauthSignIn),

@@ -28,7 +28,10 @@ export const initialState = {
   startedEditingNickname: false,
   startedChangingPassword: false,
   changePasswordSuccess: false,
-  changePasswordErrorReason: ""
+  changePasswordErrorReason: "",
+  startedEditingDescription: false,
+  editDescriptionSuccess: false,
+  editDescriptionErrorReason: ""
 };
 
 export const NULLIFY_CHANGE_PASSWORD_SUCCESS =
@@ -43,7 +46,14 @@ export const CHANGE_PASSWORD_REQUEST = "CHANGE_PASSWORD_REQUEST";
 export const CHANGE_PASSWORD_FAILURE = "CHANGE_PASSWORD_FAILURE";
 export const CHANGE_PASSWORD_SUCCESS = "CHANGE_PASSWORD_SUCCESS";
 
+export const NULLIFY_EDIT_DESCRIPTION_SUCCESS =
+  "NULLIFY_EDIT_DESCRIPTION_SUCCESS";
+export const EDIT_DESCRIPTION_REQUEST = "EDIT_DESCRIPTION_REQUEST";
+export const EDIT_DESCRIPTION_FAILURE = "EDIT_DESCRIPTION_FAILURE";
+export const EDIT_DESCRIPTION_SUCCESS = "EDIT_DESCRIPTION_SUCCESS";
+
 export const START_EDIT_NICKNAME = "START_EDIT_NICKNAME";
+export const START_EDIT_DESCRIPTION = "START_EDIT_DESCRIPTION";
 
 export const SIGN_UP_REQUEST = "SIGN_UP_REQUEST";
 export const SIGN_UP_SUCCESS = "SIGN_UP_SUCCESS";
@@ -110,6 +120,43 @@ export const OAUTH_SIGN_IN_FAILURE = "OAUTH_SIGN_IN_FAILURE";
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case NULLIFY_EDIT_DESCRIPTION_SUCCESS: {
+        draft.startedEditingDescription = false;
+        draft.editDescriptionErrorReason = "";
+        draft.editDescriptionSuccess = false;
+        // draft.nickname = action.data;
+        break;
+      }
+      case START_EDIT_DESCRIPTION: {
+        draft.startedEditingDescription = true;
+        draft.editDescriptionErrorReason = "";
+        draft.editDescriptionSuccess = false;
+
+        // draft.nickname = action.data;
+        break;
+      }
+      case EDIT_DESCRIPTION_REQUEST: {
+        draft.startedEditingDescription = true;
+        draft.editDescriptionErrorReason = "";
+        draft.editDescriptionSuccess = false;
+
+        break;
+      }
+      case EDIT_DESCRIPTION_SUCCESS: {
+        draft.startedEditingDescription = false;
+        draft.editDescriptionErrorReason = "";
+        draft.editDescriptionSuccess = true;
+        draft.me.description = action.data;
+
+        break;
+      }
+      case EDIT_DESCRIPTION_FAILURE: {
+        draft.startedEditingDescription = false;
+        draft.changePasswordSuccess = false;
+        draft.changePasswordErrorReason = action.error;
+        break;
+      }
+
       case NULLIFY_CHANGE_PASSWORD_SUCCESS: {
         draft.startedChangingPassword = false;
         draft.changePasswordSuccess = false;
@@ -230,7 +277,6 @@ export default (state = initialState, action) => {
         draft.isLoading = false;
         draft.isActivated = true;
         draft.activationErrorReason = "";
-        console.log("activation success : data:", action);
         // draft.me = action.data;
         break;
       }

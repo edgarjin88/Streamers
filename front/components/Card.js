@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import {
   LOAD_FOLLOWERS_REQUEST,
@@ -10,6 +10,7 @@ import {
   START_CHANGE_PASSWORD,
   CHANGE_PASSWORD_REQUEST
 } from "../reducers/user";
+import { useRouter } from "next/router";
 
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -40,15 +41,15 @@ import {
   MemoEmail,
   MemoNickname,
   MemoPassword,
-  MemoPasswordCheck,
-  MemoTerm,
-  MemoSignUp,
-  MemoSubmitPasswordChange
-} from "../containers/MemoForSign";
+  MemoSubmitPasswordChange,
+  MemoProfileDescription,
+  RichTextEditor
+} from "../containers/InputComponents";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: "600px",
+    maxWidth: "995px",
+    // margin: "auto",
     marginTop: "30px",
     fontSize: "14px"
   },
@@ -64,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     transform: "rotate(0deg)",
     marginLeft: "auto",
     transition: theme.transitions.create("transform", {
-      duration: theme.transitions.duration.shortest
+      duration: 300
     })
   },
   expandOpen: {
@@ -77,6 +78,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function RecipeReviewCard() {
   const classes = useStyles();
+
   const [expanded, setExpanded] = React.useState(false);
   // const [description, setDescription] = useState(dummyText);
   const handleExpandClick = () => {
@@ -94,9 +96,11 @@ export default function RecipeReviewCard() {
     hasMoreFollower,
     hasMoreFollowing,
     startedEditingNickname,
+    startedEditingDescription,
     startedChangingPassword,
     me
   } = useSelector(state => state.user);
+
   const {
     nickname,
     userId,
@@ -104,7 +108,7 @@ export default function RecipeReviewCard() {
     Followings,
     Followers,
     Posts
-  } = useSelector(({ user }) => user.me);
+  } = useSelector(({ user }) => user && user.me);
 
   const { inputNickname } = useSelector(({ input }) => {
     return {
@@ -153,10 +157,9 @@ export default function RecipeReviewCard() {
         title="Paella dish"
       />
       <CardContent>
+        <RichTextEditor />
         <Typography variant="body2" color="textSecondary" component="p">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the
-          mussels, if you like.
+          {description}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
@@ -180,22 +183,11 @@ export default function RecipeReviewCard() {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>
-            <h1>{description}</h1>{" "}
+            {!startedEditingDescription && <h1>{description}</h1>}
+            <MemoProfileDescription />
           </Typography>
-          {/* if edit button clicked */}
           user infos
-          <TextField
-            id="standard-multiline-static"
-            label="Description"
-            multiline
-            defaultValue={description}
-            InputProps={{
-              style: { fontSize: "14px" }
-            }}
-            fullWidth
-          />
           <MemoEmail profileUserId={userId} size="16px" labelSize="16px" />
-          {/* <div style={{ display: "flex" }}> */}
           <MemoNickname
             profileNickname={nickname}
             disabled={!startedEditingNickname}
@@ -214,7 +206,6 @@ export default function RecipeReviewCard() {
           >
             {startedEditingNickname ? "Save" : "Edit Nickname"}
           </Button>
-          {/* </div> */}
           <MemoPassword
             disabled={!startedChangingPassword}
             size="16px"
@@ -227,7 +218,7 @@ export default function RecipeReviewCard() {
         style={{
           display: "flex",
           margin: "16px 15px",
-          justifyContent: "flex-end" // justifyItems: "center"
+          justifyContent: "flex-end"
         }}
       >
         <Button
@@ -246,10 +237,8 @@ export default function RecipeReviewCard() {
         >
           Cancel
         </Button>
-        {/* This Button uses a Font Icon, see the installation instructions in the Icon component docs. */}
 
         <Button
-          // onClick={handleUpdateProfile}
           variant="contained"
           color="primary"
           className={classes.button}
@@ -257,14 +246,6 @@ export default function RecipeReviewCard() {
         >
           Save
         </Button>
-        {/* {me && (
-          <Toaster
-            message="Password Updated Successfully"
-            type="success"
-            whereTo={false}
-          />
-        )}
-      */}
       </div>
     </Card>
   );

@@ -24,7 +24,7 @@ import {
   MemoPassword,
   MemoPasswordCheck,
   MemoConfirmPasswordReset
-} from "../../../containers/MemoForSign";
+} from "../../../containers/InputComponents";
 
 import { SET_RESET_PASSWORD_LINK } from "../../../reducers/input";
 

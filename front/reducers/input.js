@@ -21,8 +21,11 @@ export const initialState = {
   searchValue: "",
   startedChangingPassword: true,
   changePasswordErrorReason: "",
-  resetPasswordLink: ""
+  resetPasswordLink: "",
+  description: ""
 };
+
+export const SET_DESCRIPTION = "SET_DESCRIPTION";
 
 export const SET_NICKNAME = "SET_NICKNAME";
 export const SET_NICKNAME_ERROR = "SET_NICKNAME_ERROR";
@@ -45,6 +48,12 @@ export const SET_RESET_PASSWORD_LINK = "SET_RESET_PASSWORD_LINK";
 export default (state = initialState, action) => {
   return produce(state, draft => {
     switch (action.type) {
+      case SET_DESCRIPTION:
+        {
+          draft.description = action.data;
+        }
+        // draft.nickname = action.data;
+        break;
       case SET_RESET_PASSWORD_LINK:
         {
           draft.resetPasswordLink = action.data;

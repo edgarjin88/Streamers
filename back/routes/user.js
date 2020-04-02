@@ -270,6 +270,31 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
 router.patch("/password", isLoggedIn, passwordChange);
 router.patch("/confirm-password-reset", confirmPasswordReset);
 
+router.patch("/description", isLoggedIn, async (req, res, next) => {
+  //partial update, isLoggedIn to be checked
+  console.log("description :", req.body);
+  try {
+    const exUser = await db.User.findOne({
+      where: {
+        id: req.user.id
+      }
+    });
+    if (!exUser) {
+      return res
+        .status(400)
+        .send("Error occured while editing description. Please try again");
+    }
+
+    await exUser.update({
+      description: req.body.description
+    });
+    return res.status(200).send(req.body.description);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
 router.get(
   "/auth/google",
   passport.authenticate("google", {

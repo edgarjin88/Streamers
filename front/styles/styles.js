@@ -472,7 +472,7 @@ main {
       "video-details related-videos" max-content
       "video-comments related-videos" 1fr
       / 1fr 256px;
-    margin-top: 48px;
+    // margin-top: 48px;
   }
 
   #relatead-videos {

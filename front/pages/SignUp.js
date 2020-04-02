@@ -22,7 +22,7 @@ import {
   MemoPasswordCheck,
   MemoTerm,
   MemoSignUp
-} from "../containers/MemoForSign";
+} from "../containers/InputComponents";
 
 import LinearDeterminate from "../components/Progressbar";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";

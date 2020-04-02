@@ -19,7 +19,11 @@ import { useStyles } from "../styles/SigniningStyle";
 import Link from "../components/CustomLinks";
 import Copyright from "../components/Copyright";
 
-import { MemoEmail, MemoPassword, MemoSignIn } from "../containers/MemoForSign";
+import {
+  MemoEmail,
+  MemoPassword,
+  MemoSignIn
+} from "../containers/InputComponents";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
 import { LogoAndName } from "../components/MenuComponents";
 
@@ -29,7 +33,7 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
-  const { me, logInErrorReason } = useSelector(state => state.user);
+  const { me, signInErrorReason } = useSelector(state => state.user);
   const dispatch = useDispatch();
   //No shallow comparison required here.
   useEffect(() => {
@@ -66,15 +70,14 @@ export default function SignInSide() {
                 whereTo="/"
               />
             )}
-            {logInErrorReason && (
+            {true && (
               <Toaster
-                message={logInErrorReason}
+                message={signInErrorReason}
                 type="error"
                 whereTo={false}
               />
             )}
             <MemoSignIn className={classes.submit} />
-
             <SocialLinks />
             <Grid container>
               <Grid item xs>
