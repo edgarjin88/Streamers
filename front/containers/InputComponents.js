@@ -38,10 +38,13 @@ import MUIRichTextEditor from "mui-rte";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import {
   EditorState,
+  // Editor,
   convertFromRaw,
   convertToRaw,
   ContentState
 } from "draft-js";
+// EditorState immutable.
+// Editor  control thigns
 // convertToRaw : data type is RawDraftContentState
 // EditorState : hold all state of texteditor. Immutable object.
 // Editor editor itself.
@@ -65,6 +68,9 @@ import {
 export const RichTextEditor = () => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
+  // export const RichTextEditor = () => {
+  //   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
   // import {
   //   EditorState,
   //   convertFromRaw,
@@ -75,8 +81,6 @@ export const RichTextEditor = () => {
   //   convertFromRaw,
   //   convertToRaw, 이 두개를 사용 해야 하는 듯.
 
-  console.log("editorState :", editorState);
-  console.log("editorState :", editorState);
   // getCurrentContent(): ContentState
   // const handleChange = prop => event => {
   //   const content = JSON.stringify(convertToRaw(event.getCurrentContent()));
@@ -86,11 +90,13 @@ export const RichTextEditor = () => {
   //   console.log("this is evetn: ", evetn);
   //   console.log("this is props: ", props);
   // };
-  const handleChange = editorState => {
-    console.log("currnetstate :", editorState.getCurrentContent());
-    setEditorState(editorState);
-  };
+  // const handleChange = editorState => {
+  //   console.log("current content :", editorState.getCurrentContent());
+  //   setEditorState(editorState);
+  // };
 
+  // 질문 1. 꼭 스테이트를 쓸 필요 있나 이경우?
+  // onChange에서 스트링을 쏴 주고, 이것을 데이터베이스 에 저장. 그리고 필요할 때 이것을 value로 바꿔 주면 된다. 왜 굳이 스테이트?
   const defaultTheme = createMuiTheme();
   Object.assign(defaultTheme, {
     overrides: {
@@ -109,6 +115,7 @@ export const RichTextEditor = () => {
     }
   });
   const { description } = useSelector(({ input }) => input);
+
   const { startedEditingDescription, userDescription } = useSelector(
     ({ user }) => {
       return {
@@ -118,12 +125,34 @@ export const RichTextEditor = () => {
     }
   );
   const dispatch = useDispatch();
-  const handleSaveDescription = useCallback(() => {
+
+  // 문제는 버튼과 save 버튼이 함께 이거를 사용하면서, data가 event가 될수도 있다는 점이구나. 즉 두개의 펑션이 달라야 한다. 여기서는 데이터를 받고,
+  // button click때는 이벤트를 받으니까.
+  const handleSaveDescription = data => {
+    // e.persist();
+    console.log("data from rich text :", data);
     dispatch({
       type: EDIT_DESCRIPTION_REQUEST,
-      data: description
+      data: data
     });
-  }, [description, startedEditingDescription]);
+  };
+
+  let text;
+
+  const setTemp = data => {
+    console.log(" another data: ", convertToRaw(data.getCurrentContent()));
+    text = convertToRaw(data.getCurrentContent());
+  };
+
+  const handleSaveDescriptionState = e => {
+    // e.persist();
+    console.log("data from rich text :", description);
+    console.log("text :", text);
+    dispatch({
+      type: EDIT_DESCRIPTION_REQUEST,
+      data: JSON.stringify(text)
+    });
+  };
 
   const handleEditDescription = useCallback(() => {
     dispatch({
@@ -131,35 +160,43 @@ export const RichTextEditor = () => {
     });
   }, [startedEditingDescription, description]);
 
-  // const handleChange = useCallback(
-  //   e => {
-  //     dispatch({
-  //       type: SET_DESCRIPTION,
-  //       data: e.target.value
-  //     });
-  //   },
-  //   [description]
-  // );
+  const handleChange = useCallback(
+    data => {
+      // console.log(
+      //   "data from handlechange :",
+      //   convertToRaw(data.getCurrentContent())
+      // );
+      dispatch({
+        type: SET_DESCRIPTION,
+        data: convertToRaw(data.getCurrentContent())
+      });
+    },
+    [description]
+  );
 
   return (
     <>
       <MuiThemeProvider theme={defaultTheme}>
         <MUIRichTextEditor
           // className={classes.richText}
-          onChange={handleChange}
+          onChange={setEditorState}
+          // placeHolder="This is Placeholder"
+          // editorState={editorState}
+          // value={defaultData} only for initial
           readOnly={false}
           toolbar={true}
           inlineToolbar={true}
-          value={JSON.stringify(convertFromRaw(editorState))}
+          // value={JSON.stringify(convertFromRaw(editorState))}
           onSave={handleSaveDescription}
           label="Start typing..."
-          // value={convertToRaw(editorState)}
+          // value={JSON.stringify(convertToRaw(editorState.getCurrentContent()))}
         />
       </MuiThemeProvider>
+      {/* {JSON.stringify(convertToRaw(editorState.getCurrentContent()))} */}
       <Button
         onClick={
           startedEditingDescription
-            ? handleSaveDescription
+            ? handleSaveDescriptionState
             : handleEditDescription
         }
         variant="contained"

@@ -11,6 +11,7 @@ import {
   NULLIFY_EDIT_DESCRIPTION_SUCCESS
 } from "../reducers/user";
 import { useRouter } from "next/router";
+
 const Profile = () => {
   const Router = useRouter();
 

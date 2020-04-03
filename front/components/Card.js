@@ -159,7 +159,7 @@ export default function RecipeReviewCard() {
       <CardContent>
         <RichTextEditor />
         <Typography variant="body2" color="textSecondary" component="p">
-          {description}
+          {/* {description} */}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
