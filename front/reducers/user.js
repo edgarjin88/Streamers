@@ -31,7 +31,7 @@ export const initialState = {
   changePasswordErrorReason: "",
   startedEditingDescription: false,
   editDescriptionSuccess: false,
-  editDescriptionErrorReason: ""
+  editDescriptionErrorReason: "",
 };
 
 export const NULLIFY_CHANGE_PASSWORD_SUCCESS =
@@ -118,7 +118,7 @@ export const OAUTH_SIGN_IN_SUCCESS = "OAUTH_SIGN_IN_SUCCESS";
 export const OAUTH_SIGN_IN_FAILURE = "OAUTH_SIGN_IN_FAILURE";
 
 export default (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     switch (action.type) {
       case NULLIFY_EDIT_DESCRIPTION_SUCCESS: {
         draft.startedEditingDescription = false;
@@ -360,9 +360,13 @@ export default (state = initialState, action) => {
         break;
       }
       case UNFOLLOW_USER_SUCCESS: {
-        const index = draft.me.Followings.findIndex(v => v.id === action.data);
+        const index = draft.me.Followings.findIndex(
+          (v) => v.id === action.data
+        );
         draft.me.Followings.splice(index, 1);
-        const index2 = draft.followingList.findIndex(v => v.id === action.data);
+        const index2 = draft.followingList.findIndex(
+          (v) => v.id === action.data
+        );
         draft.followingList.splice(index2, 1);
         break;
       }
@@ -374,7 +378,7 @@ export default (state = initialState, action) => {
         break;
       }
       case REMOVE_POST_OF_ME: {
-        const index = draft.me.Posts.findIndex(v => v.id === action.data);
+        const index = draft.me.Posts.findIndex((v) => v.id === action.data);
         draft.me.Posts.splice(index, 1);
         break;
       }
@@ -384,7 +388,7 @@ export default (state = initialState, action) => {
         break;
       }
       case LOAD_FOLLOWERS_SUCCESS: {
-        action.data.forEach(d => {
+        action.data.forEach((d) => {
           draft.followerList.push(d);
         });
         draft.hasMoreFollower = action.data.length === 3;
@@ -399,7 +403,7 @@ export default (state = initialState, action) => {
         break;
       }
       case LOAD_FOLLOWINGS_SUCCESS: {
-        action.data.forEach(d => {
+        action.data.forEach((d) => {
           draft.followingList.push(d);
         });
         draft.hasMoreFollowing = action.data.length === 3;
@@ -413,10 +417,12 @@ export default (state = initialState, action) => {
         break;
       }
       case REMOVE_FOLLOWER_SUCCESS: {
-        const index = draft.me.Followers.findIndex(v => v.id === action.data);
+        const index = draft.me.Followers.findIndex((v) => v.id === action.data);
 
         draft.me.Followers.splice(index, 1);
-        const index2 = draft.followerList.findIndex(v => v.id === action.data);
+        const index2 = draft.followerList.findIndex(
+          (v) => v.id === action.data
+        );
         draft.followerList.splice(index2, 1);
         break;
       }

@@ -8,7 +8,7 @@ import {
   EDIT_NICKNAME_REQUEST,
   START_EDIT_NICKNAME,
   START_CHANGE_PASSWORD,
-  CHANGE_PASSWORD_REQUEST
+  CHANGE_PASSWORD_REQUEST,
 } from "../reducers/user";
 import { useRouter } from "next/router";
 
@@ -42,38 +42,38 @@ import {
   MemoNickname,
   MemoPassword,
   MemoSubmitPasswordChange,
-  MemoProfileDescription,
-  RichTextEditor
+  // MemoProfileDescription,
+  MemoRichTextEditor,
 } from "../containers/InputComponents";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "995px",
     // margin: "auto",
     marginTop: "30px",
-    fontSize: "14px"
+    fontSize: "14px",
   },
   button: {
     margin: "5px",
-    width: "auto"
+    width: "auto",
   },
   media: {
     height: 0,
-    paddingTop: "56.25%" // 16:9
+    paddingTop: "56.25%", // 16:9
   },
   expand: {
     transform: "rotate(0deg)",
     marginLeft: "auto",
     transition: theme.transitions.create("transform", {
-      duration: 300
-    })
+      duration: 300,
+    }),
   },
   expandOpen: {
-    transform: "rotate(180deg)"
+    transform: "rotate(180deg)",
   },
   avatar: {
-    backgroundColor: red[500]
-  }
+    backgroundColor: red[500],
+  },
 }));
 
 export default function RecipeReviewCard() {
@@ -98,8 +98,8 @@ export default function RecipeReviewCard() {
     startedEditingNickname,
     startedEditingDescription,
     startedChangingPassword,
-    me
-  } = useSelector(state => state.user);
+    me,
+  } = useSelector((state) => state.user);
 
   const {
     nickname,
@@ -107,28 +107,28 @@ export default function RecipeReviewCard() {
     description,
     Followings,
     Followers,
-    Posts
+    Posts,
   } = useSelector(({ user }) => user && user.me);
 
   const { inputNickname } = useSelector(({ input }) => {
     return {
-      inputNickname: input.nickname
+      inputNickname: input.nickname,
     };
   }, shallowEqual);
-  const { mainPosts } = useSelector(state => state.post);
+  const { mainPosts } = useSelector((state) => state.post);
 
   ///logic
   const handleEditNickname = useCallback(() => {
     dispatch({
       type: START_EDIT_NICKNAME,
-      data: nickname
+      data: nickname,
     });
   }, [nickname]);
 
   const handleSaveNickname = useCallback(() => {
     dispatch({
       type: EDIT_NICKNAME_REQUEST,
-      data: inputNickname
+      data: inputNickname,
     });
   }, [inputNickname]);
 
@@ -157,7 +157,7 @@ export default function RecipeReviewCard() {
         title="Paella dish"
       />
       <CardContent>
-        <RichTextEditor />
+        <MemoRichTextEditor />
         <Typography variant="body2" color="textSecondary" component="p">
           {/* {description} */}
         </Typography>
@@ -171,7 +171,7 @@ export default function RecipeReviewCard() {
         </IconButton>
         <IconButton
           className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded
+            [classes.expandOpen]: expanded,
           })}
           onClick={handleExpandClick}
           aria-expanded={expanded}
@@ -184,7 +184,7 @@ export default function RecipeReviewCard() {
         <CardContent>
           <Typography paragraph>
             {!startedEditingDescription && <h1>{description}</h1>}
-            <MemoProfileDescription />
+            {/* <MemoProfileDescription /> */}
           </Typography>
           user infos
           <MemoEmail profileUserId={userId} size="16px" labelSize="16px" />
@@ -218,7 +218,7 @@ export default function RecipeReviewCard() {
         style={{
           display: "flex",
           margin: "16px 15px",
-          justifyContent: "flex-end"
+          justifyContent: "flex-end",
         }}
       >
         <Button

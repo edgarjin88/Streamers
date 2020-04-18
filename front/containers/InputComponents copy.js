@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Router from "next/router";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import DeleteIcon from "@material-ui/icons/Delete";
 
 import TextField from "@material-ui/core/TextField";
 import { SignUpError } from "../styles/SigniningStyle";
@@ -23,7 +22,7 @@ import {
   SET_NICKNAME_ERROR,
   SET_DESCRIPTION,
 } from "../reducers/input";
-import user, {
+import {
   SIGN_UP_REQUEST,
   SIGN_IN_REQUEST,
   PASSWORD_RESET_REQUEST,
@@ -32,7 +31,6 @@ import user, {
   START_CHANGE_PASSWORD,
   START_EDIT_DESCRIPTION,
   EDIT_DESCRIPTION_REQUEST,
-  NULLIFY_EDIT_DESCRIPTION_SUCCESS,
 } from "../reducers/user";
 import { StyledButton1 } from "../components/CustomButtons";
 
@@ -52,9 +50,60 @@ import {
 // Editor editor itself.
 // editorState: EditorState.createEmpty() to push back empty state to editor
 
-export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
-  const defaultTheme = createMuiTheme();
+// editorState back to up date
+// updateEditorState(editorState){
+//   this.ListeningStateChangedEvent({ editorState });
+// }
+// onChange={(this.updateEditorState.bind(this))}
+
+//  const [Ques, setQues] = useState({
+//    answer: "",
+//    question: ""
+//  });
+
+//  const handleChange = prop => event => {
+//    setQues({ ...Ques, [prop]: event.target.value });
+//    console.log(event.target.value);
+//  };
+export const RichTextEditor = () => {
+  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [editorState, setEditorState] = useState(null);
+
+  // export const RichTextEditor = () => {
+  //   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+  // import {
+  //   EditorState,
+  //   convertFromRaw,
+  //   convertToRaw,
+  //   ContentState
+  // } from "draft-js";
+
+  //   convertFromRaw,
+  //   convertToRaw, 이 두개를 사용 해야 하는 듯.
+
+  // getCurrentContent(): ContentState
+  // const handleChange = prop => event => {
+  //   const content = JSON.stringify(convertToRaw(event.getCurrentContent()));
+
+  //   // setQues({ ...Ques, [prop]: content });
+  //   console.log("this is content: ", content);
+  //   console.log("this is evetn: ", evetn);
+  //   console.log("this is props: ", props);
+  // };
+  // const handleChange = editorState => {
+  //   console.log("current content :", editorState.getCurrentContent());
+  //   setEditorState(editorState);
+  // };
+
+  // 질문 1. 꼭 스테이트를 쓸 필요 있나 이경우?
+  // onChange에서 스트링을 쏴 주고, 이것을 데이터베이스 에 저장. 그리고 필요할 때 이것을 value로 바꿔 주면 된다. 왜 굳이 스테이트?
+
+  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
+  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
+  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
+  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
+  const defaultTheme = createMuiTheme();
   Object.assign(defaultTheme, {
     overrides: {
       MUIRichTextEditor: {
@@ -77,32 +126,37 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
     ({ user }) => {
       return {
         startedEditingDescription: user.startedEditingDescription,
-        userDescription: user.me.description,
+        userDescription: user.description,
       };
     }
   );
   const dispatch = useDispatch();
-  const handleCancel = () => {
-    dispatch({ type: NULLIFY_EDIT_DESCRIPTION_SUCCESS });
-  };
+
+  // 문제는 버튼과 save 버튼이 함께 이거를 사용하면서, data가 event가 될수도 있다는 점이구나. 즉 두개의 펑션이 달라야 한다. 여기서는 데이터를 받고,
+  // button click때는 이벤트를 받으니까.
   const handleSaveDescription = (data) => {
     // e.persist();
-
-    console.log("data from rich texts :", typeof data);
-    setEditorState(data);
-    // dispatch({
-    //   type: EDIT_DESCRIPTION_REQUEST,
-    //   data: data,
-    // });
-  };
-
-  const submitSavedDescription = (e) => {
-    if (!editorState) {
-      return alert("Please Save the description before you submit");
-    }
+    console.log("data from rich text :", data);
     dispatch({
       type: EDIT_DESCRIPTION_REQUEST,
-      data: editorState,
+      data: data,
+    });
+  };
+
+  // let text;
+
+  // const setTemp = data => {
+  //   console.log(" another data: ", convertToRaw(data.getCurrentContent()));
+  //   text = convertToRaw(data.getCurrentContent());
+  // };
+
+  const handleSaveDescriptionState = (e) => {
+    // e.persist();
+    console.log("data from rich text :", description);
+    console.log("text :", text);
+    dispatch({
+      type: EDIT_DESCRIPTION_REQUEST,
+      data: JSON.stringify(text),
     });
   };
 
@@ -125,14 +179,22 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
     },
     [description]
   );
+  const test1 = (data) => {
+    // console.log("test :", data);
+    setEditorState(JSON.stringify(convertToRaw(data.getCurrentContent())));
+  };
+  // 현재로서 가장 좋은 방법은 onChange에 바인딩 되어있는 펑션을 불러와서 묶는 거다.
 
-  console.log("user desc :", typeof userDescription);
   return (
     <>
       <MuiThemeProvider theme={defaultTheme}>
         <MUIRichTextEditor
-          value={editorState ? editorState : userDescription}
-          readOnly={startedEditingDescription ? false : true}
+          // className={classes.richText}
+          // onChange={test1}
+          // placeHolder="This is Placeholder"
+          // editorState={editorState}
+          // value={defaultData} only for initial
+          readOnly={false}
           toolbar={true}
           inlineToolbar={true}
           // value={JSON.stringify(convertFromRaw(editorState))}
@@ -145,31 +207,20 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
       <Button
         onClick={
           startedEditingDescription
-            ? submitSavedDescription
+            ? handleSaveDescriptionState
             : handleEditDescription
         }
         variant="contained"
         color="primary"
         style={{ float: "right" }}
+        // className={classes.button}
         startIcon={<CloudUploadIcon />}
       >
-        {!startedEditingDescription ? "Edit Description" : "Submit"}
+        {!startedEditingDescription ? "Edit Description" : "Save"}
       </Button>
-      {startedEditingDescription && (
-        <Button
-          onClick={handleCancel}
-          variant="contained"
-          color="secondary"
-          // className={classes.button}
-          startIcon={<DeleteIcon />}
-          style={{ float: "right" }}
-        >
-          Cancel
-        </Button>
-      )}
     </>
   );
-});
+};
 
 export const MemoProfileDescription = memo(function MemoProfileDescription() {
   const { description } = useSelector(({ input }) => input);
