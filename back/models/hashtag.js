@@ -4,16 +4,16 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: {
         type: DataTypes.STRING(40),
-        allowNull: false
-      }
+        allowNull: false,
+      },
     },
     {
       charset: "utf8mb4",
-      collate: "utf8mb4_general_ci"
+      collate: "utf8mb4_general_ci",
     }
   );
-  Hashtag.associate = db => {
-    db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" });
+  Hashtag.associate = (db) => {
+    db.Hashtag.belongsToMany(db.Video, { through: "VideoHashtag" });
   };
   return Hashtag;
 };

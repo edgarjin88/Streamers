@@ -4,63 +4,65 @@ module.exports = (sequelize, DataTypes) => {
     {
       nickname: {
         type: DataTypes.STRING(100),
-        allowNull: true
+        allowNull: true,
       },
       provider: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        defaultValue: "local"
+        defaultValue: "local",
       },
       OAuthID: {
         type: DataTypes.STRING(100),
-        allowNull: true
+        allowNull: true,
       },
       profilePhoto: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       userId: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        unique: true // Has to be unique
+        unique: true, // Has to be unique
       },
       password: {
         type: DataTypes.STRING(200), //
-        allowNull: true
+        allowNull: true,
       },
       resetPasswordLink: {
         type: DataTypes.STRING(400),
         default: "",
-        allowNull: true
+        allowNull: true,
       },
       description: {
-        type: DataTypes.TEXT,
-        default: "Enter description about you",
-        allowNull: true
-      }
+        type: DataTypes.TEXT("medium"),
+        allowNull: true,
+      },
     },
     {
       charset: "utf8",
-      collate: "utf8_general_ci" // For multi language
+      collate: "utf8_general_ci", // For multi language
     }
   );
 
-  User.associate = db => {
+  User.associate = (db) => {
     db.User.hasMany(db.Post, { as: "Posts" });
+    db.User.hasMany(db.Video, { as: "Videos" });
     // db.Post > Posts
     db.User.hasMany(db.Comment);
-    db.User.belongsToMany(db.Post, { through: "Like", as: "Liked" });
+    // db.User.belongsToMany(db.Post, { through: "Like", as: "Liked" });
+    db.User.belongsToMany(db.Video, { through: "Like", as: "Liked" });
+
     db.User.belongsToMany(db.User, {
       through: "Follow",
       as: "Followers",
-      foreignKey: "followingId"
+      foreignKey: "followingId",
     });
     // db.User > Follow
 
     db.User.belongsToMany(db.User, {
       through: "Follow",
       as: "Followings",
-      foreignKey: "followerId"
+      foreignKey: "followerId",
     });
   };
 

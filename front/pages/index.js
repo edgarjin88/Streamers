@@ -7,6 +7,7 @@ import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import Toaster from "../components/Toaster";
 import { NULLIFY_SIGN_OUT, NULLIFY_SIGN_IN_SUCCESS } from "../reducers/user";
+import SimpleModal from "../containers/CreateChannel";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ const Index = () => {
         me: user.me,
         signOutSuccess: user.signOutSuccess,
         signoutErrorReason: user.signoutErrorReason,
-        signInSuccess: user.signInSuccess
+        signInSuccess: user.signInSuccess,
       };
     },
     shallowEqual
@@ -27,14 +28,14 @@ const Index = () => {
     if (signOutSuccess) {
       setTimeout(() => {
         dispatch({
-          type: NULLIFY_SIGN_OUT
+          type: NULLIFY_SIGN_OUT,
         });
       }, 1000);
     }
     if (signInSuccess) {
       setTimeout(() => {
         dispatch({
-          type: NULLIFY_SIGN_IN_SUCCESS
+          type: NULLIFY_SIGN_IN_SUCCESS,
         });
       }, 1000);
     }
@@ -46,6 +47,7 @@ const Index = () => {
       <HideBar style={{ zIndex: 3000 }} />
 
       <main>
+        <SimpleModal />
         <RelatedVideos />
       </main>
 

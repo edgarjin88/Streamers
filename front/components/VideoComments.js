@@ -7,7 +7,7 @@ const VideoComments = () => {
     showResponse: false,
     showResponseContainer: true,
     liked: false,
-    disliked: false
+    disliked: false,
   });
 
   const {
@@ -15,17 +15,17 @@ const VideoComments = () => {
     showResponse,
     showResponseContainer,
     liked,
-    disliked
+    disliked,
   } = truefalse;
 
-  const handleBoolean = e => {
+  const handleBoolean = (e) => {
     console.log("event.target  :", e.target);
     console.log("event.target.name :", e.target.name);
     console.log("truefalse :", truefalse);
 
     setTruefalse({
       ...truefalse,
-      [e.target.name]: !truefalse[e.target.name]
+      [e.target.name]: !truefalse[e.target.name],
     });
     console.log("after :", truefalse);
   };
@@ -69,8 +69,8 @@ const VideoComments = () => {
   };
 
   const sudoCommentList = [1, 2, 3, 4];
-  const renderEachComment = comments => {
-    return comments.map(comment => {
+  const renderEachComment = (comments) => {
+    return comments.map((comment) => {
       return (
         <div className="comment my-comment">
           <img
@@ -202,7 +202,6 @@ const VideoComments = () => {
       <button name="showComment" onClick={handleBoolean}>
         Casdjoaisdfji
       </button>
-      {/* {JSON.stringify(showComment)} */}
       {renderCommentHeader()}
 
       <div id="comment-list-container">

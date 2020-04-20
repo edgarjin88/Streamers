@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import Router from "next/router";
 import { SIGN_OUT_REQUEST, NULLIFY_SIGN_OUT } from "../reducers/user";
-import { OPEN_DRAWER, CLOSE_DRAWER } from "../reducers/menu";
+import { OPEN_DRAWER, CLOSE_DRAWER, OPEN_MODAL } from "../reducers/menu";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import LogOut from "@material-ui/icons/PowerSettingsNew";
 import Typography from "@material-ui/core/Typography";
@@ -38,13 +38,15 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
   const dispatch = useDispatch();
 
   const handleClick = useCallback(
-    ({ target }) => {
-      if (target.innerText === "Sign Out") {
+    (target) => (e) => {
+      console.log("clicking fired :", target);
+      console.log("event ? :", e);
+      if (target === "Sign Out") {
         dispatch({
-          type: SIGN_OUT_REQUEST
+          type: SIGN_OUT_REQUEST,
         });
       }
-      if (target.innerText === "Sign In") {
+      if (target === "Sign In") {
         Router.push("/signin");
       }
     },
@@ -58,7 +60,7 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
     <>
       <List>
         {ItemList.map((text, index) => (
-          <ListItem onClick={handleClick} button key={text}>
+          <ListItem onClick={handleClick(text)} button key={text}>
             <ListItemIcon>
               {(text === "Sign Out" && <LogOut fontSize="large" />) ||
                 (text === "Sign In" && (
@@ -83,10 +85,24 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
 ///MemoUserItemList
 
 export const MemoUserItemList = memo(function MemoUserItemList() {
-  //dispatch, state to come.
+  const dispatch = useDispatch();
   const { me } = useSelector(({ user }) => {
     return { me: user.me };
   }, shallowEqual);
+
+  const handleClick = useCallback(
+    (target) => (e) => {
+      if (target === "My Profile") {
+        Router.push("/profile");
+      }
+      if (target === "Create a new channel") {
+        dispatch({
+          type: OPEN_MODAL,
+        });
+      }
+    },
+    [me]
+  );
 
   const ItemList = me
     ? [
@@ -97,14 +113,14 @@ export const MemoUserItemList = memo(function MemoUserItemList() {
         "Favorite Channels",
         "Popular Channels",
         "Library",
-        "History"
+        "History",
       ]
     : ["Popular Channels", "Favorite Channels", "Library", "History"];
   //if signed in,
   return (
     <List>
       {ItemList.map((text, index) => (
-        <ListItem button key={text}>
+        <ListItem onClick={handleClick(text)} button key={text}>
           <ListItemIcon>
             {(text === "My Profile" && (
               <AccountCircleIcon fontSize="large" />
@@ -144,7 +160,7 @@ export const MemoCloseButton = memo(function MemoCloseButton() {
   const dispatch = useDispatch();
   const handleDrawerClose = () => {
     dispatch({
-      type: CLOSE_DRAWER
+      type: CLOSE_DRAWER,
     });
   };
   return (

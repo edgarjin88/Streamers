@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { GlobalStyleOne } from "../styles/styles";
+import React, { useEffect, useCallback } from "react";
+import { ProfileStyle } from "../styles/profileStyle";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
@@ -8,7 +8,11 @@ import Toaster from "../components/Toaster";
 import {
   NULLIFY_CHANGE_PASSWORD_SUCCESS,
   NULLIFY_EDIT_NICKNAME_SUCCESS,
-  NULLIFY_EDIT_DESCRIPTION_SUCCESS
+  NULLIFY_EDIT_DESCRIPTION_SUCCESS,
+  UNFOLLOW_USER_REQUEST,
+  REMOVE_FOLLOWER_REQUEST,
+  LOAD_FOLLOWINGS_REQUEST,
+  LOAD_FOLLOWERS_REQUEST,
 } from "../reducers/user";
 import { useRouter } from "next/router";
 
@@ -16,17 +20,66 @@ const Profile = () => {
   const Router = useRouter();
 
   const dispatch = useDispatch();
+
+  ///////////logic 1//
+  ///////////logic 1//
+  const {
+    followingList,
+    followerList,
+    hasMoreFollower,
+    hasMoreFollowing,
+  } = useSelector((state) => state.user);
+  const { mainPosts } = useSelector((state) => state.post);
+
+  // console.log('mainposts', mainPosts)
+  const onUnfollow = useCallback(
+    (userId) => () => {
+      dispatch({
+        type: UNFOLLOW_USER_REQUEST,
+        data: userId,
+      });
+    },
+    []
+  );
+
+  const onRemoveFollower = useCallback(
+    (userId) => () => {
+      dispatch({
+        type: REMOVE_FOLLOWER_REQUEST,
+        data: userId,
+      });
+    },
+    []
+  );
+
+  const loadMoreFollowings = useCallback(() => {
+    dispatch({
+      type: LOAD_FOLLOWINGS_REQUEST,
+      offset: followingList.length,
+    });
+  }, [followingList.length]);
+
+  const loadMoreFollowers = useCallback(() => {
+    dispatch({
+      type: LOAD_FOLLOWERS_REQUEST,
+      offset: followerList.length,
+    });
+  }, [followerList.length]);
+
+  ///////////logic 2//
+  ///////////logic 2//
+  ///////////logic 2//
   const {
     changePasswordSuccess,
     editNicknameSuccess,
     editDescriptionSuccess,
-    me
+    me,
   } = useSelector(({ user }) => {
     return {
       editNicknameSuccess: user.editNicknameSuccess,
       changePasswordSuccess: user.changePasswordSuccess,
       editDescriptionSuccess: user.editDescriptionSuccess,
-      me: user.me
+      me: user.me,
     };
   }, shallowEqual);
   useEffect(() => {
@@ -41,21 +94,19 @@ const Profile = () => {
           ? NULLIFY_CHANGE_PASSWORD_SUCCESS
           : editNicknameSuccess
           ? NULLIFY_EDIT_NICKNAME_SUCCESS
-          : NULLIFY_EDIT_DESCRIPTION_SUCCESS
+          : NULLIFY_EDIT_DESCRIPTION_SUCCESS,
       });
     }, 1000);
   }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
+
   return (
     <div className="container">
-      <GlobalStyleOne />
+      <ProfileStyle />
       <HideBar />
 
       <main>
         {me && <Card />}
-        <div>
-          Dependnig on redux states, login, password change, profile update to
-          show.{" "}
-        </div>
+
         <RelatedVideos />
       </main>
       {(changePasswordSuccess ||

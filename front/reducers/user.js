@@ -32,6 +32,7 @@ export const initialState = {
   startedEditingDescription: false,
   editDescriptionSuccess: false,
   editDescriptionErrorReason: "",
+  // profilePhoto: null,
 };
 
 export const NULLIFY_CHANGE_PASSWORD_SUCCESS =
@@ -40,6 +41,10 @@ export const NULLIFY_EDIT_NICKNAME_SUCCESS = "NULLIFY_CHANGE_PASSWORD_SUCCESS";
 
 export const NULLIFY_SIGN_OUT = "NULLIFY_SIGN_OUT";
 export const NULLIFY_SIGN_IN_SUCCESS = "NULLIFY_SIGN_IN_SUCCESS";
+
+export const UPLOAD_PROFILE_REQUEST = "UPLOAD_PROFILE_REQUEST";
+export const UPLOAD_PROFILE_FAILURE = "UPLOAD_PROFILE_FAILURE";
+export const UPLOAD_PROFILE_SUCCESS = "UPLOAD_PROFILE_SUCCESS";
 
 export const START_CHANGE_PASSWORD = "START_CHANGE_PASSWORD";
 export const CHANGE_PASSWORD_REQUEST = "CHANGE_PASSWORD_REQUEST";
@@ -95,6 +100,8 @@ export const EDIT_NICKNAME_REQUEST = "EDIT_NICKNAME_REQUEST";
 export const EDIT_NICKNAME_SUCCESS = "EDIT_NICKNAME_SUCCESS";
 export const EDIT_NICKNAME_FAILURE = "EDIT_NICKNAME_FAILURE";
 
+export const ADD_VIDEO_TO_ME = "ADD_VIDEO_TO_ME";
+export const REMOVE_VIDEO_OF_ME = "REMOVE_VIDEO_OF_ME";
 export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
 export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
 export const ACTIVATION_REQUEST = "ACTIVATION_REQUEST";
@@ -120,6 +127,18 @@ export const OAUTH_SIGN_IN_FAILURE = "OAUTH_SIGN_IN_FAILURE";
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case UPLOAD_PROFILE_REQUEST: {
+        break; //
+      }
+      case UPLOAD_PROFILE_SUCCESS: {
+        draft.me.profilePhoto = action.data;
+
+        break;
+      }
+      case UPLOAD_PROFILE_FAILURE: {
+        break;
+      }
+
       case NULLIFY_EDIT_DESCRIPTION_SUCCESS: {
         draft.startedEditingDescription = false;
         draft.editDescriptionErrorReason = "";

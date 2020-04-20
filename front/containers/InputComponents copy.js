@@ -197,13 +197,10 @@ export const RichTextEditor = () => {
           readOnly={false}
           toolbar={true}
           inlineToolbar={true}
-          // value={JSON.stringify(convertFromRaw(editorState))}
           onSave={handleSaveDescription}
           label="Start typing..."
-          // value={JSON.stringify(convertToRaw(editorState.getCurrentContent()))}
         />
       </MuiThemeProvider>
-      {/* {JSON.stringify(convertToRaw(editorState.getCurrentContent()))} */}
       <Button
         onClick={
           startedEditingDescription
@@ -519,6 +516,12 @@ export const MemoNickname = memo(function MemoNickname({
   profileNickname,
 }) {
   const dispatch = useDispatch();
+
+  const {
+    startedEditingNickname,
+    startedEditingDescription,
+    startedChangingPassword,
+  } = useSelector((state) => state.user);
   const { nickname, nicknameError, untouchedNickname } = useSelector(
     ({ input }) => {
       return {

@@ -14,7 +14,7 @@ export const initialState = {
   seledtedPost: null,
   isEditingPost: false,
   edittingPost: false,
-  editingPostErrorReason: ""
+  editingPostErrorReason: "",
 };
 
 export const LOAD_MAIN_POSTS_REQUEST = "LOAD_MAIN_POSTS_REQUEST";
@@ -70,35 +70,20 @@ export const EDIT_POST_FAILURE = "EDIT_POST_FAILURE";
 export const LOAD_POST_REQUEST = "LOAD_POST_REQUEST";
 export const LOAD_POST_SUCCESS = "LOAD_POST_SUCCESS";
 export const LOAD_POST_FAILURE = "LOAD_POST_FAILURE";
-export const UPLOAD_PROFILE_REQUEST = "UPLOAD_PROFILE_REQUEST";
-export const UPLOAD_PROFILE_FAILURE = "UPLOAD_PROFILE_FAILURE";
-export const UPLOAD_PROFILE_SUCCESS = "UPLOAD_PROFILE_SUCCESS";
 
 export const EDIT_START_REQUEST = "EDIT_START_REQUEST";
 
 export const FALSIFY_EDIT_POST_COMPLETE = "FALSIFY_EDIT_POST_COMPLETE";
 
 export default (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
-      case UPLOAD_PROFILE_REQUEST: {
-        break; //
-      }
-      case UPLOAD_PROFILE_SUCCESS: {
-        draft.profilePhoto = action.data;
-
-        break;
-      }
-      case UPLOAD_PROFILE_FAILURE: {
-        break;
-      }
-
       case UPLOAD_IMAGES_REQUEST: {
         break;
       }
       case UPLOAD_IMAGES_SUCCESS: {
-        action.data.forEach(p => {
+        action.data.forEach((p) => {
           draft.imagePaths.push(p);
         });
 
@@ -139,7 +124,7 @@ export default (state = initialState, action) => {
       }
       case ADD_COMMENT_SUCCESS: {
         const postIndex = draft.mainPosts.findIndex(
-          v => v.id === action.data.postId
+          (v) => v.id === action.data.postId
         );
         draft.mainPosts[postIndex].Comments.push(action.data.comment);
         draft.isAddingComment = false;
@@ -153,7 +138,7 @@ export default (state = initialState, action) => {
       }
       case LOAD_COMMENTS_SUCCESS: {
         const postIndex = draft.mainPosts.findIndex(
-          v => v.id === action.data.postId
+          (v) => v.id === action.data.postId
         );
         draft.mainPosts[postIndex].Comments = action.data.comments;
         break;
@@ -170,7 +155,7 @@ export default (state = initialState, action) => {
       case LOAD_MAIN_POSTS_SUCCESS:
       case LOAD_HASHTAG_POSTS_SUCCESS:
       case LOAD_USER_POSTS_SUCCESS: {
-        action.data.forEach(d => {
+        action.data.forEach((d) => {
           draft.mainPosts.push(d);
         });
         draft.hasMorePost = action.data.length === 10;
@@ -186,7 +171,7 @@ export default (state = initialState, action) => {
       }
       case LIKE_POST_SUCCESS: {
         const postIndex = draft.mainPosts.findIndex(
-          v => v.id === action.data.postId
+          (v) => v.id === action.data.postId
         );
         draft.mainPosts[postIndex].Likers.unshift({ id: action.data.userId });
         break;
@@ -199,10 +184,10 @@ export default (state = initialState, action) => {
       }
       case UNLIKE_POST_SUCCESS: {
         const postIndex = draft.mainPosts.findIndex(
-          v => v.id === action.data.postId
+          (v) => v.id === action.data.postId
         );
         const likeIndex = draft.mainPosts[postIndex].Likers.findIndex(
-          v => v.id === action.data.userId
+          (v) => v.id === action.data.userId
         );
         draft.mainPosts[postIndex].Likers.splice(likeIndex, 1);
         break;
@@ -224,7 +209,7 @@ export default (state = initialState, action) => {
         break;
       }
       case REMOVE_POST_SUCCESS: {
-        const index = draft.mainPosts.findIndex(v => v.id === action.data);
+        const index = draft.mainPosts.findIndex((v) => v.id === action.data);
         draft.mainPosts.splice(index, 1);
         break;
       }
@@ -244,7 +229,7 @@ export default (state = initialState, action) => {
         break;
       }
       case EDIT_POST_SUCCESS: {
-        const index = draft.mainPosts.findIndex(v => v.id === action.postId);
+        const index = draft.mainPosts.findIndex((v) => v.id === action.postId);
         draft.mainPosts[index].content = action.data.content;
         draft.editingCompleted = true;
         console.log("data type", action.data);

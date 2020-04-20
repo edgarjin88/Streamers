@@ -1,15 +1,17 @@
-* {
+import { createGlobalStyle } from "styled-components";
+
+export const ProfileStyle = createGlobalStyle`
+  * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
 }
 
-.ad {
-  color: rgba(245, 241, 241, 0.966);
-}
 html,
-body {
+.container {
   height: 100%;
+  /* margin: 0 5rem; */
 }
 
 html {
@@ -22,9 +24,6 @@ h1 {
   font-weight: normal;
 }
 
-/* div {
-  background-color: rgba(135, 135, 135, 0.212);
-} */
 h2 {
   font-size: 1.8rem;
   line-height: 2.25rem;
@@ -44,12 +43,12 @@ a {
   color: #111;
 }
 
-body {
+.container {
   display: grid;
   grid: 48px 1fr / 1fr;
 }
 
-body > header {
+.container > header {
   display: grid;
   grid: 1fr / 32px 1fr 28px 28px;
   grid-column-gap: 12px;
@@ -59,7 +58,7 @@ body > header {
   color: #fff;
 }
 
-body > header > a {
+.container > header > a {
   width: 32px;
   height: 32px;
 }
@@ -73,18 +72,18 @@ body > header > a {
 main {
   display: grid;
   grid:
-    "video-thumbnail" max-content
+    "main-video" max-content
     "video-details" max-content
     "related-videos" max-content
     "video-comments" max-content
     / 1fr;
 }
 
-#video-thumbnail {
-  grid-area: video-thumbnail;
+#main-video {
+  grid-area: main-video;
 }
 
-#video-thumbnail > img {
+#main-video > img {
   width: 100%;
   height: 100%;
 }
@@ -279,10 +278,7 @@ main {
   font-weight: bold;
 }
 
-#comment-uptick,
-#comment-list-container {
-  display: none;
-}
+
 
 #comment-form {
   display: grid;
@@ -389,7 +385,6 @@ main {
 }
 
 .response-list {
-  display: none;
   margin-top: 15px;
 }
 
@@ -408,7 +403,7 @@ main {
 @media (min-width: 550px) {
   main {
     grid-template-areas:
-      "video-thumbnail"
+      "main-video"
       "video-details"
       "video-comments"
       "related-videos";
@@ -464,7 +459,7 @@ main {
 }
 
 @media (min-width: 800px) and (orientation: landscape) {
-  body > header {
+  .container > header {
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -474,14 +469,14 @@ main {
 
   main {
     grid:
-      "video-thumbnail related-videos" max-content
+      "main-video related-videos" max-content
       "video-details related-videos" max-content
       "video-comments related-videos" 1fr
       / 1fr 256px;
-    margin-top: 48px;
+    // margin-top: 48px;
   }
 
-  #related-videos {
+  #relatead-videos {
     padding-left: 8px;
     padding-right: 8px;
     overflow: scroll;
@@ -503,26 +498,42 @@ main {
     min-height: inherit;
     max-height: inherit;
   }
-
+  
   #video-comments {
     border-bottom: 0;
   }
 }
 
 @media (min-width: 1280px) and (orientation: landscape) {
-  main {
-    grid-template-columns: 1fr 500px;
+  .container{
+
+    margin: 0 5rem;
+    margin: 0 15rem;
   }
 
+}
+
+@media (min-width: 1280px) and (orientation: landscape) {
+  
+  .container{
+    margin: 0 auto;
+    /* max-width: 1300px */
+  }
+  main {
+    grid-template-columns: 1fr 500px;
+    max-width: 1800px;
+    margin: 0 15rem;
+  }
+  
   #related-videos {
     width: 500px;
   }
-
+  
   #related-videos > ul {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-body {
-  background-color: black;
-}
+
+
+`;

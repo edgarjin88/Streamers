@@ -3,13 +3,15 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Router from "next/router";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import DeleteIcon from "@material-ui/icons/Delete";
-
+import EditIcon from "@material-ui/icons/Edit";
 import TextField from "@material-ui/core/TextField";
 import { SignUpError } from "../styles/SigniningStyle";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
+import SaveIcon from "@material-ui/icons/Save";
+
 import {
   SET_NICKNAME,
   SET_EMAIL,
@@ -23,7 +25,7 @@ import {
   SET_NICKNAME_ERROR,
   SET_DESCRIPTION,
 } from "../reducers/input";
-import user, {
+import {
   SIGN_UP_REQUEST,
   SIGN_IN_REQUEST,
   PASSWORD_RESET_REQUEST,
@@ -33,24 +35,13 @@ import user, {
   START_EDIT_DESCRIPTION,
   EDIT_DESCRIPTION_REQUEST,
   NULLIFY_EDIT_DESCRIPTION_SUCCESS,
+  EDIT_NICKNAME_REQUEST,
+  START_EDIT_NICKNAME,
 } from "../reducers/user";
 import { StyledButton1 } from "../components/CustomButtons";
 
 import MUIRichTextEditor from "mui-rte";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import {
-  EditorState,
-  // Editor,
-  convertFromRaw,
-  convertToRaw,
-  ContentState,
-} from "draft-js";
-// EditorState immutable.
-// Editor  control thigns
-// convertToRaw : data type is RawDraftContentState
-// EditorState : hold all state of texteditor. Immutable object.
-// Editor editor itself.
-// editorState: EditorState.createEmpty() to push back empty state to editor
 
 export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
   const defaultTheme = createMuiTheme();
@@ -59,19 +50,23 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
     overrides: {
       MUIRichTextEditor: {
         root: {
-          marginTop: 20,
+          marginTop: "1rem",
+          marginBottom: "1rem",
           width: "100%",
           height: "300px",
+          border: "1px solid rgb(231, 218, 218)",
+          backgroundColor: "rgba(245, 241, 241, 0.966)",
         },
         editor: {
-          borderBottom: "1px solid red",
-          height: "200px",
-          overflowY: "scroll",
+          maxHeight: "250px",
+          overflowY: "auto",
         },
       },
     },
   });
-  const { description } = useSelector(({ input }) => input);
+  const { description } = useSelector(({ input }) => {
+    return { description: input.description };
+  }, shallowEqual);
 
   const { startedEditingDescription, userDescription } = useSelector(
     ({ user }) => {
@@ -79,21 +74,16 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
         startedEditingDescription: user.startedEditingDescription,
         userDescription: user.me.description,
       };
-    }
+    },
+    shallowEqual
   );
   const dispatch = useDispatch();
   const handleCancel = () => {
     dispatch({ type: NULLIFY_EDIT_DESCRIPTION_SUCCESS });
   };
   const handleSaveDescription = (data) => {
-    // e.persist();
-
     console.log("data from rich texts :", typeof data);
     setEditorState(data);
-    // dispatch({
-    //   type: EDIT_DESCRIPTION_REQUEST,
-    //   data: data,
-    // });
   };
 
   const submitSavedDescription = (e) => {
@@ -112,36 +102,24 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
     });
   }, [startedEditingDescription, description]);
 
-  const handleChange = useCallback(
-    (data) => {
-      // console.log(
-      //   "data from handlechange :",
-      //   convertToRaw(data.getCurrentContent())
-      // );
-      dispatch({
-        type: SET_DESCRIPTION,
-        data: convertToRaw(data.getCurrentContent()),
-      });
-    },
-    [description]
-  );
-
+  const test = () => {
+    return (
+      <MuiThemeProvider theme={defaultTheme} key={startedEditingDescription}>
+        <MUIRichTextEditor
+          inheritFontSize={true}
+          value={editorState ? editorState : userDescription}
+          readOnly={startedEditingDescription ? false : true}
+          toolbar={startedEditingDescription ? true : false}
+          inlineToolbar={true}
+          onSave={handleSaveDescription}
+        />
+      </MuiThemeProvider>
+    );
+  };
   console.log("user desc :", typeof userDescription);
   return (
     <>
-      <MuiThemeProvider theme={defaultTheme}>
-        <MUIRichTextEditor
-          value={editorState ? editorState : userDescription}
-          readOnly={startedEditingDescription ? false : true}
-          toolbar={true}
-          inlineToolbar={true}
-          // value={JSON.stringify(convertFromRaw(editorState))}
-          onSave={handleSaveDescription}
-          label="Start typing..."
-          // value={JSON.stringify(convertToRaw(editorState.getCurrentContent()))}
-        />
-      </MuiThemeProvider>
-      {/* {JSON.stringify(convertToRaw(editorState.getCurrentContent()))} */}
+      {test()}
       <Button
         onClick={
           startedEditingDescription
@@ -151,7 +129,9 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
         variant="contained"
         color="primary"
         style={{ float: "right" }}
-        startIcon={<CloudUploadIcon />}
+        startIcon={
+          !startedEditingDescription ? <EditIcon /> : <CloudUploadIcon />
+        }
       >
         {!startedEditingDescription ? "Edit Description" : "Submit"}
       </Button>
@@ -162,79 +142,11 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
           color="secondary"
           // className={classes.button}
           startIcon={<DeleteIcon />}
-          style={{ float: "right" }}
+          style={{ float: "right", marginRight: "20px" }}
         >
           Cancel
         </Button>
       )}
-    </>
-  );
-});
-
-export const MemoProfileDescription = memo(function MemoProfileDescription() {
-  const { description } = useSelector(({ input }) => input);
-  const { startedEditingDescription, userDescription } = useSelector(
-    ({ user }) => {
-      return {
-        startedEditingDescription: user.startedEditingDescription,
-        userDescription: user.description,
-      };
-    }
-  );
-
-  const dispatch = useDispatch();
-  const handleSaveDescription = useCallback(() => {
-    dispatch({
-      type: EDIT_DESCRIPTION_REQUEST,
-      data: description,
-    });
-  }, [description, startedEditingDescription]);
-
-  const handleEditDescription = useCallback(() => {
-    dispatch({
-      type: START_EDIT_DESCRIPTION,
-    });
-  }, [startedEditingDescription, description]);
-
-  const handleChange = useCallback(
-    (e) => {
-      dispatch({
-        type: SET_DESCRIPTION,
-        data: e.target.value,
-      });
-    },
-    [description]
-  );
-  return (
-    <>
-      {startedEditingDescription && (
-        <TextField
-          id="standard-multiline-static"
-          label="Description"
-          multiline
-          onChange={handleChange}
-          value={userDescription ? userDescription : description}
-          // defaultValue={description}
-          InputProps={{
-            style: { fontSize: "14px" },
-          }}
-          fullWidth
-        />
-      )}
-      <Button
-        onClick={
-          startedEditingDescription
-            ? handleSaveDescription
-            : handleEditDescription
-        }
-        variant="contained"
-        color="primary"
-        style={{ float: "right" }}
-        // className={classes.button}
-        startIcon={<CloudUploadIcon />}
-      >
-        {!startedEditingDescription ? "Edit Description" : "Save"}
-      </Button>
     </>
   );
 });
@@ -292,7 +204,7 @@ export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
         color="primary"
         style={{ float: "right" }}
         // className={classes.button}
-        startIcon={<CloudUploadIcon />}
+        startIcon={startedChangingPassword ? <SaveIcon /> : <EditIcon />}
       >
         {startedChangingPassword ? "Save" : "Change Password"}
       </Button>
@@ -449,7 +361,6 @@ export const MemoEmail = memo(function MemoEmail({
         autoFocus
         disabled={profileUserId}
       />
-      {/* {JSON.stringify} */}
       {
         <SignUpError
           show={untouchedEmail ? "untouched" : emailError ? true : false}
@@ -461,6 +372,98 @@ export const MemoEmail = memo(function MemoEmail({
   );
 });
 
+export const MemoEditNickname = memo(function MemoEditNickname({
+  size,
+  labelSize,
+  disabled,
+  profileNickname,
+}) {
+  const dispatch = useDispatch();
+  const { nickname, nicknameError, untouchedNickname } = useSelector(
+    ({ input }) => {
+      return {
+        nickname: input.nickname,
+        nicknameError: input.nicknameError,
+        untouchedNickname: input.untouchedNickname,
+      };
+    },
+    shallowEqual
+  );
+
+  const { inputNickname } = useSelector(({ input }) => {
+    return {
+      inputNickname: input.nickname,
+    };
+  }, shallowEqual);
+
+  const {
+    startedEditingNickname,
+    startedEditingDescription,
+    startedChangingPassword,
+  } = useSelector((state) => state.user);
+
+  const handleEditNickname = useCallback(() => {
+    dispatch({
+      type: START_EDIT_NICKNAME,
+      data: nickname,
+    });
+  }, [nickname]);
+
+  const handleChange = (e) =>
+    dispatch({
+      type: SET_NICKNAME,
+      data: e.target.value,
+    });
+
+  const handleSaveNickname = useCallback(() => {
+    dispatch({
+      type: EDIT_NICKNAME_REQUEST,
+      data: inputNickname,
+    });
+  }, [inputNickname]);
+  return (
+    <>
+      <TextField
+        InputProps={{
+          style: { fontSize: size },
+        }}
+        InputLabelProps={{
+          style: { fontSize: labelSize },
+        }}
+        margin="normal"
+        required={true}
+        fullWidth
+        id="nickname"
+        value={untouchedNickname ? profileNickname : nickname}
+        label="Nick Name"
+        name="nickname"
+        onChange={handleChange}
+        disabled={disabled}
+      />
+
+      <Button
+        onClick={
+          startedEditingNickname ? handleSaveNickname : handleEditNickname
+        }
+        variant="contained"
+        color="primary"
+        style={{ float: "right" }}
+        // className={classes.button}
+        startIcon={startedEditingNickname ? <SaveIcon /> : <EditIcon />}
+      >
+        {startedEditingNickname ? "Save" : "Edit Nickname"}
+      </Button>
+
+      {
+        <SignUpError
+          show={untouchedNickname ? "untouched" : nicknameError ? true : false}
+        >
+          Please enter Nick Name
+        </SignUpError>
+      }
+    </>
+  );
+});
 export const MemoNickname = memo(function MemoNickname({
   size,
   labelSize,

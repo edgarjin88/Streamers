@@ -33,7 +33,7 @@ const options =
 
         ca: fs.readFileSync(
           path.join(certsPath, "api.websiteName.com.ca-bundle")
-        )
+        ),
       }
     : null;
 
@@ -64,7 +64,7 @@ if (prod) {
   app.use(
     cors({
       origin: "*",
-      credentials: true
+      credentials: true,
     })
   );
 } else {
@@ -72,7 +72,7 @@ if (prod) {
   app.use(
     cors({
       origin: "http://localhost:3000",
-      credentials: true
+      credentials: true,
     })
   );
 }
@@ -90,9 +90,9 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? false : false,
-      domain: prod && ".websiteName.com" // without '.'  api.sumotee won't work. For subdomain as well.
+      domain: prod && ".websiteName.com", // without '.'  api.sumotee won't work. For subdomain as well.
     },
-    name: "websiteName" //cookie name to change. Name of cookie from browser
+    name: "websiteName", //cookie name to change. Name of cookie from browser
   })
 );
 app.use(passport.initialize()); //I will be initialized everytime. In real product, to be cached.
@@ -101,6 +101,7 @@ app.use(passport.session());
 
 app.use("/api/user", userAPIRouter);
 app.use("/api/post", postAPIRouter);
+app.use("/api/video", postAPIRouter);
 app.use("/api/posts", postsAPIRouter);
 app.use("/api/hashtag", hashtagAPIRouter);
 

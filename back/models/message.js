@@ -4,20 +4,20 @@ module.exports = (sequelize, DataTypes) => {
     {
       content: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
       },
-      PostId: {
-        type: DataTypes.INTEGER
-      }
+      VideoId: {
+        type: DataTypes.INTEGER,
+      },
     },
     {
       charset: "utf8mb4",
-      collate: "utf8mb4_general_ci"
+      collate: "utf8mb4_general_ci",
     }
   );
-  Message.associate = db => {
+  Message.associate = (db) => {
     db.Message.belongsTo(db.User);
-    db.Message.belongsTo(db.Post);
+    db.Message.belongsTo(db.Video);
   };
   return Message;
 };

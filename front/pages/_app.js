@@ -24,7 +24,7 @@ const Front = ({ Component, pageProps, store }) => {
   );
 };
 
-Front.getInitialProps = async context => {
+Front.getInitialProps = async (context) => {
   //executed when paged loaded first, and move to other page via link or next/router.
   // store, Apptree, query pathname objects are included in context by next
 
@@ -43,7 +43,7 @@ Front.getInitialProps = async context => {
   if (!state.user.me) {
     // console.log('getinitialprops fired');
     ctx.store.dispatch({
-      type: LOAD_USER_REQUEST
+      type: LOAD_USER_REQUEST,
     });
   }
   if (Component.getInitialProps) {
@@ -64,7 +64,7 @@ const configureStore = (initialState = {}, options) => {
           !options.isServer &&
             typeof window.__REDUX_DEVTOOLS_EXTENSION__ !== "undefined"
             ? window.__REDUX_DEVTOOLS_EXTENSION__()
-            : f => f
+            : (f) => f
         );
   const store = createStore(reducer, initialState, enhancer);
   //inhancer includes everything at this point.

@@ -1,16 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import {
-  LOAD_FOLLOWERS_REQUEST,
-  LOAD_FOLLOWINGS_REQUEST,
-  REMOVE_FOLLOWER_REQUEST,
-  UNFOLLOW_USER_REQUEST,
-  EDIT_NICKNAME_REQUEST,
-  START_EDIT_NICKNAME,
-  START_CHANGE_PASSWORD,
-  CHANGE_PASSWORD_REQUEST,
-} from "../reducers/user";
-import { useRouter } from "next/router";
+import { EDIT_NICKNAME_REQUEST, START_EDIT_NICKNAME } from "../reducers/user";
 
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -24,32 +14,24 @@ import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import { red } from "@material-ui/core/colors";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
-import TextField from "@material-ui/core/TextField";
-
-import Button from "@material-ui/core/Button";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import KeyboardVoiceIcon from "@material-ui/icons/KeyboardVoice";
-import Icon from "@material-ui/core/Icon";
-import SaveIcon from "@material-ui/icons/Save";
 import {
   MemoEmail,
-  MemoNickname,
+  MemoEditNickname,
   MemoPassword,
   MemoSubmitPasswordChange,
-  // MemoProfileDescription,
   MemoRichTextEditor,
 } from "../containers/InputComponents";
+import UploadProfile from "../containers/UploadProfile";
+
+import moment from "moment";
+moment.locale("en");
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: "995px",
-    // margin: "auto",
+    width: "100%",
     marginTop: "30px",
     fontSize: "14px",
   },
@@ -59,17 +41,20 @@ const useStyles = makeStyles((theme) => ({
   },
   media: {
     height: 0,
+    margin: "0 1.7rem",
     paddingTop: "56.25%", // 16:9
   },
   expand: {
     transform: "rotate(0deg)",
-    marginLeft: "auto",
+    // marginLeft: "auto",
+
     transition: theme.transitions.create("transform", {
-      duration: 300,
+      duration: 200,
     }),
   },
   expandOpen: {
     transform: "rotate(180deg)",
+    // float: "left",
   },
   avatar: {
     backgroundColor: red[500],
@@ -80,66 +65,46 @@ export default function RecipeReviewCard() {
   const classes = useStyles();
 
   const [expanded, setExpanded] = React.useState(false);
-  // const [description, setDescription] = useState(dummyText);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   ///logic
-
-  ///logic
-  const dispatch = useDispatch();
-
   const {
-    followingList,
-    followerList,
-    hasMoreFollower,
-    hasMoreFollowing,
     startedEditingNickname,
     startedEditingDescription,
     startedChangingPassword,
-    me,
+    // profilePhoto,
   } = useSelector((state) => state.user);
 
   const {
     nickname,
     userId,
     description,
-    Followings,
-    Followers,
-    Posts,
+    profilePhoto,
+    createdAt,
   } = useSelector(({ user }) => user && user.me);
 
-  const { inputNickname } = useSelector(({ input }) => {
-    return {
-      inputNickname: input.nickname,
-    };
-  }, shallowEqual);
   const { mainPosts } = useSelector((state) => state.post);
 
   ///logic
-  const handleEditNickname = useCallback(() => {
-    dispatch({
-      type: START_EDIT_NICKNAME,
-      data: nickname,
-    });
-  }, [nickname]);
-
-  const handleSaveNickname = useCallback(() => {
-    dispatch({
-      type: EDIT_NICKNAME_REQUEST,
-      data: inputNickname,
-    });
-  }, [inputNickname]);
 
   // 111
 
   return (
     <Card className={classes.root}>
       <CardHeader
+        titleTypographyProps={{ variant: "h5" }}
         avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
-            R
+          <Avatar
+            className={classes.avatar}
+            src={
+              process.env.NODE_ENV === "development"
+                ? `http://localhost:3003/${profilePhoto}`
+                : profilePhoto
+            }
+          >
+            {!profilePhoto && nickname.slice(0, 1)}{" "}
           </Avatar>
         }
         action={
@@ -148,64 +113,63 @@ export default function RecipeReviewCard() {
           </IconButton>
         }
         title={nickname}
-        subheader="September 14, 2016"
+        subheader={`Joined on ${moment(createdAt).format("DD.MM.YYYY")}`}
       />
       {/* Profile Image here */}
       <CardMedia
         className={classes.media}
-        image="../static/images/videos/main-video.png"
-        title="Paella dish"
+        image={
+          profilePhoto
+            ? process.env.NODE_ENV === "development"
+              ? `http://localhost:3003/${profilePhoto}`
+              : profilePhoto
+            : "../static/images/profiles/noimage.png"
+        }
+        title="Profile Image"
       />
       <CardContent>
+        <hr />
+        <h1>
+          <strong>User Description</strong>
+        </h1>
+        <hr />
         <MemoRichTextEditor />
-        <Typography variant="body2" color="textSecondary" component="p">
-          {/* {description} */}
-        </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
+        {/* <hr /> */}
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,
           })}
           onClick={handleExpandClick}
+          size="medium"
+          style={{
+            fontSize: "5rem",
+            color: "#fff",
+            backgroundColor: "#fda026",
+          }}
           aria-expanded={expanded}
-          aria-label="show more"
+          aria-label="User Details"
         >
-          <ExpandMoreIcon />
+          <ExpandMoreIcon
+            style={{
+              float: "left",
+              fontSize: "2rem",
+            }}
+          />
         </IconButton>
+        <h1> &nbsp; User Details </h1>
+        {/* <hr /> */}
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography paragraph>
-            {!startedEditingDescription && <h1>{description}</h1>}
-            {/* <MemoProfileDescription /> */}
-          </Typography>
-          user infos
           <MemoEmail profileUserId={userId} size="16px" labelSize="16px" />
-          <MemoNickname
+          <MemoEditNickname
             profileNickname={nickname}
             disabled={!startedEditingNickname}
             size="16px"
             labelSize="16px"
           />
-          <Button
-            onClick={
-              startedEditingNickname ? handleSaveNickname : handleEditNickname
-            }
-            variant="contained"
-            color="primary"
-            style={{ float: "right" }}
-            className={classes.button}
-            startIcon={<CloudUploadIcon />}
-          >
-            {startedEditingNickname ? "Save" : "Edit Nickname"}
-          </Button>
           <MemoPassword
             disabled={!startedChangingPassword}
             size="16px"
@@ -214,39 +178,7 @@ export default function RecipeReviewCard() {
           <MemoSubmitPasswordChange />
         </CardContent>
       </Collapse>
-      <div
-        style={{
-          display: "flex",
-          margin: "16px 15px",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Button
-          variant="contained"
-          color="default"
-          className={classes.button}
-          startIcon={<CloudUploadIcon />}
-        >
-          Upload Profile Image
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          className={classes.button}
-          startIcon={<DeleteIcon />}
-        >
-          Cancel
-        </Button>
-
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          startIcon={<SaveIcon />}
-        >
-          Save
-        </Button>
-      </div>
+      <UploadProfile />
     </Card>
   );
 }

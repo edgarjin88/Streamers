@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 
 const expressJWT = require("express-jwt");
 const _ = require("lodash");
+
 // const fetch = require("node-fetch");
 require("dotenv").config();
 
@@ -19,7 +20,7 @@ const {
   signup,
   passwordReset,
   passwordChange,
-  confirmPasswordReset
+  confirmPasswordReset,
 } = require("../controllers/auth");
 
 router.get("/", isLoggedIn, (req, res) => {
@@ -33,31 +34,61 @@ router.post("/", signup);
 router.post("/account-activation", accountActivation);
 router.post("/passwordreset", passwordReset);
 
+const { imageLink, upload } = require("../utilities/multerOptions");
+
+router.post(
+  "/profile",
+  isLoggedIn,
+  upload.single("image"),
+  async (req, res) => {
+    //image from "image" in formdata
+    //req.body.image, req.body.content
+    // if different name for each file, you can use upload.fields()
+    console.log("req.files", req.file);
+    // res.json(req.file[imageLink]);
+    try {
+      console.log("profilePhoto address", req.file[imageLink]);
+      await db.User.update(
+        {
+          profilePhoto: req.file[imageLink],
+        },
+        {
+          where: { id: req.user.id },
+        }
+      );
+      res.send(req.file[imageLink]);
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
+  }
+);
+
 router.get("/:id", async (req, res, next) => {
   try {
     const user = await db.User.findOne({
       where: {
-        id: parseInt(req.params.id, 10)
+        id: parseInt(req.params.id, 10),
       },
 
       include: [
         {
           model: db.Post,
           as: "Posts",
-          attributes: ["id"]
+          attributes: ["id"],
         },
         {
           model: db.User,
           as: "Followings",
-          attributes: ["id"]
+          attributes: ["id"],
         },
         {
           model: db.User,
           as: "Followers",
-          attributes: ["id"]
-        }
+          attributes: ["id"],
+        },
       ],
-      attributes: ["id", "nickname", "profilePhoto"]
+      attributes: ["id", "nickname", "profilePhoto"],
     });
     const jsonUser = user.toJSON();
     jsonUser.Posts = jsonUser.Posts ? jsonUser.Posts.length : 0;
@@ -87,7 +118,7 @@ router.post("/login", (req, res, next) => {
     if (info) {
       return res.status(401).send(info.reason);
     }
-    return req.login(user, async loginErr => {
+    return req.login(user, async (loginErr) => {
       //serialize starts
       try {
         if (loginErr) {
@@ -95,26 +126,26 @@ router.post("/login", (req, res, next) => {
         }
         const fullUser = await db.User.findOne({
           where: {
-            id: user.id
+            id: user.id,
           },
           include: [
             {
               model: db.Post,
               as: "Posts",
-              attributes: ["id"]
+              attributes: ["id"],
             },
             {
               model: db.User,
               as: "Followings",
-              attributes: ["id"]
+              attributes: ["id"],
             },
             {
               model: db.User,
               as: "Followers",
-              attributes: ["id"]
-            }
+              attributes: ["id"],
+            },
           ],
-          attributes: ["id", "nickname", "userId", "profilePhoto"]
+          attributes: ["id", "nickname", "userId", "profilePhoto"],
         });
         console.log(fullUser);
         return res.json(fullUser);
@@ -130,14 +161,14 @@ router.get("/:id/followings", isLoggedIn, async (req, res, next) => {
   try {
     const user = await db.User.findOne({
       where: {
-        id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0
-      }
+        id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,
+      },
     });
     const followers = await user.getFollowings({
       //cached user
       attributes: ["id", "nickname", "profilePhoto"],
       limit: parseInt(req.query.limit, 10), //limit, offset are sequalize attributes
-      offset: parseInt(req.query.offset, 10)
+      offset: parseInt(req.query.offset, 10),
     });
     res.json(followers);
   } catch (e) {
@@ -151,15 +182,15 @@ router.get("/:id/followers", isLoggedIn, async (req, res, next) => {
   try {
     const user = await db.User.findOne({
       where: {
-        id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0
+        id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,
         //0 to prevent undefined. In sequelize, undefined can make errors.
-      } //
+      }, //
     }); // req.params.id '0'
     const followers = await user.getFollowers({
       //getFollowers options
       attributes: ["id", "nickname", "profilePhoto"],
       limit: parseInt(req.query.limit, 10), //req.param.id === strings
-      offset: parseInt(req.query.offset, 10)
+      offset: parseInt(req.query.offset, 10),
     });
     res.json(followers);
   } catch (e) {
@@ -173,8 +204,8 @@ router.delete("/:id/follower", isLoggedIn, async (req, res, next) => {
     const me = await db.User.findOne({
       //req.user.id=== my id, //req.params.id others' id
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     await me.removeFollower(req.params.id);
     res.send(req.params.id);
@@ -189,8 +220,8 @@ router.post("/:id/follow", isLoggedIn, async (req, res, next) => {
     const me = await db.User.findOne({
       //req.user.id. cache user first to prevent unexpected errors.
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     await me.addFollowing(req.params.id);
     res.send(req.params.id);
@@ -204,8 +235,8 @@ router.delete("/:id/follow", isLoggedIn, async (req, res, next) => {
   try {
     const me = await db.User.findOne({
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     await me.removeFollowing(req.params.id);
     res.send(req.params.id);
@@ -220,23 +251,23 @@ router.get("/:id/posts", async (req, res, next) => {
     const posts = await db.Post.findAll({
       where: {
         UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0, //if "0", still send information.
-        RetweetId: null // If it is my post, retweetId is null.
+        RetweetId: null, // If it is my post, retweetId is null.
       },
       include: [
         {
           model: db.User,
-          attributes: ["id", "nickname", "profilePhoto"]
+          attributes: ["id", "nickname", "profilePhoto"],
         },
         {
-          model: db.Image
+          model: db.Image,
         },
         {
           model: db.User,
           through: "Like",
           as: "Likers",
-          attributes: ["id", "profilePhoto"]
-        }
-      ]
+          attributes: ["id", "profilePhoto"],
+        },
+      ],
     });
     res.json(posts);
   } catch (e) {
@@ -252,12 +283,12 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
     await db.User.update(
       {
         //partial update
-        nickname: req.body.nickname // req.body
+        nickname: req.body.nickname, // req.body
       },
       {
         where: {
-          id: req.user.id
-        }
+          id: req.user.id,
+        },
       }
     );
     res.send(req.body.nickname);
@@ -271,13 +302,12 @@ router.patch("/password", isLoggedIn, passwordChange);
 router.patch("/confirm-password-reset", confirmPasswordReset);
 
 router.patch("/description", isLoggedIn, async (req, res, next) => {
-  //partial update, isLoggedIn to be checked
   console.log("description :", req.body);
   try {
     const exUser = await db.User.findOne({
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     if (!exUser) {
       return res
@@ -286,7 +316,7 @@ router.patch("/description", isLoggedIn, async (req, res, next) => {
     }
 
     await exUser.update({
-      description: req.body.description
+      description: req.body.description,
     });
     return res.status(200).send(req.body.description);
   } catch (e) {
@@ -300,15 +330,15 @@ router.get(
   passport.authenticate("google", {
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email"
-    ]
+      "https://www.googleapis.com/auth/userinfo.email",
+    ],
   })
 );
 
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/http://localhost:3000/signin"
+    failureRedirect: "/http://localhost:3000/signin",
   }),
   (req, res) => {
     console.log("fired here");
@@ -319,14 +349,14 @@ router.get(
 router.get(
   "/auth/facebook",
   passport.authenticate("facebook", {
-    scope: ["public_profile", "email"]
+    scope: ["public_profile", "email"],
   })
 );
 
 router.get(
   "/auth/facebook/callback",
   passport.authenticate("facebook", {
-    failureRedirect: "/http://localhost:3000/signin"
+    failureRedirect: "/http://localhost:3000/signin",
   }),
   (req, res) => {
     console.log("fired here");
@@ -336,14 +366,14 @@ router.get(
 router.get(
   "/auth/instagram",
   passport.authenticate("instagram", {
-    scope: ["public_profile", "email"]
+    scope: ["public_profile", "email"],
   })
 );
 
 router.get(
   "/auth/instagram/callback",
   passport.authenticate("instagram", {
-    failureRedirect: "http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
     console.log("fired here");
@@ -353,14 +383,14 @@ router.get(
 router.get(
   "/auth/kakao",
   passport.authenticate("kakao", {
-    failureRedirect: "http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin",
   })
 );
 
 router.get(
   "/auth/kakao/callback",
   passport.authenticate("kakao", {
-    failureRedirect: "http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
     console.log("kakao fired here");
@@ -371,14 +401,14 @@ router.get(
 router.get(
   "/auth/linkedin",
   passport.authenticate("linkedin", {
-    failureRedirect: "http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin",
   })
 );
 
 router.get(
   "/auth/linkedin/callback",
   passport.authenticate("linkedin", {
-    failureRedirect: "http://localhost:3000/signin"
+    failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
     console.log(" linkedin fired here");

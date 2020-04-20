@@ -1,10 +1,8 @@
 const RelatedVideos = () => {
   const headerPart = () => (
     <header>
-      <div>Up next-next video screenshot to be added</div>
-      <div>
-        decide wether to show or not dynamically dependnig on redux state
-      </div>
+      <div>Up next-next video </div>
+      <div>decide</div>
       <div>Autoplay</div>
       <button>
         <span className="autoplay-slider"></span>
@@ -33,13 +31,13 @@ const RelatedVideos = () => {
     4,
     4,
     4,
-    4
+    4,
   ];
-  const renderVideoList = videoInfoList => {
+  const renderVideoList = (videoInfoList) => {
     // console.log("render video fired", videoInfoList);
     return (
       <ul>
-        {videoInfoList.map(videoInfo => {
+        {videoInfoList.map((videoInfo) => {
           return (
             <li>
               <a href="#" title="Why I laugh at most CEOs">

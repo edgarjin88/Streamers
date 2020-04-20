@@ -1,4 +1,11 @@
-import { all, call, fork, put, takeEvery } from "redux-saga/effects";
+import {
+  all,
+  call,
+  fork,
+  put,
+  takeEvery,
+  takeLatest,
+} from "redux-saga/effects";
 import axios from "axios";
 import {
   EDIT_NICKNAME_FAILURE,
@@ -48,7 +55,10 @@ import {
   EDIT_DESCRIPTION_SUCCESS,
   CONFIRM_PASSWORD_RESET_REQUEST,
   CONFIRM_PASSWORD_RESET_SUCCESS,
-  CONFIRM_PASSWORD_RESET_FAILURE
+  CONFIRM_PASSWORD_RESET_FAILURE,
+  UPLOAD_PROFILE_REQUEST,
+  UPLOAD_PROFILE_FAILURE,
+  UPLOAD_PROFILE_SUCCESS,
 } from "../reducers/user";
 
 const https = require("https");
@@ -57,14 +67,14 @@ const https = require("https");
 const httpsAgent =
   process.env.NODE_ENV === "production"
     ? new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       })
     : undefined;
 
 function signInAPI(loginData) {
   return axios.post("/user/login", loginData, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -73,13 +83,13 @@ function* signIn(action) {
     const result = yield call(signInAPI, action.data);
     yield put({
       type: SIGN_IN_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error("this is error for login action", e.response);
     yield put({
       type: SIGN_IN_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -91,7 +101,7 @@ function* watchSignIn() {
 function signUpAPI(signUpData) {
   return axios.post("/user/", signUpData, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -99,13 +109,13 @@ function* signUp(action) {
   try {
     yield call(signUpAPI, action.data);
     yield put({
-      type: SIGN_UP_SUCCESS
+      type: SIGN_UP_SUCCESS,
     });
   } catch (e) {
     console.error("this is error for signup action", e.response);
     yield put({
       type: SIGN_UP_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -120,7 +130,7 @@ function logOutAPI() {
     {},
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -130,13 +140,13 @@ function* logOut() {
     yield call(logOutAPI);
     yield put({
       //
-      type: SIGN_OUT_SUCCESS
+      type: SIGN_OUT_SUCCESS,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: SIGN_OUT_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -148,7 +158,7 @@ function* watchLogOut() {
 function loadUserAPI(userId) {
   return axios.get(userId ? `/user/${userId}` : "/user/", {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -158,14 +168,14 @@ function* loadUser(action) {
     yield put({
       type: LOAD_USER_SUCCESS,
       me: !action.data,
-      data: result.data
+      data: result.data,
     });
     // console.log('load user success', result.data);
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_USER_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -180,7 +190,7 @@ function followAPI(userId) {
     {},
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -190,12 +200,12 @@ function* follow(action) {
     const result = yield call(followAPI, action.data);
     yield put({
       type: FOLLOW_USER_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     yield put({
       type: FOLLOW_USER_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -207,7 +217,7 @@ function* watchFollow() {
 function unfollowAPI(userId) {
   return axios.delete(`/user/${userId}/follow`, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -216,13 +226,13 @@ function* unfollow(action) {
     const result = yield call(unfollowAPI, action.data);
     yield put({
       type: UNFOLLOW_USER_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UNFOLLOW_USER_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -243,13 +253,13 @@ function* loadFollowers(action) {
     const result = yield call(loadFollowersAPI, action.data, action.offset);
     yield put({
       type: LOAD_FOLLOWERS_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_FOLLOWERS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -263,7 +273,7 @@ function loadFollowingsAPI(userId, offset = 0, limit = 3) {
     `/user/${userId || 0}/followings?offset=${offset}&limit=${limit}`,
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -273,13 +283,13 @@ function* loadFollowings(action) {
     const result = yield call(loadFollowingsAPI, action.data, action.offset);
     yield put({
       type: LOAD_FOLLOWINGS_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_FOLLOWINGS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -291,7 +301,7 @@ function* watchLoadFollowings() {
 function removeFollowerAPI(userId) {
   return axios.delete(`/user/${userId}/follower`, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -300,13 +310,13 @@ function* removeFollower(action) {
     const result = yield call(removeFollowerAPI, action.data);
     yield put({
       type: REMOVE_FOLLOWER_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: REMOVE_FOLLOWER_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -321,7 +331,7 @@ function editNicknameAPI(nickname) {
     { nickname },
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -331,14 +341,14 @@ function* editNickname(action) {
     const result = yield call(editNicknameAPI, action.data);
     yield put({
       type: EDIT_NICKNAME_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
 
     yield put({
       type: EDIT_NICKNAME_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -357,14 +367,14 @@ function* activationRequest(action) {
     const result = yield call(activationAPI, action.data);
     yield put({
       type: ACTIVATION_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error("this is error for activation action", e.response);
 
     yield put({
       type: ACTIVATION_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -383,14 +393,14 @@ function* passwordResetRequest(action) {
     const result = yield call(passwordResetAPI, action.data);
     yield put({
       type: PASSWORD_RESET_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error("this is error for PASSWORD_RESET action", e.response);
 
     yield put({
       type: PASSWORD_RESET_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -407,7 +417,7 @@ function* watchPasswordReset() {
 function OauthSignInAPI(loginData) {
   return axios.get(`/user/auth/${loginData}`, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -416,13 +426,13 @@ function* OauthSignIn(action) {
     const result = yield call(OauthSignInAPI, action.data);
     yield put({
       type: OAUTH_SIGN_IN_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error("this is error for login action", e.response);
     yield put({
       type: OAUTH_SIGN_IN_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -437,7 +447,7 @@ function changePasswordAPI(password) {
     { password },
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -448,14 +458,14 @@ function* changePassword(action) {
     const result = yield call(changePasswordAPI, action.data);
     yield put({
       type: CHANGE_PASSWORD_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
 
     yield put({
       type: CHANGE_PASSWORD_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -467,7 +477,7 @@ function* watchChangePassword() {
 function confirmResetPasswordAPI(data) {
   return axios.patch("/user/confirm-password-reset", data, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -477,7 +487,7 @@ function* confirmResetPassword(action) {
     const result = yield call(confirmResetPasswordAPI, action.data);
     yield put({
       type: CONFIRM_PASSWORD_RESET_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(
@@ -489,7 +499,7 @@ function* confirmResetPassword(action) {
 
     yield put({
       type: CONFIRM_PASSWORD_RESET_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -504,7 +514,7 @@ function editDescriptionAPI(description) {
     { description },
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -514,14 +524,14 @@ function* editDescription(action) {
     const result = yield call(editDescriptionAPI, action.data);
     yield put({
       type: EDIT_DESCRIPTION_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
 
     yield put({
       type: EDIT_DESCRIPTION_FAILURE,
-      reason: e.response && e.response.data
+      reason: e.response && e.response.data,
     });
   }
 }
@@ -529,8 +539,37 @@ function* editDescription(action) {
 function* watchEditDescription() {
   yield takeEvery(EDIT_DESCRIPTION_REQUEST, editDescription);
 }
+
+function uploadProfileImagesAPI(formData) {
+  return axios.post("/user/profile", formData, {
+    withCredentials: true,
+    httpsAgent,
+  });
+}
+
+function* uploadProfileImages(action) {
+  try {
+    const result = yield call(uploadProfileImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_PROFILE_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: UPLOAD_PROFILE_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchUploadProfileImages() {
+  console.log("wath profile upload fired");
+  yield takeLatest(UPLOAD_PROFILE_REQUEST, uploadProfileImages);
+}
 export default function* userSaga() {
   yield all([
+    fork(watchUploadProfileImages),
     fork(watchEditDescription),
     fork(watchConfirmPasswordReset),
     fork(watchChangePassword),
@@ -546,6 +585,6 @@ export default function* userSaga() {
     fork(watchRemoveFollower),
     fork(watchEditNickname),
     fork(watchActivationRequest),
-    fork(watchPasswordReset)
+    fork(watchPasswordReset),
   ]);
 }

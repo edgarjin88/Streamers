@@ -10,7 +10,7 @@ class MyDocument extends Document {
     const sheet = new ServerStyleSheet();
     const materialUI = new MaterialUiServerStyleSheets();
     try {
-      const page = context.renderPage(App => props => {
+      const page = context.renderPage((App) => (props) => {
         console.log("props in document :", props);
         return sheet.collectStyles(materialUI.collect(<App {...props} />));
       });
@@ -33,7 +33,7 @@ class MyDocument extends Document {
       <html {...htmlAttrs}>
         <head>
           {this.props.styleTags}
-          {Object.values(helmet).map(el => el.toComponent())}
+          {Object.values(helmet).map((el) => el.toComponent())}
         </head>
         <body {...bodyAttrs}>
           <Main />

@@ -37,12 +37,9 @@ import {
   LOAD_POST_SUCCESS,
   LOAD_POST_FAILURE,
   LOAD_POST_REQUEST,
-  UPLOAD_PROFILE_REQUEST,
-  UPLOAD_PROFILE_FAILURE,
-  UPLOAD_PROFILE_SUCCESS,
   EDIT_POST_REQUEST,
   EDIT_POST_FAILURE,
-  EDIT_POST_SUCCESS
+  EDIT_POST_SUCCESS,
 } from "../reducers/post";
 
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
@@ -52,16 +49,14 @@ const https = require("https");
 const httpsAgent =
   process.env.NODE_ENV === "production"
     ? new https.Agent({
-        rejectUnauthorized: false
-        // cert: fs.readFileSync(path.join(__dirname,'sumontee.com.crt')),
-        // key: fs.readFileSync(path.join(__dirname,'sumontee_com_key.txt'))
+        rejectUnauthorized: false,
       })
     : undefined;
 
 function addPostAPI(postData) {
   return axios.post("/post", postData, {
     httpsAgent,
-    withCredentials: true
+    withCredentials: true,
   });
 }
 
@@ -70,16 +65,16 @@ function* addPost(action) {
     const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: result.data
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: result.data.id
+      data: result.data.id,
     });
   } catch (e) {
     yield put({
       type: ADD_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -91,7 +86,7 @@ function* watchAddPost() {
 function loadMainPostsAPI(lastId = 0, limit = 10) {
   return axios.get(`/posts?lastId=${lastId}&limit=${limit}`, {
     httpsAgent,
-    withCredentials: true
+    withCredentials: true,
   });
   //lastId=0 as a default value otherwise, sequelize can make an error with the value "undefined"
 }
@@ -101,12 +96,12 @@ function* loadMainPosts(action) {
     const result = yield call(loadMainPostsAPI, action.lastId);
     yield put({
       type: LOAD_MAIN_POSTS_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     yield put({
       type: LOAD_MAIN_POSTS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -127,12 +122,12 @@ function* loadHashtagPosts(action) {
     const result = yield call(loadHashtagPostsAPI, action.data, action.lastId);
     yield put({
       type: LOAD_HASHTAG_POSTS_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     yield put({
       type: LOAD_HASHTAG_POSTS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -144,7 +139,7 @@ function* watchLoadHashtagPosts() {
 function loadUserPostsAPI(id) {
   return axios.get(`/user/${id || 0}/posts`, {
     httpsAgent,
-    withCredentials: true
+    withCredentials: true,
   });
 }
 
@@ -153,12 +148,12 @@ function* loadUserPosts(action) {
     const result = yield call(loadUserPostsAPI, action.data);
     yield put({
       type: LOAD_USER_POSTS_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     yield put({
       type: LOAD_USER_POSTS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -173,7 +168,7 @@ function addCommentAPI(data) {
     { content: data.content },
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -185,14 +180,14 @@ function* addComment(action) {
       type: ADD_COMMENT_SUCCESS,
       data: {
         postId: action.data.postId,
-        comment: result.data
-      }
+        comment: result.data,
+      },
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: ADD_COMMENT_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -204,7 +199,7 @@ function* watchAddComment() {
 function loadCommentsAPI(postId) {
   return axios.get(`/post/${postId}/comments`, {
     httpsAgent,
-    withCredentials: true
+    withCredentials: true,
   });
 }
 
@@ -215,14 +210,14 @@ function* loadComments(action) {
       type: LOAD_COMMENTS_SUCCESS,
       data: {
         postId: action.data,
-        comments: result.data
-      }
+        comments: result.data,
+      },
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_COMMENTS_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -234,7 +229,7 @@ function* watchLoadComments() {
 function uploadImagesAPI(formData) {
   return axios.post("/post/images", formData, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -243,13 +238,13 @@ function* uploadImages(action) {
     const result = yield call(uploadImagesAPI, action.data);
     yield put({
       type: UPLOAD_IMAGES_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UPLOAD_IMAGES_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -258,40 +253,13 @@ function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
 
-function uploadProfileImagesAPI(formData) {
-  return axios.post("/post/profile", formData, {
-    withCredentials: true,
-    httpsAgent
-  });
-}
-
-function* uploadProfileImages(action) {
-  try {
-    const result = yield call(uploadProfileImagesAPI, action.data);
-    yield put({
-      type: UPLOAD_PROFILE_SUCCESS,
-      data: result.data
-    });
-  } catch (e) {
-    console.error(e);
-    yield put({
-      type: UPLOAD_PROFILE_FAILURE,
-      error: e
-    });
-  }
-}
-
-function* watchUploadProfileImages() {
-  yield takeLatest(UPLOAD_PROFILE_REQUEST, uploadProfileImages);
-}
-
 function likePostAPI(postId) {
   return axios.post(
     `/post/${postId}/like`,
     {},
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -303,14 +271,14 @@ function* likePost(action) {
       type: LIKE_POST_SUCCESS,
       data: {
         postId: action.data,
-        userId: result.data.userId
-      }
+        userId: result.data.userId,
+      },
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LIKE_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -322,7 +290,7 @@ function* watchLikePost() {
 function unlikePostAPI(postId) {
   return axios.delete(`/post/${postId}/like`, {
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -333,14 +301,14 @@ function* unlikePost(action) {
       type: UNLIKE_POST_SUCCESS,
       data: {
         postId: action.data,
-        userId: result.data.userId
-      }
+        userId: result.data.userId,
+      },
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: UNLIKE_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -355,7 +323,7 @@ function retweetAPI(postId) {
     {},
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -365,13 +333,13 @@ function* retweet(action) {
     const result = yield call(retweetAPI, action.data);
     yield put({
       type: RETWEET_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: RETWEET_FAILURE,
-      error: e
+      error: e,
     });
     alert(e.response && e.response.data);
   }
@@ -385,7 +353,7 @@ function removePostAPI(postId) {
   return axios.delete(`/post/${postId}`, {
     // delete!
     withCredentials: true,
-    httpsAgent
+    httpsAgent,
   });
 }
 
@@ -394,17 +362,17 @@ function* removePost(action) {
     const result = yield call(removePostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: result.data
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: REMOVE_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -419,7 +387,7 @@ function editPostAPI(postId, content) {
     { content },
     {
       withCredentials: true,
-      httpsAgent
+      httpsAgent,
     }
   );
 }
@@ -430,13 +398,13 @@ function* editPost(action) {
     yield put({
       type: EDIT_POST_SUCCESS,
       data: result.data,
-      postId: action.data
+      postId: action.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: EDIT_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -454,13 +422,13 @@ function* loadPost(action) {
     const result = yield call(loadPostAPI, action.data);
     yield put({
       type: LOAD_POST_SUCCESS,
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     console.error(e);
     yield put({
       type: LOAD_POST_FAILURE,
-      error: e
+      error: e,
     });
   }
 }
@@ -478,12 +446,11 @@ export default function* postSaga() {
     fork(watchLoadHashtagPosts),
     fork(watchLoadUserPosts),
     fork(watchUploadImages),
-    fork(watchUploadProfileImages),
     fork(watchLikePost),
     fork(watchUnlikePost),
     fork(watchRetweet),
     fork(watchRemovePost),
     fork(watchEditPost),
-    fork(watchLoadPost)
+    fork(watchLoadPost),
   ]);
 }

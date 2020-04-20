@@ -1,37 +1,27 @@
 import produce from "immer";
 
-// export const initialState = {
-//   isLoggingOut: false,
-//   isLoggingIn: false,
-//   logInErrorReason: "",
-//   isSignedUp: false,
-//   isSigningUp: false,
-//   signUpErrorReason: "",
-//   me: null,
-//   followingList: [],
-//   followerList: [],
-//   userInfo: "test",
-//   isEditingNickname: false,
-//   editNicknameErrorReason: "",
-//   hasMoreFollower: false,
-//   hasMoreFollowing: false
-// };
 export const initialState = {
   openDrawer: false,
-  backDrop: false
+  backDrop: false,
+  openModal: false,
 };
 
 export const OPEN_DRAWER = "OPEN_DRAWER";
 export const CLOSE_DRAWER = "CLOSE_DRAWER";
-// export const OPEN_BACKDROP = "OPEN_BACKDROP";
-// export const CLOSE_BACKDROP = "CLOSE_BACKDROP";
-
-// export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
-// export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
+export const CLOSE_MODAL = "CLOSE_MODAL";
+export const OPEN_MODAL = "OPEN_MODAL";
 
 export default (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     switch (action.type) {
+      case OPEN_MODAL: {
+        draft.openModal = true;
+        break;
+      }
+      case CLOSE_MODAL: {
+        draft.openModal = false;
+        break;
+      }
       case OPEN_DRAWER: {
         draft.openDrawer = true;
         draft.backDrop = true;

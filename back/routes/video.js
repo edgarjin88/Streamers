@@ -8,10 +8,9 @@ const router = express.Router();
 const { imageLink, upload } = require("../utilities/multerOptions");
 
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
-  //none(), only text allowed
   try {
     const hashtags = req.body.content.match(/#[^\s]+/g);
-    const newPost = await db.Post.create({
+    const newVideo = await db.Video.create({
       content: req.body.content,
       UserId: req.user.id,
     });
@@ -24,12 +23,10 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
         )
       );
       console.log(result);
-      await newPost.addHashtags(result.map((r) => r[0]));
+      await newVideo.addHashtags(result.map((r) => r[0]));
     }
 
     if (req.body.image) {
-      //we are not using multer here. only address
-      // if array,  image: [address1, address2]
       if (Array.isArray(req.body.image)) {
         const images = await Promise.all(
           //wait for all record on DB
@@ -37,17 +34,17 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
             return db.Image.create({ src: image });
           })
         );
-        await newPost.addImages(images);
+        await newVideo.addImages(images);
       } else {
         //for one image, image: address 1.
         const image = await db.Image.create({ src: req.body.image });
 
-        await newPost.addImage(image);
+        await newVideo.addImage(image);
       }
     }
 
-    const fullPost = await db.Post.findOne({
-      where: { id: newPost.id },
+    const fullVideo = await db.Video.findOne({
+      where: { id: newVideo.id },
       include: [
         {
           model: db.User,
@@ -57,7 +54,7 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
         },
       ],
     });
-    res.json(fullPost);
+    res.json(fullVideo);
   } catch (e) {
     console.error(e);
     next(e);
@@ -81,16 +78,16 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
     console.log("patch fired", req.body.content);
     console.log("patch fired whole body", req.body);
     console.log("id", req.params.id);
-    const post = await db.Post.findOne({
+    const video = await db.Video.findOne({
       where: { id: req.params.id },
     });
 
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    if (!video) {
+      return res.status(404).send("video does not exist.");
     }
 
-    await post.update({ content: req.body.content });
-    res.send(post);
+    await video.update({ content: req.body.content });
+    res.send(video);
   } catch (e) {
     console.error(e);
     next(e);
@@ -99,7 +96,7 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
 //////
 router.get("/:id", async (req, res, next) => {
   try {
-    const post = await db.Post.findOne({
+    const video = await db.Video.findOne({
       where: { id: req.params.id },
       include: [
         {
@@ -111,7 +108,7 @@ router.get("/:id", async (req, res, next) => {
         },
       ],
     });
-    res.json(post);
+    res.json(video);
   } catch (e) {
     console.error(e);
     next(e);
@@ -120,11 +117,11 @@ router.get("/:id", async (req, res, next) => {
 
 router.delete("/:id", isLoggedIn, async (req, res, next) => {
   try {
-    const post = await db.Post.findOne({ where: { id: req.params.id } });
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
-    await db.Post.destroy({ where: { id: req.params.id } });
+    await db.Video.destroy({ where: { id: req.params.id } });
     res.send(req.params.id);
   } catch (e) {
     console.error(e);
@@ -133,15 +130,15 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
 });
 
 router.get("/:id/comments", async (req, res, next) => {
-  // :id/comments==  post.id/coments
+  // :id/comments==  video.id/coments
   try {
-    const post = await db.Post.findOne({ where: { id: req.params.id } });
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
     const comments = await db.Comment.findAll({
       where: {
-        PostId: req.params.id,
+        VideoId: req.params.id,
       },
       order: [["createdAt", "ASC"]],
       include: [
@@ -161,16 +158,16 @@ router.get("/:id/comments", async (req, res, next) => {
 router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
   // POST /api/post/1000000/comment  /// !== comments
   try {
-    const post = await db.Post.findOne({ where: { id: req.params.id } });
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
     const newComment = await db.Comment.create({
-      PostId: post.id,
+      VideoId: video.id,
       UserId: req.user.id,
       content: req.body.content,
     });
-    await post.addComment(newComment.id);
+    await video.addComment(newComment.id);
     const comment = await db.Comment.findOne({
       where: {
         id: newComment.id,
@@ -192,11 +189,11 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/like", isLoggedIn, async (req, res, next) => {
   try {
-    const post = await db.Post.findOne({ where: { id: req.params.id } });
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
-    await post.addLiker(req.user.id);
+    await video.addLiker(req.user.id);
     res.json({ userId: req.user.id });
   } catch (e) {
     console.error(e);
@@ -206,11 +203,11 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
 
 router.delete("/:id/like", isLoggedIn, async (req, res, next) => {
   try {
-    const post = await db.Post.findOne({ where: { id: req.params.id } });
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
-    await post.removeLiker(req.user.id);
+    await video.removeLiker(req.user.id);
     res.json({ userId: req.user.id });
   } catch (e) {
     console.error(e);
@@ -220,44 +217,44 @@ router.delete("/:id/like", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
   try {
-    const post = await db.Post.findOne({
-      where: { id: req.params.id }, // post with ':id'
+    const video = await db.Video.findOne({
+      where: { id: req.params.id }, // video with ':id'
       include: [
         {
-          model: db.Post,
-          as: "Retweet", //   db.Post.belongsTo(db.Post, { as: 'Retweet' });
+          model: db.Video,
+          as: "Retweet", //   db.Video.belongsTo(db.Video, { as: 'Retweet' });
         }, // this will bring Retweet info. At this point, RetweetId is null, so Retweet is null too.
       ],
     });
-    console.log("retweet post :", post);
-    if (!post) {
-      return res.status(404).send("Post does not exist.");
+    console.log("retweet video :", video);
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
     }
     if (
-      req.user.id === post.UserId ||
-      (post.Retweet && post.Retweet.UserId === req.user.id)
+      req.user.id === video.UserId ||
+      (video.Retweet && video.Retweet.UserId === req.user.id)
     ) {
-      return res.status(403).send("You cannot retwit your post.");
+      return res.status(403).send("You cannot retwit your video.");
     }
-    const retweetTargetId = post.RetweetId || post.id;
-    //RetweetId === null, so, post.id to be used
+    const retweetTargetId = video.RetweetId || video.id;
+    //RetweetId === null, so, video.id to be used
 
-    const exPost = await db.Post.findOne({
+    const exVideo = await db.Video.findOne({
       where: {
         UserId: req.user.id,
         RetweetId: retweetTargetId,
       },
     });
-    if (exPost) {
+    if (exVideo) {
       return res.status(403).send("You already retwitted.");
     }
-    const retweet = await db.Post.create({
+    const retweet = await db.Video.create({
       UserId: req.user.id,
       RetweetId: retweetTargetId,
       content: "retweet",
     });
     console.log("retweet completed :", retweet);
-    const retweetWithPrevPost = await db.Post.findOne({
+    const retweetWithPrevVideo = await db.Video.findOne({
       //  include original post with retweet
       where: { id: retweet.id },
       include: [
@@ -266,7 +263,7 @@ router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
           attributes: ["id", "nickname", "profilePhoto"],
         },
         {
-          model: db.Post,
+          model: db.Video,
           as: "Retweet",
           include: [
             {
@@ -280,8 +277,8 @@ router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
         },
       ],
     });
-    console.log("with prev post: ", retweetWithPrevPost);
-    res.json(retweetWithPrevPost);
+    console.log("with prev post: ", retweetWithPrevVideo);
+    res.json(retweetWithPrevVideo);
   } catch (e) {
     console.error(e);
     next(e);
