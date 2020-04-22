@@ -16,14 +16,13 @@ import { SignInButton } from "./SignInButton";
 import {
   MemoSearchInput,
   MemoMenuItems,
-  MemoMenuIcon
+  MemoMenuIcon,
 } from "./MenuBarSubComponents";
 import { LogoAndName } from "../components/MenuComponents";
 
-import Toaster from "../components/Toaster";
-
+import { CLOSE_DRAWER } from "../reducers/menu";
 ///////// stylings to be seperated
-const HideOnScroll = props => {
+const HideOnScroll = (props) => {
   const { children, window } = props;
   const trigger = useScrollTrigger({ target: window ? window() : undefined });
   return (
@@ -37,21 +36,22 @@ const HideOnScroll = props => {
 
 export default function HideAppBar(props) {
   const theme = useTheme();
-
-  const { openDrawer } = useSelector(({ menu }) => {
-    return { openDrawer: menu.openDrawer };
-  }, shallowEqual);
+  const dispatch = useDispatch();
 
   const { backDrop } = useSelector(({ menu }) => {
     return { backDrop: menu.backDrop };
   }, shallowEqual);
 
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
 
   const { me } = useSelector(({ user }) => {
     return { me: user.me };
   }, shallowEqual);
+  const handleClose = useCallback(() => {
+    dispatch({
+      type: CLOSE_DRAWER,
+    });
+  }, [backDrop]);
 
   return (
     <>
@@ -60,6 +60,7 @@ export default function HideAppBar(props) {
         <Backdrop
           style={{ backgroundColor: "rgba(19, 19, 20, 0.72)", zIndex: 300 }}
           open={backDrop}
+          onClick={handleClose}
         />
 
         <HideOnScroll {...props}>
@@ -67,7 +68,7 @@ export default function HideAppBar(props) {
             position="fixed"
             color="inherit"
             className={clsx(classes.appBar, {
-              [classes.appBarShift]: false
+              [classes.appBarShift]: false,
             })}
           >
             <Toolbar
@@ -75,7 +76,7 @@ export default function HideAppBar(props) {
               style={{
                 padding: "0 20px 0 20px",
                 width: "80%",
-                placeSelf: "center"
+                placeSelf: "center",
               }}
             >
               <MemoMenuIcon />
@@ -85,7 +86,7 @@ export default function HideAppBar(props) {
                   <SearchIcon
                     style={{
                       fontSize: "25px",
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                     className={classes.searchIcon}
                   />

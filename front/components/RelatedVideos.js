@@ -1,4 +1,51 @@
-const RelatedVideos = () => {
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
+import Avatar from "@material-ui/core/Avatar";
+import Link from "next/link";
+
+import { URL } from "../config/config";
+import moment from "moment";
+
+moment.locale("en");
+const MainVideos = () => {
+  const { mainVideos, hasMoreVideos } = useSelector((state) => state.video);
+  const countRef = useRef([]); //last id record
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({
+      type: LOAD_MAIN_VIDEOS_REQUEST,
+    });
+  }, []);
+
+  const onScroll = useCallback(() => {
+    //action creator
+    if (
+      window.scrollY + document.documentElement.clientHeight >
+      document.documentElement.scrollHeight - 350
+    ) {
+      if (hasMoreVideos) {
+        const lastId = mainVideos[mainVideos.length - 1].id; //
+        if (!countRef.current.includes(lastId)) {
+          // dispatch, if no current id
+          dispatch({
+            type: LOAD_MAIN_VIDEOS_REQUEST,
+            lastId, // lastid : lastId
+          });
+          countRef.current.push(lastId);
+        }
+      }
+    }
+  }, [hasMoreVideos, mainVideos.length]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [mainVideos.length]);
+
   const headerPart = () => (
     <header>
       <div>Up next-next video </div>
@@ -10,29 +57,14 @@ const RelatedVideos = () => {
       </button>
     </header>
   );
-  const videoList = [
-    1,
-    2,
-    3,
-    4,
-    4,
-    5,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-  ];
+
+  // <Link
+  //   href={{
+  //     pathname: "/user",
+  //     query: { id: post.Retweet.User.id }
+  //   }}
+  //   as={`/user/${post.Retweet.User.id}`}
+  // >
   const renderVideoList = (videoInfoList) => {
     // console.log("render video fired", videoInfoList);
     return (
@@ -40,18 +72,35 @@ const RelatedVideos = () => {
         {videoInfoList.map((videoInfo) => {
           return (
             <li>
-              <a href="#" title="Why I laugh at most CEOs">
-                <article>
-                  <img
-                    src="../static/images/videos/try-not-to-laugh.png"
-                    alt="Why I laugh at most CEOs"
-                  />
-                  {videoInfo}
-                  <h4>Why I laugh at most CEOs</h4>
-                  <p>Its Me</p>
-                  <p>221 views</p>
-                </article>
-              </a>
+              <Link href={`/video/${videoInfo && videoInfo.id}`}>
+                <a title={videoInfo.title}>
+                  <article>
+                    <img
+                      src={
+                        videoInfo.Images && videoInfo.Images[0]
+                          ? `${URL}/${videoInfo.Images[0].src}`
+                          : "../static/images/videos/try-not-to-laugh.png"
+                      }
+                      alt="Why I laugh at most CEOs"
+                    />
+                    {`Created on ${moment(videoInfo.createdAt).format(
+                      "DD.MM.YYYY"
+                    )}`}
+                    <div style={{ display: "flex" }}>
+                      <h4 style={{ marginRight: "auto" }}>{videoInfo.title}</h4>
+                      <strong>
+                        Currently streaming{" "}
+                        <span style={{ color: "red" }}>OFF</span>
+                      </strong>
+                    </div>
+
+                    <p>3/5 joined</p>
+                    <p>
+                      {videoInfo.viewCount ? videoInfo.viewCount : "0"} views
+                    </p>
+                  </article>
+                </a>
+              </Link>
             </li>
           );
         })}
@@ -62,9 +111,15 @@ const RelatedVideos = () => {
     <aside id="related-videos">
       {headerPart()}
 
-      {renderVideoList(videoList)}
+      {renderVideoList(mainVideos)}
     </aside>
   );
 };
 
-export default RelatedVideos;
+MainVideos.getInitialProps = async (context) => {
+  context.store.dispatch({
+    type: LOAD_MAIN_VIDEOS_REQUEST,
+  });
+};
+
+export default MainVideos;

@@ -2,13 +2,21 @@ module.exports = (sequelize, DataTypes) => {
   const Video = sequelize.define(
     "Video",
     {
-      content: {
+      description: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      title: {
+        type: DataTypes.STRING(256),
+        allowNull: false,
+      },
+      videoImageURL: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
       viewCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {

@@ -73,8 +73,8 @@ router.get("/:id", async (req, res, next) => {
 
       include: [
         {
-          model: db.Post,
-          as: "Posts",
+          model: db.Video,
+          as: "Videos",
           attributes: ["id"],
         },
         {
@@ -91,7 +91,7 @@ router.get("/:id", async (req, res, next) => {
       attributes: ["id", "nickname", "profilePhoto"],
     });
     const jsonUser = user.toJSON();
-    jsonUser.Posts = jsonUser.Posts ? jsonUser.Posts.length : 0;
+    jsonUser.Videos = jsonUser.Videos ? jsonUser.Videos.length : 0;
     jsonUser.Followings = jsonUser.Followings ? jsonUser.Followings.length : 0;
     jsonUser.Followers = jsonUser.Followers ? jsonUser.Followers.length : 0;
     res.json(jsonUser);
@@ -109,7 +109,6 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/login", (req, res, next) => {
-  // POST /api/user/login
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       console.error(err);
@@ -119,7 +118,6 @@ router.post("/login", (req, res, next) => {
       return res.status(401).send(info.reason);
     }
     return req.login(user, async (loginErr) => {
-      //serialize starts
       try {
         if (loginErr) {
           return next(loginErr);
@@ -130,8 +128,8 @@ router.post("/login", (req, res, next) => {
           },
           include: [
             {
-              model: db.Post,
-              as: "Posts",
+              model: db.Video,
+              as: "Videos",
               attributes: ["id"],
             },
             {
@@ -246,9 +244,9 @@ router.delete("/:id/follow", isLoggedIn, async (req, res, next) => {
   }
 });
 
-router.get("/:id/posts", async (req, res, next) => {
+router.get("/:id/videos", async (req, res, next) => {
   try {
-    const posts = await db.Post.findAll({
+    const vidoes = await db.Video.findAll({
       where: {
         UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0, //if "0", still send information.
         RetweetId: null, // If it is my post, retweetId is null.
@@ -269,7 +267,7 @@ router.get("/:id/posts", async (req, res, next) => {
         },
       ],
     });
-    res.json(posts);
+    res.json(vidoes);
   } catch (e) {
     console.error(e);
     next(e);

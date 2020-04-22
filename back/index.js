@@ -13,8 +13,10 @@ const helmet = require("helmet");
 const passportConfig = require("./passport");
 const db = require("./models");
 const userAPIRouter = require("./routes/user");
-const postAPIRouter = require("./routes/post");
-const postsAPIRouter = require("./routes/posts");
+// const postAPIRouter = require("./routes/post");
+// const postsAPIRouter = require("./routes/posts");
+const videoAPIRouter = require("./routes/video");
+const videosAPIRouter = require("./routes/videos");
 const hashtagAPIRouter = require("./routes/hashtag");
 
 //multer is in post rout.
@@ -100,9 +102,10 @@ app.use(passport.initialize()); //I will be initialized everytime. In real produ
 app.use(passport.session());
 
 app.use("/api/user", userAPIRouter);
-app.use("/api/post", postAPIRouter);
-app.use("/api/video", postAPIRouter);
-app.use("/api/posts", postsAPIRouter);
+app.use("/api/video", videoAPIRouter);
+app.use("/api/videos", videosAPIRouter);
+// app.use("/api/post", postAPIRouter);
+// app.use("/api/posts", postsAPIRouter);
 app.use("/api/hashtag", hashtagAPIRouter);
 
 server.listen(prod ? 443 : PORT, () =>

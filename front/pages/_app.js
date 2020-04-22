@@ -6,6 +6,8 @@ import { Provider } from "react-redux";
 import createSagaMiddleware from "redux-saga";
 import axios from "axios";
 import Helmet from "react-helmet";
+import SimpleModal from "../containers/CreateChannel";
+
 //set up helmet later.
 
 import rootSaga from "../sagas";
@@ -20,6 +22,7 @@ const Front = ({ Component, pageProps, store }) => {
   return (
     <Provider store={store}>
       <Component {...pageProps} />
+      <SimpleModal />
     </Provider>
   );
 };

@@ -1,21 +1,46 @@
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import SubscriptionsIcon from "@material-ui/icons/Subscriptions";
+import { URL } from "../config/config";
+// id(pin):2
+// description(pin):"fwaefawef"
+// title(pin):"asdfasdf"
+// videoImageURL(pin):null
+// viewCount(pin):null
+// createdAt(pin):"2020-04-22T04:13:04.000Z"
+// updatedAt(pin):"2020-04-22T04:13:04.000Z"
+// UserId(pin):1
+// RetweetId(pin): null
+
 const VideoDetails = () => {
+  const { currentVideo } = useSelector(({ video }) => {
+    return {
+      currentVideo: video.currentVideo,
+    };
+  }, shallowEqual);
+
+  const {
+    title,
+    description,
+    viewCount,
+    createdAt,
+    Likers,
+    User,
+  } = currentVideo;
+
   const renderSocialContainer = () => {
     return (
-      <div id="social-container">
+      <div
+        id="social-container"
+        style={{ display: "flex", justifyContent: "space-around" }}
+      >
         <div className="social-item active">
           <img
             src="../static/images/icons/thumbs-up-blue.svg"
             alt="Thumbs Up"
           />
-          <p className="social-item-title">9</p>
+          <p className="social-item-title">{Likers.length}</p>
         </div>
-        <div className="social-item">
-          <img
-            src="../static/images/icons/thumbs-down-default.svg"
-            alt="Thumbs Down"
-          />
-          <p className="social-item-title">0</p>
-        </div>
+
         <div className="social-item">
           <img src="../static/images/icons/share-default.svg" alt="Share" />
           <p className="social-item-title">Share</p>
@@ -37,20 +62,26 @@ const VideoDetails = () => {
       <div id="channel-details">
         <a href="#">
           <img
-            src="../static/images/profiles/how-to-anything.png"
-            alt="How To Anything"
+            src={
+              User.profilePhoto
+                ? `${URL}/${User.profilePhoto}`
+                : "../static/images/profiles/how-to-anything.png"
+            }
+            alt={`${User.nickname}`}
           />
           <div id="channel-metadata">
-            <h3>How To Anything</h3>
-            <div id="channel-subscriber-count">2K subscribers</div>
+            <h3>{User.nickname}</h3>
+            <div id="channel-subscriber-count">
+              {User.Followers.length} subscribers
+            </div>
           </div>
         </a>
         <button>
-          <img
-            src="../static/images/icons/site-logo-blue.svg"
-            alt="Lyrad Digital"
+          <SubscriptionsIcon
+            style={{ fontSize: "2.5rem", marginRight: "0.5rem" }}
           />
-          <span>Connect</span>
+          <span>Subscribe</span>
+          {/* follow unfollow 여기다 달자 */}
         </button>
       </div>
     );
@@ -58,8 +89,12 @@ const VideoDetails = () => {
   return (
     <section id="video-details">
       <header>
-        <h2>How to film your own course</h2>
-        <div id="video-views-count">88 views</div>
+        <h4>#hash tags1 #hash tag2</h4>
+        <h2>
+          <strong>{title}</strong>
+        </h2>
+        <span style={{ fontSize: "1.4rem" }}>{description}</span>
+        <div id="video-views-count">{viewCount ? viewCount : 0} views</div>
       </header>
 
       {renderSocialContainer()}

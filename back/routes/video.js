@@ -9,9 +9,10 @@ const { imageLink, upload } = require("../utilities/multerOptions");
 
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
-    const hashtags = req.body.content.match(/#[^\s]+/g);
+    const hashtags = req.body.description.match(/#[^\s]+/g);
     const newVideo = await db.Video.create({
-      content: req.body.content,
+      title: req.body.title,
+      description: req.body.description,
       UserId: req.user.id,
     });
     if (hashtags) {
@@ -61,7 +62,7 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   }
 });
 
-router.post("/images", upload.array("image"), (req, res) => {
+router.post("/image", upload.array("image"), (req, res) => {
   res.json(
     req.files.map((v) => {
       console.log("each v :", v);
@@ -75,7 +76,7 @@ router.post("/images", upload.array("image"), (req, res) => {
 
 router.patch("/:id", isLoggedIn, async (req, res, next) => {
   try {
-    console.log("patch fired", req.body.content);
+    console.log("patch fired", req.body.description);
     console.log("patch fired whole body", req.body);
     console.log("id", req.params.id);
     const video = await db.Video.findOne({
@@ -86,7 +87,7 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
       return res.status(404).send("video does not exist.");
     }
 
-    await video.update({ content: req.body.content });
+    await video.update({ description: req.body.description });
     res.send(video);
   } catch (e) {
     console.error(e);
@@ -102,12 +103,33 @@ router.get("/:id", async (req, res, next) => {
         {
           model: db.User,
           attributes: ["id", "nickname", "profilePhoto"],
+          include: [
+            {
+              model: db.User,
+              through: "Follow",
+              as: "Followers",
+              attributes: ["id"],
+            },
+            // {
+            //   model: db.User,
+            //   through: "Follow",
+            //   as: "Followings",
+            //   attributes: ["id"],
+            // },
+          ],
         },
         {
           model: db.Image,
         },
+        {
+          model: db.User,
+          through: "Like",
+          as: "Likers",
+          attributes: ["id"],
+        },
       ],
     });
+    video;
     res.json(video);
   } catch (e) {
     console.error(e);

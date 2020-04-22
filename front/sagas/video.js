@@ -141,6 +141,7 @@ function* watchLoadHashtagVideos() {
 
 function loadUserVideosAPI(id) {
   return axios.get(`/user/${id || 0}/videos`, {
+    // if no ide, 0 == my video
     httpsAgent,
     withCredentials: true,
   });
@@ -443,10 +444,12 @@ function* watchLoadVideo() {
   yield takeLatest(LOAD_VIDEO_REQUEST, loadVideo);
 }
 
+// /////////////
+
 function uploadVideoImagesAPI(formData) {
   console.log("uploadVideoImagesAPI fired");
 
-  return axios.post("/user/profile", formData, {
+  return axios.post("/video/image", formData, {
     withCredentials: true,
     httpsAgent,
   });

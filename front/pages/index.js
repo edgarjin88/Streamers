@@ -7,7 +7,7 @@ import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import Toaster from "../components/Toaster";
 import { NULLIFY_SIGN_OUT, NULLIFY_SIGN_IN_SUCCESS } from "../reducers/user";
-import SimpleModal from "../containers/CreateChannel";
+// import SimpleModal from "../containers/CreateChannel";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ const Index = () => {
       <HideBar style={{ zIndex: 3000 }} />
 
       <main>
-        <SimpleModal />
+        {/* <SimpleModal /> */}
         <RelatedVideos />
       </main>
 

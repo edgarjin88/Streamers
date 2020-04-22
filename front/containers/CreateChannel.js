@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { CLOSE_MODAL } from "../reducers/menu";
 import Button from "@material-ui/core/Button";
@@ -11,8 +11,16 @@ import { StyledForm } from "../styles/FormStyle";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import SaveIcon from "@material-ui/icons/Save";
+import Toaster from "../components/Toaster";
+
 // import { StyledLink } from "../components/CustomLinks";
-import { UPLOAD_VIDEO_IMAGE_REQUEST } from "../reducers/video";
+import {
+  UPLOAD_VIDEO_IMAGE_REQUEST,
+  ADD_VIDEO_REQUEST,
+  NULLIFY_VIDEO_ADDED,
+} from "../reducers/video";
+import { URL } from "../config/config";
+
 function getModalStyle() {
   const top = 50;
   const left = 50;
@@ -27,7 +35,8 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: "absolute",
-    width: "70%",
+    // maxWidth: "70%",
+    maxHeight: "85%",
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
@@ -35,19 +44,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Video title input
-// Video description
-// video picture
-// submit button.
-// video picture submit button.
-
-// post to video.
 export default function SimpleModal() {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
-
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
+  console.log("state :", title);
   const imageInput = useRef(); //
   const dispatch = useDispatch();
+
+  const { uploadedVideoImage, videoAdded } = useSelector(({ video }) => {
+    return {
+      uploadedVideoImage: video.uploadedVideoImage,
+      videoAdded: video.videoAdded,
+    };
+  }, shallowEqual);
+
+  const { openModal } = useSelector(({ menu }) => {
+    return { openModal: menu.openModal };
+  }, shallowEqual);
+
   const onChangeVideoImages = useCallback((e) => {
     const imageFormData = new FormData();
     imageFormData.append("image", e.target.files[0]);
@@ -62,15 +78,58 @@ export default function SimpleModal() {
     imageInput.current.click();
   }, [imageInput.current]);
 
-  const { openModal } = useSelector(({ menu }) => {
-    return { openModal: menu.openModal };
-  }, shallowEqual);
+  const handleChange = (e) => {
+    if (e.target.name === "title") {
+      setTitle(e.target.value);
+    } else {
+      setDescription(e.target.value);
+    }
+  };
+
+  const onSubmitForm = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!title || !title.trim()) {
+        return alert("Please write title before submitting");
+      }
+      if (!description || !description.trim()) {
+        return alert("Please write description before submitting");
+      }
+
+      const formData = new FormData();
+      formData.append("image", uploadedVideoImage);
+
+      formData.append("description", description);
+      formData.append("title", title);
+      dispatch({
+        type: ADD_VIDEO_REQUEST,
+        data: formData,
+      });
+      setDescription("");
+      setTitle("");
+    },
+    [title, description, uploadedVideoImage]
+  );
 
   const handleClose = () => {
     dispatch({
       type: CLOSE_MODAL,
     });
   };
+
+  useEffect(() => {
+    console.log("nullifyfired");
+    if (videoAdded) {
+      dispatch({
+        type: CLOSE_MODAL,
+      });
+      setTimeout(() => {
+        dispatch({
+          type: NULLIFY_VIDEO_ADDED,
+        });
+      }, 1000);
+    }
+  }, [videoAdded]);
 
   const body = (
     <StyledForm>
@@ -86,8 +145,12 @@ export default function SimpleModal() {
         </h2>
         <div>
           <img
-            style={{ width: "100%" }}
-            src="../static/images/profiles/noimage.png"
+            style={{ width: "100%", maxHeight: "30rem", objectFit: "cover" }}
+            src={
+              uploadedVideoImage
+                ? `${URL}/${uploadedVideoImage}`
+                : "../static/images/profiles/noimage.png"
+            }
             alt=""
           />
         </div>
@@ -101,10 +164,13 @@ export default function SimpleModal() {
         <form action="#" className="form">
           <div className="form__group">
             <input
+              onChange={handleChange}
+              value={title}
+              name="title"
               type="text"
               className="form__input"
               placeholder="Title of the Channel"
-              id="title"
+              htmlId="title"
               required
             />
             <label htmlFor="title" className="form__label">
@@ -114,11 +180,13 @@ export default function SimpleModal() {
 
           <div className="form__group">
             <textarea
+              onChange={handleChange}
+              value={description}
               type="text"
               className="form__input"
               placeholder="Description"
               name="description"
-              id="description"
+              htmlId="description"
               required
             />
             <label htmlFor="description" className="form__label">
@@ -130,14 +198,15 @@ export default function SimpleModal() {
           variant="contained"
           startIcon={<SaveIcon />}
           color="primary"
-          style={{ float: "right" }}
+          style={{ float: "right", marginRight: "1rem", marginTop: "1rem" }}
+          onClick={onSubmitForm}
         >
           Submit
         </Button>
         <Button
           variant="contained"
           color="primary"
-          style={{ float: "right", marginRight: "1rem" }}
+          style={{ float: "right", marginRight: "1rem", marginTop: "1rem" }}
           startIcon={<CloudUploadIcon />}
           onClick={onClickImageUpload}
         >
@@ -158,6 +227,14 @@ export default function SimpleModal() {
       >
         {body}
       </Modal>
+      {videoAdded && (
+        <Toaster
+          message="A new channel successfully created"
+          whereTo={false}
+          type="success"
+        />
+      )}
+      />
     </div>
   );
 }

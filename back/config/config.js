@@ -8,20 +8,20 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     database: "streamers",
     host: "127.0.0.1",
-    dialect: "mysql"
+    dialect: "mysql",
   },
   test: {
     username: "root",
     password: process.env.DB_PASSWORD,
-    database: "streamerss",
+    database: "streamers",
     host: "127.0.0.1",
-    dialect: "mysql"
+    dialect: "mysql",
   },
   production: {
     username: "root",
     password: process.env.DB_PASSWORD,
-    database: "streamerss",
+    database: "streamers",
     host: "127.0.0.1",
-    dialect: "mysql"
-  }
+    dialect: "mysql",
+  },
 };

@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.associate = (db) => {
-    db.User.hasMany(db.Post, { as: "Posts" });
+    // db.User.hasMany(db.Post, { as: "Posts" });
     db.User.hasMany(db.Video, { as: "Videos" });
     // db.Post > Posts
     db.User.hasMany(db.Comment);

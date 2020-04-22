@@ -79,13 +79,23 @@ main {
 }
 
 #main-video {
+  margin-top:1rem;
   grid-area: main-video;
+  @media (min-width: 600px){
+    margin-top:1.8rem;
+
+  }
 }
 
-#main-video > img {
+
+
+#main-video > .main-content {
   width: 100%;
-  height: 100%;
+  /* how to calculate based on current width, not vh */
+  max-height: calc(100vh / 2);
+  object-fit: cover;
 }
+  
 
 #video-details {
   grid-area: video-details;

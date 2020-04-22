@@ -10,48 +10,48 @@ router.get("/:tag", async (req, res, next) => {
       //query !
       where = {
         id: {
-          [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10)
-        }
+          [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10),
+        },
       };
     }
-    const posts = await db.Post.findAll({
+    const videos = await db.Video.findAll({
       where,
       include: [
         {
           model: db.Hashtag,
-          where: { name: decodeURIComponent(req.params.tag) } //for Korean
+          where: { name: decodeURIComponent(req.params.tag) }, //for Korean
         },
         {
           model: db.User,
-          attributes: ["id", "nickname", "profilePhoto"]
+          attributes: ["id", "nickname", "profilePhoto"],
         },
         {
-          model: db.Image
+          model: db.Image,
         },
         {
           model: db.User,
           through: "Like",
           as: "Likers",
-          attributes: ["id"]
+          attributes: ["id"],
         },
         {
-          model: db.Post,
+          model: db.Video,
           as: "Retweet",
           include: [
             {
               model: db.User,
-              attributes: ["id", "nickname", "profilePhoto"]
+              attributes: ["id", "nickname", "profilePhoto"],
             },
             {
-              model: db.Image
-            }
-          ]
-        }
+              model: db.Image,
+            },
+          ],
+        },
       ],
       order: [["createdAt", "DESC"]],
-      limit: parseInt(req.query.limit, 10)
+      limit: parseInt(req.query.limit, 10),
     });
-    res.json(posts);
+    res.json(videos);
   } catch (e) {
     console.error(e);
     next(e);

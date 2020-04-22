@@ -21,21 +21,21 @@ module.exports = () => {
         where: { id },
         include: [
           {
-            model: db.Post,
-            as: "Posts",
-            attributes: ["id"]
+            model: db.Video,
+            as: "Videos",
+            attributes: ["id"],
           },
           {
             model: db.User,
             as: "Followings",
-            attributes: ["id"]
+            attributes: ["id"],
           },
           {
             model: db.User,
             as: "Followers",
-            attributes: ["id"]
-          }
-        ]
+            attributes: ["id"],
+          },
+        ],
       });
       return done(null, user);
     } catch (e) {
