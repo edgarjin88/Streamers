@@ -43,7 +43,9 @@ import { StyledButton1 } from "../components/CustomButtons";
 import MUIRichTextEditor from "mui-rte";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 
-export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
+export const MemoRichTextEditor = memo(function MemoRichTextEditor({
+  profileOwner,
+}) {
   const defaultTheme = createMuiTheme();
   const [editorState, setEditorState] = useState(null);
   Object.assign(defaultTheme, {
@@ -72,7 +74,7 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
     ({ user }) => {
       return {
         startedEditingDescription: user.startedEditingDescription,
-        userDescription: user.me.description,
+        userDescription: user.userInfo.description,
       };
     },
     shallowEqual
@@ -120,21 +122,24 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor() {
   return (
     <>
       {test()}
-      <Button
-        onClick={
-          startedEditingDescription
-            ? submitSavedDescription
-            : handleEditDescription
-        }
-        variant="contained"
-        color="primary"
-        style={{ float: "right" }}
-        startIcon={
-          !startedEditingDescription ? <EditIcon /> : <CloudUploadIcon />
-        }
-      >
-        {!startedEditingDescription ? "Edit Description" : "Submit"}
-      </Button>
+      {profileOwner && (
+        <Button
+          onClick={
+            startedEditingDescription
+              ? submitSavedDescription
+              : handleEditDescription
+          }
+          variant="contained"
+          color="primary"
+          style={{ float: "right" }}
+          startIcon={
+            !startedEditingDescription ? <EditIcon /> : <CloudUploadIcon />
+          }
+        >
+          {!startedEditingDescription ? "Edit Description" : "Submit"}
+        </Button>
+      )}
+
       {startedEditingDescription && (
         <Button
           onClick={handleCancel}

@@ -1,6 +1,10 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import { EDIT_NICKNAME_REQUEST, START_EDIT_NICKNAME } from "../reducers/user";
+import {
+  EDIT_NICKNAME_REQUEST,
+  START_EDIT_NICKNAME,
+  LOAD_USER_REQUEST,
+} from "../reducers/user";
 
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -27,6 +31,7 @@ import {
 import UploadProfile from "../containers/UploadProfile";
 
 import moment from "moment";
+import { useRouter } from "next/router";
 moment.locale("en");
 
 const useStyles = makeStyles((theme) => ({
@@ -63,7 +68,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RecipeReviewCard() {
   const classes = useStyles();
-
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const queryId = router.query.id;
   const [expanded, setExpanded] = React.useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -74,23 +81,33 @@ export default function RecipeReviewCard() {
     startedEditingNickname,
     startedEditingDescription,
     startedChangingPassword,
-    // profilePhoto,
-  } = useSelector((state) => state.user);
-
-  const {
+    followingList,
+    followerList,
+    hasMoreFollower,
+    hasMoreFollowing,
     nickname,
     userId,
     description,
     profilePhoto,
     createdAt,
-  } = useSelector(({ user }) => user && user.me);
+    id,
+    // profilePhoto,
+  } = useSelector((state) => state.user.userInfo);
 
-  const { mainPosts } = useSelector((state) => state.post);
+  useEffect(() => {
+    dispatch({
+      type: LOAD_USER_REQUEST,
+      data: router.query.id,
+    });
+  }, [id]);
 
-  ///logic
+  const { me } = useSelector(({ user }) => user);
 
-  // 111
-
+  const profileOwner = me && me.id === id && id === parseInt(queryId, 10);
+  // console.log("profileOwnser :", profileOwner);
+  // console.log("me :", me);
+  // console.log("id :", id);
+  // console.log("queryId :", queryId);
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -104,7 +121,7 @@ export default function RecipeReviewCard() {
                 : profilePhoto
             }
           >
-            {!profilePhoto && nickname.slice(0, 1)}{" "}
+            {!profilePhoto && nickname && nickname.slice(0, 1)}{" "}
           </Avatar>
         }
         action={
@@ -114,7 +131,7 @@ export default function RecipeReviewCard() {
         }
         title={nickname}
         subheader={`Joined on ${moment(createdAt).format("DD.MM.YYYY")}`}
-      />
+      ></CardHeader>
       {/* Profile Image here */}
       <CardMedia
         className={classes.media}
@@ -133,33 +150,37 @@ export default function RecipeReviewCard() {
           <strong>User Description</strong>
         </h1>
         <hr />
-        <MemoRichTextEditor />
+        <MemoRichTextEditor profileOwner={profileOwner} />
       </CardContent>
       <CardActions disableSpacing>
         {/* <hr /> */}
-        <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded,
-          })}
-          onClick={handleExpandClick}
-          size="medium"
-          style={{
-            fontSize: "5rem",
-            color: "#fff",
-            backgroundColor: "#fda026",
-          }}
-          aria-expanded={expanded}
-          aria-label="User Details"
-        >
-          <ExpandMoreIcon
-            style={{
-              float: "left",
-              fontSize: "2rem",
-            }}
-          />
-        </IconButton>
-        <h1> &nbsp; User Details </h1>
-        {/* <hr /> */}
+        {profileOwner && (
+          <>
+            <IconButton
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: expanded,
+              })}
+              onClick={handleExpandClick}
+              size="medium"
+              style={{
+                fontSize: "5rem",
+                color: "#fff",
+                backgroundColor: "#fda026",
+              }}
+              aria-expanded={expanded}
+              aria-label="User Details"
+            >
+              <ExpandMoreIcon
+                style={{
+                  float: "left",
+                  fontSize: "2rem",
+                }}
+              />
+            </IconButton>
+            <h1> &nbsp; User Details </h1>
+            <hr />{" "}
+          </>
+        )}
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
@@ -178,7 +199,7 @@ export default function RecipeReviewCard() {
           <MemoSubmitPasswordChange />
         </CardContent>
       </Collapse>
-      <UploadProfile />
+      {profileOwner && <UploadProfile />}
     </Card>
   );
 }

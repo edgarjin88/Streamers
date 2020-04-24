@@ -22,6 +22,9 @@ export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
 
 export const REMOVE_IMAGE = "REMOVE_IMAGE"; //
 
+export const INCREASE_SUBSCRIPTION = "INCREASE_SUBSCRIPTION"; //
+export const DECREASE_SUBSCRIPTION = "DECREASE_SUBSCRIPTION"; //
+
 export const ADD_VIDEO_REQUEST = "ADD_VIDEO_REQUEST";
 export const ADD_VIDEO_SUCCESS = "ADD_VIDEO_SUCCESS";
 export const ADD_VIDEO_FAILURE = "ADD_VIDEO_FAILURE";
@@ -34,6 +37,14 @@ export const LIKE_VIDEO_FAILURE = "LIKE_VIDEO_FAILURE";
 export const UNLIKE_VIDEO_REQUEST = "UNLIKE_VIDEO_REQUEST";
 export const UNLIKE_VIDEO_SUCCESS = "UNLIKE_VIDEO_SUCCESS";
 export const UNLIKE_VIDEO_FAILURE = "UNLIKE_VIDEO_FAILURE";
+
+export const DISLIKE_VIDEO_REQUEST = "DISLIKE_VIDEO_REQUEST";
+export const DISLIKE_VIDEO_SUCCESS = "DISLIKE_VIDEO_SUCCESS";
+export const DISLIKE_VIDEO_FAILURE = "DISLIKE_VIDEO_FAILURE";
+
+export const UNDISLIKE_VIDEO_REQUEST = "UNDISLIKE_VIDEO_REQUEST";
+export const UNDISLIKE_VIDEO_SUCCESS = "UNDISLIKE_VIDEO_SUCCESS";
+export const UNDISLIKE_VIDEO_FAILURE = "UNDISLIKE_VIDEO_FAILURE";
 
 export const ADD_COMMENT_REQUEST = "ADD_COMMENT_REQUEST";
 export const ADD_COMMENT_SUCCESS = "ADD_COMMENT_SUCCESS";
@@ -62,9 +73,12 @@ export const LOAD_VIDEO_FAILURE = "LOAD_VIDEO_FAILURE";
 export const EDIT_START_REQUEST = "EDIT_START_REQUEST";
 export const FALSIFY_EDIT_VIDEO_COMPLETE = "FALSIFY_EDIT_VIDEO_COMPLETE";
 
+import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
+
 export const initialState = {
   mainVideos: [],
-  hasMorePost: false,
+  userVideos: [],
+  hasMoreVideos: false,
   imagePaths: [],
   uploadedVideoImage: "",
   uploadVideoImageErrorReason: "",
@@ -73,6 +87,7 @@ export const initialState = {
   isLoading: false,
   currentVideo: null,
   loadCurrentVideoErrorReason: "",
+  dislikeErrorReason: "",
 };
 
 // export const initialState = {
@@ -96,9 +111,91 @@ export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case LOAD_USER_VIDEOS_REQUEST: {
+        draft.userVideos = !action.lastId ? [] : draft.userVideos;
+
+        draft.hasMoreVideos = action.lastId ? draft.hasMoreVideos : true;
+
+        break;
+      }
+      case LOAD_USER_VIDEOS_SUCCESS: {
+        action.data.forEach((d) => {
+          draft.userVideos.push(d);
+        });
+        draft.hasMoreVideos = action.data.length === 10;
+        break;
+      }
+      case LOAD_USER_VIDEOS_FAILURE: {
+        break;
+      }
+
+      case INCREASE_SUBSCRIPTION: {
+        draft.currentVideo.User.Followers.unshift(action.data);
+
+        break;
+      }
+      case DECREASE_SUBSCRIPTION: {
+        const userIndex = draft.currentVideo.User.Followers.findIndex(
+          (v) => v.id === action.data
+        );
+        draft.currentVideo.User.Followers.splice(userIndex, 1);
+
+        break;
+      }
+
+      case UNDISLIKE_VIDEO_REQUEST: {
+        break;
+      }
+      case UNDISLIKE_VIDEO_SUCCESS: {
+        const disLikeIndex = draft.currentVideo.Dislikers.findIndex(
+          (v) => v.id === action.data.userId
+        );
+        draft.currentVideo.Dislikers.splice(disLikeIndex, 1);
+        break;
+      }
+      case UNDISLIKE_VIDEO_FAILURE: {
+        break;
+      }
+
+      case DISLIKE_VIDEO_REQUEST: {
+        break;
+      }
+      case DISLIKE_VIDEO_SUCCESS: {
+        draft.currentVideo.Dislikers.unshift({ id: action.data.userId });
+        break;
+      }
+      case DISLIKE_VIDEO_FAILURE: {
+        draft.dislikeErrorReason = action.error;
+        break;
+      }
+
+      case UNLIKE_VIDEO_REQUEST: {
+        break;
+      }
+      case UNLIKE_VIDEO_SUCCESS: {
+        const likeIndex = draft.currentVideo.Likers.findIndex(
+          (v) => v.id === action.data.userId
+        );
+        draft.currentVideo.Likers.splice(likeIndex, 1);
+        break;
+      }
+      case UNLIKE_VIDEO_FAILURE: {
+        break;
+      }
+
+      case LIKE_VIDEO_REQUEST: {
+        break;
+      }
+      case LIKE_VIDEO_SUCCESS: {
+        draft.currentVideo.Likers.unshift({ id: action.data.userId });
+        break;
+      }
+      case LIKE_VIDEO_FAILURE: {
+        break;
+      }
       case LOAD_VIDEO_REQUEST: {
         draft.isLoading = true;
-        draft.currentVideo = null;
+        // draft.currentVideo = null;
         break;
       }
       case LOAD_VIDEO_SUCCESS: {

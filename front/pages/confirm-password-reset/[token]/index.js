@@ -23,7 +23,7 @@ import {
   MemoEmail,
   MemoPassword,
   MemoPasswordCheck,
-  MemoConfirmPasswordReset
+  MemoConfirmPasswordReset,
 } from "../../../containers/InputComponents";
 
 import { SET_RESET_PASSWORD_LINK } from "../../../reducers/input";
@@ -42,12 +42,12 @@ export default function SignInSide() {
   const {
     confirmPasswordReset,
     isLoading,
-    confirmPasswordResetErrorReason
+    confirmPasswordResetErrorReason,
   } = useSelector(({ user }) => {
     return {
       confirmPasswordReset: user.confirmPasswordReset,
       isLoading: user.isLoading,
-      confirmPasswordResetErrorReason: user.confirmPasswordResetErrorReason
+      confirmPasswordResetErrorReason: user.confirmPasswordResetErrorReason,
     };
   }, shallowEqual);
 
@@ -55,7 +55,7 @@ export default function SignInSide() {
     if (token) {
       dispatch({
         type: SET_RESET_PASSWORD_LINK,
-        data: token
+        data: token,
       });
     }
     if (confirmPasswordReset) {
@@ -87,7 +87,7 @@ export default function SignInSide() {
               style={{
                 display: "flex",
                 justifyContent: "center",
-                border: "none"
+                border: "none",
               }}
             >
               <MemoConfirmPasswordReset userId={userId} />

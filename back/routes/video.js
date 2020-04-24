@@ -110,12 +110,6 @@ router.get("/:id", async (req, res, next) => {
               as: "Followers",
               attributes: ["id"],
             },
-            // {
-            //   model: db.User,
-            //   through: "Follow",
-            //   as: "Followings",
-            //   attributes: ["id"],
-            // },
           ],
         },
         {
@@ -127,9 +121,16 @@ router.get("/:id", async (req, res, next) => {
           as: "Likers",
           attributes: ["id"],
         },
+        {
+          model: db.User,
+          through: "Dislike",
+          as: "Dislikers",
+          attributes: ["id"],
+        },
       ],
     });
-    video;
+
+    await video.update({ viewCount: video.viewCount + 1 });
     res.json(video);
   } catch (e) {
     console.error(e);
@@ -209,6 +210,35 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.post("/:id/dislike", isLoggedIn, async (req, res, next) => {
+  try {
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
+    }
+    await video.addDisliker(req.user.id);
+    res.json({
+      userId: req.user.id,
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.delete("/:id/dislike", isLoggedIn, async (req, res, next) => {
+  try {
+    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    if (!video) {
+      return res.status(404).send("Video does not exist.");
+    }
+    await video.removeDisliker(req.user.id);
+    res.json({ userId: req.user.id });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
 router.post("/:id/like", isLoggedIn, async (req, res, next) => {
   try {
     const video = await db.Video.findOne({ where: { id: req.params.id } });
@@ -216,7 +246,9 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
       return res.status(404).send("Video does not exist.");
     }
     await video.addLiker(req.user.id);
-    res.json({ userId: req.user.id });
+    res.json({
+      userId: req.user.id,
+    });
   } catch (e) {
     console.error(e);
     next(e);

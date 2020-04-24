@@ -18,7 +18,7 @@ import { LOAD_USER_REQUEST } from "../reducers/user";
 
 const Front = ({ Component, pageProps, store }) => {
   // console.log("front itself  :", );
-  console.log("store inside Front :", store);
+  // console.log("store inside Front :", store);
   return (
     <Provider store={store}>
       <Component {...pageProps} />
@@ -31,9 +31,9 @@ Front.getInitialProps = async (context) => {
   //executed when paged loaded first, and move to other page via link or next/router.
   // store, Apptree, query pathname objects are included in context by next
 
-  console.log("context on getInitialProps :", context);
+  // console.log("context on getInitialProps :", context);
   const { ctx, Component } = context;
-  console.log("ctx on getInitialProps :", ctx);
+  // console.log("ctx on getInitialProps :", ctx);
   let pageProps = {};
   const state = ctx.store.getState(); //
   const cookie = ctx.isServer ? ctx.req.headers.cookie : ""; //cookies는 여기 들어 있다. 근데 이 req 는 프론트로 들어오는 req?
@@ -72,7 +72,7 @@ const configureStore = (initialState = {}, options) => {
   const store = createStore(reducer, initialState, enhancer);
   //inhancer includes everything at this point.
   store.sagaTask = sagaMiddleware.run(rootSaga);
-  console.log("sagaTask: ", store.sagaTask);
+  // console.log("sagaTask: ", store.sagaTask);
   return store;
 };
 

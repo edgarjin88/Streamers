@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     db.Video.belongsTo(db.Video, { as: "Retweet" });
     db.Video.belongsToMany(db.Hashtag, { through: "VideoHashtag" });
     db.Video.belongsToMany(db.User, { through: "Like", as: "Likers" });
+    db.Video.belongsToMany(db.User, { through: "Dislike", as: "Dislikers" });
   };
   return Video;
 };

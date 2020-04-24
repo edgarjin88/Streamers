@@ -7,9 +7,18 @@ import {
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_REQUEST,
   ADD_COMMENT_SUCCESS,
+  DISLIKE_VIDEO_FAILURE,
+  DISLIKE_VIDEO_REQUEST,
+  DISLIKE_VIDEO_SUCCESS,
+  UNDISLIKE_VIDEO_FAILURE,
+  UNDISLIKE_VIDEO_REQUEST,
+  UNDISLIKE_VIDEO_SUCCESS,
   LIKE_VIDEO_FAILURE,
   LIKE_VIDEO_REQUEST,
   LIKE_VIDEO_SUCCESS,
+  UNLIKE_VIDEO_FAILURE,
+  UNLIKE_VIDEO_REQUEST,
+  UNLIKE_VIDEO_SUCCESS,
   LOAD_COMMENTS_FAILURE,
   LOAD_COMMENTS_REQUEST,
   LOAD_COMMENTS_SUCCESS,
@@ -28,9 +37,6 @@ import {
   RETWEET_FAILURE,
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
-  UNLIKE_VIDEO_FAILURE,
-  UNLIKE_VIDEO_REQUEST,
-  UNLIKE_VIDEO_SUCCESS,
   UPLOAD_IMAGES_FAILURE,
   UPLOAD_IMAGES_REQUEST,
   UPLOAD_IMAGES_SUCCESS,
@@ -324,6 +330,73 @@ function* watchUnlikeVideo() {
   yield takeLatest(UNLIKE_VIDEO_REQUEST, unlikeVideo);
 }
 
+/////dislike
+/////dislike
+/////dislike
+function dislikeVideoAPI(videoId) {
+  return axios.post(
+    `/video/${videoId}/dislike`,
+    {},
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* dislikeVideo(action) {
+  try {
+    const result = yield call(dislikeVideoAPI, action.data);
+    yield put({
+      type: DISLIKE_VIDEO_SUCCESS,
+      data: {
+        videoId: action.data,
+        userId: result.data.userId,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: DISLIKE_VIDEO_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchDislikeVideo() {
+  yield takeLatest(DISLIKE_VIDEO_REQUEST, dislikeVideo);
+}
+
+function undisLikeVideoAPI(videoId) {
+  return axios.delete(`/video/${videoId}/dislike`, {
+    withCredentials: true,
+    httpsAgent,
+  });
+}
+
+function* undisLikeVideo(action) {
+  try {
+    const result = yield call(undisLikeVideoAPI, action.data);
+    yield put({
+      type: UNDISLIKE_VIDEO_SUCCESS,
+      data: {
+        videoId: action.data,
+        userId: result.data.userId,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: UNDISLIKE_VIDEO_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchUndislikeVideo() {
+  yield takeLatest(UNDISLIKE_VIDEO_REQUEST, undisLikeVideo);
+}
+
 function retweetAPI(videoId) {
   return axios.post(
     `/video/${videoId}/retweet`,
@@ -490,6 +563,8 @@ export default function* videoSaga() {
     fork(watchUploadImages),
     fork(watchLikeVideo),
     fork(watchUnlikeVideo),
+    fork(watchDislikeVideo),
+    fork(watchUndislikeVideo),
     fork(watchRetweet),
     fork(watchRemoveVideo),
     fork(watchEditVideo),

@@ -88,7 +88,7 @@ router.get("/:id", async (req, res, next) => {
           attributes: ["id"],
         },
       ],
-      attributes: ["id", "nickname", "profilePhoto"],
+      attributes: ["id", "nickname", "profilePhoto", "description"],
     });
     const jsonUser = user.toJSON();
     jsonUser.Videos = jsonUser.Videos ? jsonUser.Videos.length : 0;

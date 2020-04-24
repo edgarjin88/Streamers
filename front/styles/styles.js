@@ -128,8 +128,12 @@ main {
   color: rgba(17, 17, 17, 0.6);
 }
 
+/* .social-item.active {
+  color: red;
+  /* filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); */
+} */
 .social-item.active {
-  color: #1a599c;
+  color: red;
 }
 
 .social-item > img {

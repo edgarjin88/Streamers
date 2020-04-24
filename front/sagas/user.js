@@ -61,6 +61,10 @@ import {
   UPLOAD_PROFILE_SUCCESS,
 } from "../reducers/user";
 
+import {
+  DECREASE_SUBSCRIPTION,
+  INCREASE_SUBSCRIPTION,
+} from "../reducers/video.js";
 const https = require("https");
 
 //https agent not required here. delete them all.
@@ -202,6 +206,10 @@ function* follow(action) {
       type: FOLLOW_USER_SUCCESS,
       data: result.data,
     });
+    yield put({
+      type: INCREASE_SUBSCRIPTION,
+      data: result.data,
+    });
   } catch (e) {
     yield put({
       type: FOLLOW_USER_FAILURE,
@@ -228,8 +236,11 @@ function* unfollow(action) {
       type: UNFOLLOW_USER_SUCCESS,
       data: result.data,
     });
+    yield put({
+      type: DECREASE_SUBSCRIPTION,
+      data: result.data,
+    });
   } catch (e) {
-    console.error(e);
     yield put({
       type: UNFOLLOW_USER_FAILURE,
       error: e,
