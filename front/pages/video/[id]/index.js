@@ -5,7 +5,11 @@ import RelatedVideos from "../../../components/RelatedVideos";
 import VideoComments from "../../../components/VideoComments";
 import MainVideo from "../../../components/MainVideo";
 import { useRouter } from "next/router";
-import { LOAD_VIDEO_REQUEST } from "../../../reducers/video";
+import {
+  LOAD_VIDEO_REQUEST,
+  LOAD_MAIN_VIDEOS_REQUEST,
+  LOAD_COMMENTS_REQUEST,
+} from "../../../reducers/video";
 
 const VideoPage = () => {
   return (
@@ -27,6 +31,13 @@ VideoPage.getInitialProps = async (context) => {
   console.log("server side LOAD_VIDEO_REQUEST fired");
   await context.store.dispatch({
     type: LOAD_VIDEO_REQUEST,
+    data: id,
+  });
+  await context.store.dispatch({
+    type: LOAD_MAIN_VIDEOS_REQUEST,
+  });
+  await context.store.dispatch({
+    type: LOAD_COMMENTS_REQUEST,
     data: id,
   });
 };

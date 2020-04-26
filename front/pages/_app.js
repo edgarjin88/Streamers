@@ -40,7 +40,6 @@ Front.getInitialProps = async (context) => {
   axios.defaults.headers.Cookie = "";
   if (ctx.isServer && cookie) {
     axios.defaults.headers.Cookie = cookie;
-    //reset the default cookies in axios with cookies in headers
   }
 
   if (!state.user.me) {

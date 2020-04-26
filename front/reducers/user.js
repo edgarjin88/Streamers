@@ -10,7 +10,7 @@ export const initialState = {
   me: null,
   followingList: [],
   followerList: [],
-  userInfo: "test",
+  userInfo: "dummy user",
   isEditingNickname: false,
   editNicknameErrorReason: "",
   editNicknameSuccess: false,
@@ -101,7 +101,8 @@ export const EDIT_NICKNAME_SUCCESS = "EDIT_NICKNAME_SUCCESS";
 export const EDIT_NICKNAME_FAILURE = "EDIT_NICKNAME_FAILURE";
 
 export const ADD_VIDEO_TO_ME = "ADD_VIDEO_TO_ME";
-export const REMOVE_VIDEO_OF_ME = "REMOVE_VIDEO_OF_ME";
+export const REMOVE_VIDEO_FROM_ME = "REMOVE_VIDEO_FROM_ME";
+
 export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
 export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
 export const ACTIVATION_REQUEST = "ACTIVATION_REQUEST";
@@ -370,6 +371,7 @@ export default (state = initialState, action) => {
       }
       case FOLLOW_USER_SUCCESS: {
         draft.me.Followings.unshift({ id: action.data });
+        draft.userInfo = action.data;
         break;
       }
 
@@ -384,6 +386,7 @@ export default (state = initialState, action) => {
           (v) => v.id === action.data
         );
         draft.me.Followings.splice(index, 1);
+        draft.userInfo = action.data;
 
         // const index2 = draft.followingList.findIndex(
         //   (v) => v.id === action.data
@@ -394,13 +397,13 @@ export default (state = initialState, action) => {
       case UNFOLLOW_USER_FAILURE: {
         break;
       }
-      case ADD_POST_TO_ME: {
-        draft.me.Posts.unshift({ id: action.data });
+      case ADD_VIDEO_TO_ME: {
+        draft.me.Videos.unshift({ id: action.data });
         break;
       }
-      case REMOVE_POST_OF_ME: {
-        const index = draft.me.Posts.findIndex((v) => v.id === action.data);
-        draft.me.Posts.splice(index, 1);
+      case REMOVE_VIDEO_FROM_ME: {
+        const index = draft.me.Videos.findIndex((v) => v.id === action.data);
+        draft.me.Videos.splice(index, 1);
         break;
       }
       case LOAD_FOLLOWERS_REQUEST: {

@@ -10,6 +10,7 @@ const { imageLink, upload } = require("../utilities/multerOptions");
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
     const hashtags = req.body.description.match(/#[^\s]+/g);
+    console.log("form in body :", req.body);
     const newVideo = await db.Video.create({
       title: req.body.title,
       description: req.body.description,
@@ -76,24 +77,57 @@ router.post("/image", upload.array("image"), (req, res) => {
 
 router.patch("/:id", isLoggedIn, async (req, res, next) => {
   try {
-    console.log("patch fired", req.body.description);
-    console.log("patch fired whole body", req.body);
-    console.log("id", req.params.id);
-    const video = await db.Video.findOne({
+    const exVideo = await db.Video.findOne({
       where: { id: req.params.id },
     });
 
-    if (!video) {
+    if (!exVideo) {
       return res.status(404).send("video does not exist.");
     }
+    const images = await db.Image.findAll({
+      where: { VideoId: exVideo.id },
+    });
 
-    await video.update({ description: req.body.description });
+    console.log("image liset: ", images);
+    await exVideo.removeImages(images);
+
+    await exVideo.update({
+      description: req.body.description,
+      title: req.body.title,
+    });
+
+    if (req.body.image) {
+      if (Array.isArray(req.body.image)) {
+        const images = await Promise.all(
+          req.body.image.map((image) => {
+            return db.Image.create({ src: image });
+          })
+        );
+        await exVideo.addImages(images);
+      } else {
+        const image = await db.Image.create({ src: req.body.image });
+
+        await exVideo.addImage(image);
+      }
+    }
+
+    const video = await db.Video.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: db.Image,
+        },
+      ],
+    });
+    console.log("video :", video);
+
     res.send(video);
   } catch (e) {
     console.error(e);
     next(e);
   }
 });
+
 //////
 router.get("/:id", async (req, res, next) => {
   try {
@@ -169,6 +203,18 @@ router.get("/:id/comments", async (req, res, next) => {
           model: db.User,
           attributes: ["id", "nickname", "profilePhoto"],
         },
+        {
+          model: db.User,
+          through: "CommentLike",
+          as: "CommentLikers",
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.User,
+          through: "CommentDislike",
+          as: "CommentDislikers",
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
       ],
     });
     res.json(comments);
@@ -198,6 +244,18 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: db.User,
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.User,
+          through: "CommentLike",
+          as: "CommentLikers",
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.User,
+          through: "CommentDislike",
+          as: "CommentDislikers",
           attributes: ["id", "nickname", "profilePhoto"],
         },
       ],
@@ -239,6 +297,7 @@ router.delete("/:id/dislike", isLoggedIn, async (req, res, next) => {
     next(e);
   }
 });
+
 router.post("/:id/like", isLoggedIn, async (req, res, next) => {
   try {
     const video = await db.Video.findOne({ where: { id: req.params.id } });
@@ -268,7 +327,72 @@ router.delete("/:id/like", isLoggedIn, async (req, res, next) => {
     next(e);
   }
 });
+///comment like
+///comment like
+router.post("/:id/commentlike", isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await db.Comment.findOne({ where: { id: req.params.id } });
+    if (!comment) {
+      return res.status(404).send("Comment does not exist.");
+    }
+    await comment.addCommentLiker(req.user.id);
 
+    const user = await db.User.findOne({ where: { id: req.user.id } });
+    res.json(user);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.delete("/:id/commentlike", isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await db.Comment.findOne({ where: { id: req.params.id } });
+    if (!comment) {
+      return res.status(404).send("Video does not exist.");
+    }
+    await comment.removeCommentLiker(req.user.id);
+    res.json({ userId: req.user.id });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+// comment dislike
+// comment dislike
+// comment dislike
+router.post("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await db.Comment.findOne({ where: { id: req.params.id } });
+    if (!comment) {
+      return res.status(404).send("Comment does not exist.");
+    }
+    await comment.addCommentDisliker(req.user.id);
+    res.json({
+      userId: req.user.id,
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.delete("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await db.Comment.findOne({ where: { id: req.params.id } });
+    if (!comment) {
+      return res.status(404).send("Comment does not exist.");
+    }
+    await comment.removeCommentDisliker(req.user.id);
+    res.json({ userId: req.user.id });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+//////////
 router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
   try {
     const video = await db.Video.findOne({
@@ -309,7 +433,6 @@ router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
     });
     console.log("retweet completed :", retweet);
     const retweetWithPrevVideo = await db.Video.findOne({
-      //  include original post with retweet
       where: { id: retweet.id },
       include: [
         {

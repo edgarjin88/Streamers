@@ -504,7 +504,19 @@ main {
   }
 }
 
+
+  /* main {
+    grid:
+      "main-video related-videos" max-content
+      "video-details related-videos" max-content
+      "video-comments related-videos" 1fr
+      / 1fr 256px;
+    // margin-top: 48px;
+  } */
+
+
 @media (min-width: 1280px) and (orientation: landscape) {
+
   .container{
 
     margin: 0 5rem;
@@ -520,9 +532,9 @@ main {
     /* max-width: 1300px */
   }
   main {
-    grid-template-columns: 1fr 500px;
-    max-width: 1800px;
-    margin: 0 15rem;
+    grid-template-columns: 80rem 50rem;
+    max-width: 180rem;
+    margin: 0 auto;
   }
   
   #related-videos {

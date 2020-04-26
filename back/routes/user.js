@@ -40,7 +40,7 @@ router.post(
   "/profile",
   isLoggedIn,
   upload.single("image"),
-  async (req, res) => {
+  async (req, res, next) => {
     //image from "image" in formdata
     //req.body.image, req.body.content
     // if different name for each file, you can use upload.fields()
@@ -88,7 +88,7 @@ router.get("/:id", async (req, res, next) => {
           attributes: ["id"],
         },
       ],
-      attributes: ["id", "nickname", "profilePhoto", "description"],
+      attributes: ["id", "nickname", "profilePhoto", "userId", "description"],
     });
     const jsonUser = user.toJSON();
     jsonUser.Videos = jsonUser.Videos ? jsonUser.Videos.length : 0;

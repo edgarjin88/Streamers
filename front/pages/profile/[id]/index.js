@@ -31,9 +31,7 @@ const Profile = () => {
 
   // 내 프로필이 아니면 저장 못하게 하기.
 
-  const { followings, followers, nickname } = useSelector(
-    (state) => state.user.userInfo
-  );
+  const { nickname } = useSelector((state) => state.user.userInfo);
 
   const { userVideos } = useSelector((state) => state.video);
 
@@ -72,22 +70,6 @@ const Profile = () => {
     },
     []
   );
-
-  // const loadMoreFollowings = useCallback(() => {
-  //   dispatch({
-  //     type: LOAD_FOLLOWINGS_REQUEST,
-  //     offset: followingList.length,
-  //   });
-  // }, [followingList.length]);
-
-  // const loadMoreFollowers = useCallback(() => {
-  //   dispatch({
-  //     type: LOAD_FOLLOWERS_REQUEST,
-  //     offset: followerList.length,
-  //   });
-  // }, [followerList.length]);
-
-  ///////////logic 2//
 
   useEffect(() => {
     setTimeout(() => {

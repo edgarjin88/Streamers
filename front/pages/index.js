@@ -7,6 +7,8 @@ import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import Toaster from "../components/Toaster";
 import { NULLIFY_SIGN_OUT, NULLIFY_SIGN_IN_SUCCESS } from "../reducers/user";
+import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
+
 // import SimpleModal from "../containers/CreateChannel";
 
 const Index = () => {
@@ -24,7 +26,6 @@ const Index = () => {
   );
 
   useEffect(() => {
-    console.log("nulifyfired");
     if (signOutSuccess) {
       setTimeout(() => {
         dispatch({
@@ -64,6 +65,15 @@ const Index = () => {
       )}
     </div>
   );
+};
+
+Index.getInitialProps = async (context) => {
+  const { id } = context.query;
+  console.log("server side LOAD_VIDEO_REQUEST fired");
+
+  await context.store.dispatch({
+    type: LOAD_MAIN_VIDEOS_REQUEST,
+  });
 };
 
 export default Index;

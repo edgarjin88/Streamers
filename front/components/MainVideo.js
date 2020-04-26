@@ -5,16 +5,19 @@ import { LOAD_VIDEO_REQUEST } from "../reducers/video";
 const MainVideo = () => {
   const { src } = useSelector(({ video }) => {
     return {
-      src: video.currentVideo.Images[0] && video.currentVideo.Images[0].src,
+      src:
+        video.currentVideo &&
+        video.currentVideo.Images &&
+        video.currentVideo.Images[0] &&
+        video.currentVideo.Images[0].src,
     };
   }, shallowEqual);
 
-  console.log("inside src:", src);
   return (
     <div id="main-video">
       <img
         className={"main-content"}
-        src={src ? `${URL}/${src}` : "../static/images/videos/main-video.png"}
+        src={src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"}
         alt="How to film your course"
       />
       {/* or video contents later */}

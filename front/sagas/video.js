@@ -19,6 +19,12 @@ import {
   UNLIKE_VIDEO_FAILURE,
   UNLIKE_VIDEO_REQUEST,
   UNLIKE_VIDEO_SUCCESS,
+  LIKE_COMMENT_FAILURE,
+  LIKE_COMMENT_REQUEST,
+  LIKE_COMMENT_SUCCESS,
+  UNLIKE_COMMENT_FAILURE,
+  UNLIKE_COMMENT_REQUEST,
+  UNLIKE_COMMENT_SUCCESS,
   LOAD_COMMENTS_FAILURE,
   LOAD_COMMENTS_REQUEST,
   LOAD_COMMENTS_SUCCESS,
@@ -37,21 +43,21 @@ import {
   RETWEET_FAILURE,
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
-  UPLOAD_IMAGES_FAILURE,
-  UPLOAD_IMAGES_REQUEST,
-  UPLOAD_IMAGES_SUCCESS,
   LOAD_VIDEO_SUCCESS,
   LOAD_VIDEO_FAILURE,
   LOAD_VIDEO_REQUEST,
   EDIT_VIDEO_REQUEST,
   EDIT_VIDEO_FAILURE,
   EDIT_VIDEO_SUCCESS,
+  UPLOAD_IMAGES_FAILURE,
+  UPLOAD_IMAGES_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
   UPLOAD_VIDEO_IMAGE_FAILURE,
   UPLOAD_VIDEO_IMAGE_REQUEST,
   UPLOAD_VIDEO_IMAGE_SUCCESS,
 } from "../reducers/video";
 
-import { ADD_VIDEO_TO_ME, REMOVE_VIDEO_OF_ME } from "../reducers/user";
+import { ADD_VIDEO_TO_ME, REMOVE_VIDEO_FROM_ME } from "../reducers/user";
 
 const https = require("https");
 
@@ -175,10 +181,10 @@ function* watchLoadUserVideos() {
 ///////review above
 ///////review above
 ///////review above
-function addCommentAPI(data) {
+function addCommentAPI(commentData) {
   return axios.post(
-    `/video/${data.videoId}/comment`,
-    { content: data.content },
+    `/video/${commentData.videoId}/comment`,
+    { content: commentData.content },
     {
       withCredentials: true,
       httpsAgent,
@@ -445,7 +451,7 @@ function* removeVideo(action) {
       data: result.data,
     });
     yield put({
-      type: REMOVE_VIDEO_OF_ME,
+      type: REMOVE_VIDEO_FROM_ME,
       data: result.data,
     });
   } catch (e) {
@@ -461,20 +467,18 @@ function* watchRemoveVideo() {
   yield takeLatest(REMOVE_VIDEO_REQUEST, removeVideo);
 }
 
-function editVideoAPI(videoId, content) {
-  return axios.patch(
-    `/video/${videoId}`,
-    { content },
-    {
-      withCredentials: true,
-      httpsAgent,
-    }
-  );
+function editVideoAPI(videoId, videoData) {
+  console.log("video Id here :", videoId);
+  return axios.patch(`/video/${videoId}`, videoData, {
+    withCredentials: true,
+    httpsAgent,
+  });
 }
 
 function* editVideo(action) {
+  // console.log("action here1 :", action);
   try {
-    const result = yield call(editVideoAPI, action.data, action.content);
+    const result = yield call(editVideoAPI, action.videoId, action.data);
     yield put({
       type: EDIT_VIDEO_SUCCESS,
       data: result.data,
@@ -547,12 +551,47 @@ function* uploadVideoImages(action) {
 }
 
 function* watchUploadVideoeImages() {
-  console.log("watch upload image fired");
   yield takeLatest(UPLOAD_VIDEO_IMAGE_REQUEST, uploadVideoImages);
+}
+
+function likeCommentAPI(commentId) {
+  return axios.post(
+    `/video/${commentId}/commentlike`,
+    {},
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* likeComment(action) {
+  //이거 아주 좋아.
+  try {
+    const result = yield call(likeCommentAPI, action.data);
+    yield put({
+      type: LIKE_COMMENT_SUCCESS,
+      data: {
+        commentId: action.data,
+        userId: result.data.userId,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: LIKE_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchLikeComment() {
+  yield takeLatest(LIKE_COMMENT_REQUEST, likeComment);
 }
 
 export default function* videoSaga() {
   yield all([
+    fork(watchLikeComment),
     fork(watchUploadVideoeImages),
     fork(watchLoadMainVideos),
     fork(watchAddVideo),

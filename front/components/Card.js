@@ -20,6 +20,7 @@ import Typography from "@material-ui/core/Typography";
 import { red } from "@material-ui/core/colors";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { URL } from "../config/config";
 
 import {
   MemoEmail,
@@ -32,11 +33,12 @@ import UploadProfile from "../containers/UploadProfile";
 
 import moment from "moment";
 import { useRouter } from "next/router";
+// import FollowButton from "../containers/FollowButton";
 moment.locale("en");
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
+    maxWidth: "95rem",
     marginTop: "30px",
     fontSize: "14px",
   },
@@ -46,12 +48,11 @@ const useStyles = makeStyles((theme) => ({
   },
   media: {
     height: 0,
-    margin: "0 1.7rem",
+    margin: "0 1.7refm",
     paddingTop: "56.25%", // 16:9
   },
   expand: {
     transform: "rotate(0deg)",
-    // marginLeft: "auto",
 
     transition: theme.transitions.create("transform", {
       duration: 200,
@@ -59,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
   },
   expandOpen: {
     transform: "rotate(180deg)",
-    // float: "left",
+    float: "left",
   },
   avatar: {
     backgroundColor: red[500],
@@ -71,28 +72,43 @@ export default function RecipeReviewCard() {
   const dispatch = useDispatch();
   const router = useRouter();
   const queryId = router.query.id;
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [user, setUser] = useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   ///logic
+  // const {
+  //   followingList,
+  //   followerList,
+  //   hasMoreFollower,
+  //   hasMoreFollowing,
+  //   id,
+  //   // profilePhoto,
+  // } = useSelector((state) => state.user.userInfo);
+
   const {
     startedEditingNickname,
-    startedEditingDescription,
     startedChangingPassword,
-    followingList,
-    followerList,
-    hasMoreFollower,
-    hasMoreFollowing,
+    profilePhoto,
     nickname,
     userId,
-    description,
-    profilePhoto,
-    createdAt,
     id,
-    // profilePhoto,
-  } = useSelector((state) => state.user.userInfo);
+    createdAt,
+    Followers,
+  } = useSelector(({ user }) => {
+    return {
+      startedEditingNickname: user.startedEditingNickname,
+      startedChangingPassword: user.startedChangingPassword,
+      profilePhoto: user.userInfo.profilePhoto,
+      nickname: user.userInfo.nickname,
+      userId: user.userInfo.userId,
+      id: user.userInfo.id,
+      createdAt: user.userInfo.createdAt,
+      Followers: user.userInfo.Followers,
+    };
+  });
 
   useEffect(() => {
     dispatch({
@@ -104,10 +120,6 @@ export default function RecipeReviewCard() {
   const { me } = useSelector(({ user }) => user);
 
   const profileOwner = me && me.id === id && id === parseInt(queryId, 10);
-  // console.log("profileOwnser :", profileOwner);
-  // console.log("me :", me);
-  // console.log("id :", id);
-  // console.log("queryId :", queryId);
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -115,22 +127,19 @@ export default function RecipeReviewCard() {
         avatar={
           <Avatar
             className={classes.avatar}
-            src={
-              process.env.NODE_ENV === "development"
-                ? `http://localhost:3003/${profilePhoto}`
-                : profilePhoto
-            }
+            src={profilePhoto && `${URL}/${profilePhoto}`}
           >
             {!profilePhoto && nickname && nickname.slice(0, 1)}{" "}
           </Avatar>
         }
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
+        action={<IconButton aria-label="settings"></IconButton>}
         title={nickname}
-        subheader={`Joined on ${moment(createdAt).format("DD.MM.YYYY")}`}
+        subheader={
+          <div>
+            Joined on {moment(createdAt).format("DD.MM.YYYY")} <br />
+            {Followers} Subscribers
+          </div>
+        }
       ></CardHeader>
       {/* Profile Image here */}
       <CardMedia
@@ -146,7 +155,13 @@ export default function RecipeReviewCard() {
       />
       <CardContent>
         <hr />
-        <h1>
+        <h1
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <strong>User Description</strong>
         </h1>
         <hr />
@@ -172,7 +187,7 @@ export default function RecipeReviewCard() {
             >
               <ExpandMoreIcon
                 style={{
-                  float: "left",
+                  float: "right",
                   fontSize: "2rem",
                 }}
               />
@@ -186,7 +201,7 @@ export default function RecipeReviewCard() {
         <CardContent>
           <MemoEmail profileUserId={userId} size="16px" labelSize="16px" />
           <MemoEditNickname
-            profileNickname={nickname}
+            profileNickname={nickname ? nickname : "Enter your Nickname"}
             disabled={!startedEditingNickname}
             size="16px"
             labelSize="16px"

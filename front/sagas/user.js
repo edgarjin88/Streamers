@@ -575,7 +575,6 @@ function* uploadProfileImages(action) {
 }
 
 function* watchUploadProfileImages() {
-  console.log("wath profile upload fired");
   yield takeLatest(UPLOAD_PROFILE_REQUEST, uploadProfileImages);
 }
 export default function* userSaga() {

@@ -13,13 +13,13 @@ const MainVideos = ({ headers = "", videoData = null }) => {
   const countRef = useRef([]);
 
   const dispatch = useDispatch();
-  if (!videoData) {
-    useEffect(() => {
-      dispatch({
-        type: LOAD_MAIN_VIDEOS_REQUEST,
-      });
-    }, []);
-  }
+  // if (!videoData) {
+  //   useEffect(() => {
+  //     dispatch({
+  //       type: LOAD_MAIN_VIDEOS_REQUEST,
+  //     });
+  //   }, []);
+  // }
 
   const videoList = videoData && videoData.length > 0 ? videoData : mainVideos;
 
@@ -50,23 +50,19 @@ const MainVideos = ({ headers = "", videoData = null }) => {
   }, [mainVideos.length]);
 
   const headerPart = () => (
-    <header>
-      <div>{headers} </div>
-      <div>Autoplay</div>
-      <button>
-        <span className="autoplay-slider"></span>
-        <span className="autoplay-slider-toggle-button"></span>
-      </button>
-    </header>
+    <>
+      <header>
+        <div>{headers} </div>
+      </header>
+    </>
   );
 
   const renderVideoList = (videoInfoList) => {
     return (
       <ul>
         {videoInfoList.map((videoInfo) => {
-          console.log("each video id:", videoInfo.id);
           return (
-            <li>
+            <li key={videoInfo && videoInfo.createdAt}>
               <Link
                 href={`/video/[id]`}
                 as={`/video/${videoInfo && videoInfo.id}`}
@@ -117,12 +113,6 @@ const MainVideos = ({ headers = "", videoData = null }) => {
       {renderVideoList(videoList)}
     </aside>
   );
-};
-
-MainVideos.getInitialProps = async (context) => {
-  context.store.dispatch({
-    type: LOAD_MAIN_VIDEOS_REQUEST,
-  });
 };
 
 export default MainVideos;

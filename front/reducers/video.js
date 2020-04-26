@@ -30,6 +30,14 @@ export const ADD_VIDEO_SUCCESS = "ADD_VIDEO_SUCCESS";
 export const ADD_VIDEO_FAILURE = "ADD_VIDEO_FAILURE";
 export const NULLIFY_VIDEO_ADDED = "NULLIFY_VIDEO_ADDED";
 
+export const LIKE_COMMENT_REQUEST = "LIKE_COMMENT_REQUEST";
+export const LIKE_COMMENT_SUCCESS = "LIKE_COMMENT_SUCCESS";
+export const LIKE_COMMENT_FAILURE = "LIKE_COMMENT_FAILURE";
+
+export const UNLIKE_COMMENT_REQUEST = "UNLIKE_COMMENT_REQUEST";
+export const UNLIKE_COMMENT_SUCCESS = "UNLIKE_COMMENT_SUCCESS";
+export const UNLIKE_COMMENT_FAILURE = "UNLIKE_COMMENT_FAILURE";
+
 export const LIKE_VIDEO_REQUEST = "LIKE_VIDEO_REQUEST";
 export const LIKE_VIDEO_SUCCESS = "LIKE_VIDEO_SUCCESS";
 export const LIKE_VIDEO_FAILURE = "LIKE_VIDEO_FAILURE";
@@ -58,20 +66,28 @@ export const RETWEET_REQUEST = "RETWEET_REQUEST";
 export const RETWEET_SUCCESS = "RETWEET_SUCCESS";
 export const RETWEET_FAILURE = "RETWEET_FAILURE";
 
-export const REMOVE_VIDEO_REQUEST = "REMOVE_VIDEO_REQUEST";
-export const REMOVE_VIDEO_SUCCESS = "REMOVE_VIDEO_SUCCESS";
-export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
-
-export const EDIT_VIDEO_REQUEST = "EDIT_VIDEO_REQUEST";
-export const EDIT_VIDEO_SUCCESS = "EDIT_VIDEO_SUCCESS";
-export const EDIT_VIDEO_FAILURE = "EDIT_VIDEO_FAILURE";
-
 export const LOAD_VIDEO_REQUEST = "LOAD_VIDEO_REQUEST";
 export const LOAD_VIDEO_SUCCESS = "LOAD_VIDEO_SUCCESS";
 export const LOAD_VIDEO_FAILURE = "LOAD_VIDEO_FAILURE";
 
 export const EDIT_START_REQUEST = "EDIT_START_REQUEST";
+
 export const FALSIFY_EDIT_VIDEO_COMPLETE = "FALSIFY_EDIT_VIDEO_COMPLETE";
+
+export const INIT_EDIT_VIDEO_REQUEST = "INIT_EDIT_VIDEO_REQUEST";
+export const STOP_EDIT_VIDEO_REQUEST = "STOP_EDIT_VIDEO_REQUEST";
+export const NULLIFY_EDIT_VIDEO_SUCCESS = "NULLIFY_EDIT_VIDEO_SUCCESS";
+export const EDIT_VIDEO_REQUEST = "EDIT_VIDEO_REQUEST";
+export const EDIT_VIDEO_SUCCESS = "EDIT_VIDEO_SUCCESS";
+export const EDIT_VIDEO_FAILURE = "EDIT_VIDEO_FAILURE";
+
+export const INIT_REMOVE_VIDEO_REQUEST = "INIT_REMOVE_VIDEO_REQUEST";
+export const STOP_REMOVE_VIDEO_REQUEST = "STOP_REMOVE_VIDEO_REQUEST";
+export const NULLIFY_REMOVE_VIDEO_SUCCESS = "NULLIFY_REMOVE_VIDEO_SUCCESS";
+
+export const REMOVE_VIDEO_REQUEST = "REMOVE_VIDEO_REQUEST";
+export const REMOVE_VIDEO_SUCCESS = "REMOVE_VIDEO_SUCCESS";
+export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
 
 import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
 
@@ -85,32 +101,172 @@ export const initialState = {
   addVideoErrorReason: "",
   videoAdded: false,
   isLoading: false,
-  currentVideo: null,
+  currentVideo: {},
+  currentVideoComments: [],
   loadCurrentVideoErrorReason: "",
   dislikeErrorReason: "",
-};
+  initEditVideo: false,
+  editVideoSuccess: false,
+  editVideoErrorReason: "",
 
-// export const initialState = {
-//   mainVideos: [],
-//   imagePaths: [],
-//   addPostErrorReason: "",
-//   isAddingPost: false,
-//   postAdded: false,
-//   isAddingComment: false,
-//   addCommentErrorReason: "",
-//   commentAdded: false,
-//   singlePost: null,
-//   profilePhoto: null,
-//   seledtedPost: null,
-//   isEditingPost: false,
-//   edittingPost: false,
-//   editingPostErrorReason: "",
-// };
+  initRemoveVideo: false,
+  removeVideoSuccess: false,
+  removeVideoErrorReason: "",
+
+  //  isAddingComment: false,
+  addCommentErrorReason: "",
+  commentAdded: false,
+};
 
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case LIKE_COMMENT_REQUEST: {
+        break;
+      }
+
+      // const postIndex = draft.mainPosts.findIndex(
+      //   v => v.id === action.data.postId
+      // );
+      // draft.mainPosts[postIndex].Likers.unshift({ id: action.data.draft.mainVideos.splice(index, 1);userId });
+
+      // draft.mainVideos.splice(index, 1);
+
+      case LIKE_COMMENT_SUCCESS: {
+        // 리턴 값은 유저 아이디
+        // const index = draft.currentVideoComments.findIndex(v => v.id ===action.data.commentId)
+        //   draft.currentVideoComments[index].CommentLikers.splice(index, 1);
+        const index = draft.currentVideoComments.findIndex(
+          (v) => v.id === action.data.commentId
+        );
+        draft.currentVideoComments[index].CommentLikers.push(
+          action.data.userId
+        );
+        // action.data.commentId
+        // action.data.userId
+        break;
+      }
+      case LIKE_COMMENT_FAILURE: {
+        break;
+      }
+      case LOAD_COMMENTS_SUCCESS: {
+        draft.currentVideoComments = action.data.comments;
+        break;
+      }
+      case ADD_COMMENT_REQUEST: {
+        draft.isLoading = true;
+        draft.addCommentErrorReason = "";
+        draft.commentAdded = false;
+        break;
+      }
+      case ADD_COMMENT_SUCCESS: {
+        // const index = draft.mainVideos.findIndex(
+        //   (v) => v.id === action.data.postId
+        // );
+        draft.currentVideoComments.push(action.data.comment);
+        draft.isLoading = false;
+        draft.commentAdded = true;
+        break;
+      }
+      case ADD_COMMENT_FAILURE: {
+        draft.isLoading = false;
+        draft.addCommentErrorReason = action.error;
+        break;
+      }
+
+      case REMOVE_VIDEO_REQUEST: {
+        draft.isLoading = true;
+        draft.removeVideoErrorReason = "";
+        draft.removeVideoSuccess = false;
+        break;
+      }
+      case REMOVE_VIDEO_SUCCESS: {
+        // console.log("action checking: ", action);
+        // const index = draft.mainVideos.findIndex(
+        //   (v) => v.id === action.data.id
+        // );
+        // console.log("index : ", index);
+        // draft.mainVideos.splice(index, 1, action.data);
+
+        const index = draft.mainVideos.findIndex((v) => v.id === action.data);
+        draft.mainVideos.splice(index, 1);
+
+        draft.isLoading = false;
+        draft.removeVideoSuccess = true;
+        draft.uploadedVideoImage = ""; // to empty the image path
+        draft.initRemoveVideo = false;
+        break;
+      }
+      case REMOVE_VIDEO_FAILURE: {
+        draft.isLoading = false;
+        draft.removeVideoSuccess = false;
+        draft.removeVideoErrorReason = action.error;
+        break;
+      }
+
+      case NULLIFY_REMOVE_VIDEO_SUCCESS: {
+        draft.isLoading = false;
+        draft.removeVideoSuccess = false;
+        break;
+      }
+      case STOP_REMOVE_VIDEO_REQUEST: {
+        draft.initRemoveVideo = false;
+        draft.uploadedVideoImage = "";
+        break;
+      }
+      case INIT_REMOVE_VIDEO_REQUEST: {
+        draft.initRemoveVideo = true;
+        draft.isLoading = false;
+        break;
+      }
+
+      //
+      //
+      //
+      case EDIT_VIDEO_REQUEST: {
+        draft.isLoading = true;
+        draft.editVideoErrorReason = "";
+        draft.editVideoSuccess = false;
+        break;
+      }
+      case EDIT_VIDEO_SUCCESS: {
+        console.log("action checking: ", action);
+        const index = draft.mainVideos.findIndex(
+          (v) => v.id === action.data.id
+        );
+        console.log("index : ", index);
+        draft.mainVideos.splice(index, 1, action.data);
+        draft.isLoading = false;
+
+        draft.editVideoSuccess = true;
+        draft.uploadedVideoImage = ""; // to empty the image path
+        draft.initEditVideo = false;
+        break;
+      }
+      case EDIT_VIDEO_FAILURE: {
+        draft.isLoading = false;
+        draft.editVideoSuccess = false;
+        draft.editVideoErrorReason = action.error;
+        break;
+      }
+
+      case NULLIFY_EDIT_VIDEO_SUCCESS: {
+        draft.isLoading = false;
+        draft.editVideoSuccess = false;
+        break;
+      }
+      case STOP_EDIT_VIDEO_REQUEST: {
+        draft.initEditVideo = false;
+        draft.uploadedVideoImage = "";
+        break;
+      }
+      case INIT_EDIT_VIDEO_REQUEST: {
+        draft.initEditVideo = true;
+
+        break;
+      }
+
       case LOAD_USER_VIDEOS_REQUEST: {
         draft.userVideos = !action.lastId ? [] : draft.userVideos;
 

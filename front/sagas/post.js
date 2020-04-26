@@ -42,7 +42,7 @@ import {
   EDIT_POST_SUCCESS,
 } from "../reducers/post";
 
-import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
+import { ADD_VIDEO_TO_ME, REMOVE_VIDEO_FROM_ME } from "../reducers/user";
 
 const https = require("https");
 
@@ -365,7 +365,7 @@ function* removePost(action) {
       data: result.data,
     });
     yield put({
-      type: REMOVE_POST_OF_ME,
+      type: REMOVE_POST_FROM_ME,
       data: result.data,
     });
   } catch (e) {

@@ -2,22 +2,19 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { CLOSE_MODAL } from "../reducers/menu";
 import Button from "@material-ui/core/Button";
-
 import Modal from "@material-ui/core/Modal";
 import { makeStyles } from "@material-ui/core/styles";
-
 import { StyledForm } from "../styles/FormStyle";
-
 import VideocamIcon from "@material-ui/icons/Videocam";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import SaveIcon from "@material-ui/icons/Save";
 import Toaster from "../components/Toaster";
-
-// import { StyledLink } from "../components/CustomLinks";
 import {
   UPLOAD_VIDEO_IMAGE_REQUEST,
-  ADD_VIDEO_REQUEST,
-  NULLIFY_VIDEO_ADDED,
+  EDIT_VIDEO_REQUEST,
+  NULLIFY_EDIT_VIDEO_SUCCESS,
+  STOP_EDIT_VIDEO_REQUEST,
+  LOAD_VIDEO_REQUEST,
 } from "../reducers/video";
 import { URL } from "../config/config";
 
@@ -45,23 +42,43 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SimpleModal() {
-  const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
-  const [description, setDescription] = useState("");
-  const [title, setTitle] = useState("");
-  const imageInput = useRef(); //
-  const dispatch = useDispatch();
-
-  const { uploadedVideoImage, videoAdded } = useSelector(({ video }) => {
+  const {
+    uploadedVideoImage,
+    src,
+    videoTitle,
+    videoDescription,
+    videoId,
+    initEditVideo,
+    editVideoSuccess,
+    editVideoErrorReason,
+    isLoading,
+  } = useSelector(({ video }) => {
     return {
+      editVideoErrorReason: video.editVideoErrorReason,
+      isLoading: video.isLoading,
+      editVideoSuccess: video.editVideoSuccess,
       uploadedVideoImage: video.uploadedVideoImage,
-      videoAdded: video.videoAdded,
+      videoId: video.currentVideo.id,
+      initEditVideo: video.initEditVideo,
+      videoDescription: video.currentVideo.description,
+      videoTitle: video.currentVideo.title,
+      src:
+        video.currentVideo.Images &&
+        video.currentVideo.Images[0] &&
+        video.currentVideo.Images[0].src,
     };
   }, shallowEqual);
 
-  const { openModal } = useSelector(({ menu }) => {
-    return { openModal: menu.openModal };
-  }, shallowEqual);
+  const classes = useStyles();
+  const [modalStyle] = React.useState(getModalStyle);
+  const [description, setDescription] = useState(videoDescription);
+  const [title, setTitle] = useState(videoTitle);
+  const imageInput = useRef(); //
+  const dispatch = useDispatch();
+
+  // const { openModal } = useSelector(({ menu }) => {
+  //   return { openModal: menu.openModal };
+  // }, shallowEqual);
 
   const onChangeVideoImages = useCallback((e) => {
     const imageFormData = new FormData();
@@ -85,51 +102,57 @@ export default function SimpleModal() {
     }
   };
 
-  const onSubmitForm = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (!title || !title.trim()) {
-        return alert("Please write title before submitting");
-      }
-      if (!description || !description.trim()) {
-        return alert("Please write description before submitting");
-      }
+  const onSubmitForm = (e) => {
+    e.preventDefault();
+    if (!title || !title.trim()) {
+      return alert("Please write title before submitting");
+    }
+    if (!description || !description.trim()) {
+      return alert("Please write description before submitting");
+    }
+    const edited = {
+      description,
+      title,
+      videoId,
+      image: uploadedVideoImage ? uploadedVideoImage : src,
+    };
 
-      const formData = new FormData();
-      formData.append("image", uploadedVideoImage);
-
-      formData.append("description", description);
-      formData.append("title", title);
-      dispatch({
-        type: ADD_VIDEO_REQUEST,
-        data: formData,
-      });
-      setDescription("");
-      setTitle("");
-    },
-    [title, description, uploadedVideoImage]
-  );
+    dispatch({
+      type: EDIT_VIDEO_REQUEST,
+      data: edited,
+      videoId: videoId,
+    });
+  };
 
   const handleClose = () => {
-    setDescription("");
-    setTitle("");
     dispatch({
-      type: CLOSE_MODAL,
+      type: STOP_EDIT_VIDEO_REQUEST,
     });
   };
 
   useEffect(() => {
-    if (videoAdded) {
+    if (initEditVideo) {
+      console.log("init video:", videoDescription);
+      setDescription(videoDescription);
+      setTitle(videoTitle);
+    }
+  }, [initEditVideo]);
+  useEffect(() => {
+    if (editVideoSuccess) {
       dispatch({
-        type: CLOSE_MODAL,
+        type: STOP_EDIT_VIDEO_REQUEST,
+      });
+      dispatch({
+        type: LOAD_VIDEO_REQUEST,
+        data: videoId,
       });
       setTimeout(() => {
         dispatch({
-          type: NULLIFY_VIDEO_ADDED,
+          type: NULLIFY_EDIT_VIDEO_SUCCESS,
         });
       }, 1000);
     }
-  }, [videoAdded]);
+  }, [editVideoSuccess]);
 
   const body = (
     <StyledForm>
@@ -141,7 +164,7 @@ export default function SimpleModal() {
           <VideocamIcon
             style={{ marginLeft: "15px", fontSize: "35px", color: "black" }}
           />
-          Create Your Streaming Channel here!
+          Edit Your Streaming Channel Details Here !
         </h2>
         <div>
           <img
@@ -149,6 +172,8 @@ export default function SimpleModal() {
             src={
               uploadedVideoImage
                 ? `${URL}/${uploadedVideoImage}`
+                : src
+                ? `${URL}/${src}`
                 : "../static/images/profiles/noimage.png"
             }
             alt=""
@@ -220,21 +245,20 @@ export default function SimpleModal() {
     <div>
       <Modal
         style={{ zIndex: 99999 }}
-        open={openModal}
+        open={initEditVideo}
         onClose={handleClose}
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
       >
         {body}
       </Modal>
-      {videoAdded && (
+      {editVideoSuccess && (
         <Toaster
-          message="A new channel successfully created"
+          message="Your video channel was successfully edited"
           whereTo={false}
           type="success"
         />
       )}
-      />
     </div>
   );
 }

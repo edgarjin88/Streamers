@@ -6,7 +6,8 @@ export const StyledButton1 = styled.button`
   color: ${({ color }) => (color ? color : "#55c57a")};
   font-size: ${({ size }) => (size ? size : "inherit")};
   cursor: pointer;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
+  margin: 1rem;
   background-color: transparent;
   display: inline-block;
   text-decoration: none;
