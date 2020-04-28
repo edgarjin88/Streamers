@@ -8,15 +8,29 @@ module.exports = (sequelize, DataTypes) => {
 
         allowNull: false,
       },
+      refComment: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       charset: "utf8mb4",
       collate: "utf8mb4_general_ci",
-    }
+    },
+    { hierarchy: true }
   );
+
   Comment.associate = (db) => {
     db.Comment.belongsTo(db.User);
+    db.Comment.belongsToMany(db.User, {
+      through: "RecommentTable",
+      as: "Repliers",
+    });
+
+    // db.Comment.belongsToMany(db.User, {through:"Recommenter", as : "RecommentUser"});
     db.Comment.belongsTo(db.Video);
+    // db.Comment.belongsTo(db.User, { as: "Recommenter" });
+    db.Comment.hasMany(db.Comment, { as: "Recomment" });
 
     db.Comment.belongsToMany(db.User, {
       through: "CommentLike",

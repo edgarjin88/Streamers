@@ -1,4 +1,7 @@
-const Sequelize = require("sequelize");
+const Sequelize = require("sequelize-hierarchy")();
+
+// const Sequelize = require("sequelize");
+// require("sequelize-hierarchy")(Sequelize);
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config")[env]; //config json
 const db = {};

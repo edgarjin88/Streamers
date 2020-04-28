@@ -22,7 +22,7 @@ import Copyright from "../components/Copyright";
 import {
   MemoEmail,
   MemoPassword,
-  MemoSignIn
+  MemoSignIn,
 } from "../containers/InputComponents";
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
 import { LogoAndName } from "../components/MenuComponents";
@@ -33,19 +33,17 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
-  const { me, signInErrorReason } = useSelector(state => state.user);
+  const { me, signInErrorReason } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   //No shallow comparison required here.
   useEffect(() => {
     dispatch({
-      type: CLEAR_INPUT_FIELDS
+      type: CLEAR_INPUT_FIELDS,
     });
   }, []);
   useEffect(() => {
     if (me) {
-      setTimeout(() => {
-        Router.push("/");
-      }, 6000);
+      Router.push("/");
     }
   }, [me]);
 

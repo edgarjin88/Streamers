@@ -4,6 +4,9 @@ import {
   ADD_VIDEO_FAILURE,
   ADD_VIDEO_REQUEST,
   ADD_VIDEO_SUCCESS,
+  ADD_REPLY_TO_COMMENT_FAILURE,
+  ADD_REPLY_TO_COMMENT_REQUEST,
+  ADD_REPLY_TO_COMMENT_SUCCESS,
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_REQUEST,
   ADD_COMMENT_SUCCESS,
@@ -25,6 +28,12 @@ import {
   UNLIKE_COMMENT_FAILURE,
   UNLIKE_COMMENT_REQUEST,
   UNLIKE_COMMENT_SUCCESS,
+  DISLIKE_COMMENT_FAILURE,
+  DISLIKE_COMMENT_REQUEST,
+  DISLIKE_COMMENT_SUCCESS,
+  UNDISLIKE_COMMENT_FAILURE,
+  UNDISLIKE_COMMENT_REQUEST,
+  UNDISLIKE_COMMENT_SUCCESS,
   LOAD_COMMENTS_FAILURE,
   LOAD_COMMENTS_REQUEST,
   LOAD_COMMENTS_SUCCESS,
@@ -40,6 +49,9 @@ import {
   REMOVE_VIDEO_FAILURE,
   REMOVE_VIDEO_REQUEST,
   REMOVE_VIDEO_SUCCESS,
+  REMOVE_COMMENT_FAILURE,
+  REMOVE_COMMENT_REQUEST,
+  REMOVE_COMMENT_SUCCESS,
   RETWEET_FAILURE,
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
@@ -184,7 +196,10 @@ function* watchLoadUserVideos() {
 function addCommentAPI(commentData) {
   return axios.post(
     `/video/${commentData.videoId}/comment`,
-    { content: commentData.content },
+    {
+      content: commentData.content,
+      commentId: commentData.commentId,
+    },
     {
       withCredentials: true,
       httpsAgent,
@@ -197,6 +212,7 @@ function* addComment(action) {
     const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
+      // data: result.data,
       data: {
         videoId: action.data.videoId,
         comment: result.data,
@@ -566,18 +582,18 @@ function likeCommentAPI(commentId) {
 }
 
 function* likeComment(action) {
-  //이거 아주 좋아.
   try {
     const result = yield call(likeCommentAPI, action.data);
+    console.log("whole action id :", action);
     yield put({
       type: LIKE_COMMENT_SUCCESS,
       data: {
         commentId: action.data,
-        userId: result.data.userId,
+        userInfo: result.data,
       },
     });
   } catch (e) {
-    console.error(e);
+    console.error("like comment error :", e);
     yield put({
       type: LIKE_COMMENT_FAILURE,
       error: e,
@@ -587,14 +603,196 @@ function* likeComment(action) {
 
 function* watchLikeComment() {
   yield takeLatest(LIKE_COMMENT_REQUEST, likeComment);
+  console.log("undefined ? :", LIKE_COMMENT_REQUEST);
+}
+
+//unlike below
+function unlikeCommentAPI(commentId) {
+  return axios.delete(
+    `/video/${commentId}/commentlike`,
+
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* unlikeComment(action) {
+  try {
+    const result = yield call(unlikeCommentAPI, action.data);
+    yield put({
+      type: UNLIKE_COMMENT_SUCCESS,
+      data: {
+        commentId: action.data,
+        userInfo: result.data,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: UNLIKE_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchUnlikeComment() {
+  yield takeLatest(UNLIKE_COMMENT_REQUEST, unlikeComment);
+}
+
+//////
+
+function dislikeCommentAPI(commentId) {
+  return axios.post(
+    `/video/${commentId}/commentDislike`,
+    {},
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* dislikeComment(action) {
+  try {
+    const result = yield call(dislikeCommentAPI, action.data);
+    yield put({
+      type: DISLIKE_COMMENT_SUCCESS,
+      data: {
+        commentId: action.data,
+        userInfo: result.data,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: DISLIKE_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchDislikeComment() {
+  yield takeLatest(DISLIKE_COMMENT_REQUEST, dislikeComment);
+}
+
+////
+
+function undislikeCommentAPI(commentId) {
+  return axios.delete(
+    `/video/${commentId}/commentDislike`,
+
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* undislikeComment(action) {
+  try {
+    const result = yield call(undislikeCommentAPI, action.data);
+    yield put({
+      type: UNDISLIKE_COMMENT_SUCCESS,
+      data: {
+        commentId: action.data,
+        userInfo: result.data,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: UNDISLIKE_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchUndislikeComment() {
+  yield takeLatest(UNDISLIKE_COMMENT_REQUEST, undislikeComment);
+}
+
+function removeCommentAPI(commentId) {
+  return axios.delete(`/video/${commentId}/comment`, {
+    // delete!
+    withCredentials: true,
+    httpsAgent,
+  });
+}
+
+function* removeComment(action) {
+  try {
+    const result = yield call(removeCommentAPI, action.data);
+    yield put({
+      type: REMOVE_COMMENT_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: REMOVE_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchRemoveComment() {
+  yield takeLatest(REMOVE_COMMENT_REQUEST, removeComment);
+}
+
+////////
+
+function addReplyToCommentAPI(commentData) {
+  return axios.post(
+    `/video/${commentData.commentId}/recomment`,
+    {
+      content: commentData.content,
+    },
+    {
+      withCredentials: true,
+      httpsAgent,
+    }
+  );
+}
+
+function* addReplyToComment(action) {
+  try {
+    const result = yield call(addReplyToCommentAPI, action.data);
+    yield put({
+      type: ADD_REPLY_TO_COMMENT_SUCCESS,
+      // data: result.data,
+      data: {
+        videoId: action.data.videoId,
+        comment: result.data,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: ADD_REPLY_TO_COMMENT_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchAddReplyToComment() {
+  yield takeLatest(ADD_REPLY_TO_COMMENT_REQUEST, addReplyToComment);
 }
 
 export default function* videoSaga() {
   yield all([
+    fork(watchRemoveComment),
     fork(watchLikeComment),
+    fork(watchUnlikeComment),
+    fork(watchUndislikeComment),
+    fork(watchDislikeComment),
+    fork(watchDislikeVideo),
+    fork(watchUndislikeVideo),
     fork(watchUploadVideoeImages),
     fork(watchLoadMainVideos),
     fork(watchAddVideo),
+    fork(watchAddReplyToComment),
     fork(watchAddComment),
     fork(watchLoadComments),
     fork(watchLoadHashtagVideos),
@@ -602,8 +800,6 @@ export default function* videoSaga() {
     fork(watchUploadImages),
     fork(watchLikeVideo),
     fork(watchUnlikeVideo),
-    fork(watchDislikeVideo),
-    fork(watchUndislikeVideo),
     fork(watchRetweet),
     fork(watchRemoveVideo),
     fork(watchEditVideo),

@@ -187,18 +187,45 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
 });
 
 router.get("/:id/comments", async (req, res, next) => {
-  // :id/comments==  video.id/coments
   try {
     const video = await db.Video.findOne({ where: { id: req.params.id } });
     if (!video) {
       return res.status(404).send("Video does not exist.");
     }
+
+    // nested: true;
     const comments = await db.Comment.findAll({
       where: {
         VideoId: req.params.id,
       },
       order: [["createdAt", "ASC"]],
       include: [
+        {
+          model: db.Comment,
+          as: "Recomment",
+          attributes: ["id"],
+
+          include: [
+            {
+              model: db.User,
+              through: "RecommentTable",
+              as: "Repliers",
+              attributes: ["id", "nickname", "profilePhoto"],
+            },
+            {
+              model: db.User,
+              through: "CommentLike",
+              as: "CommentLikers",
+              attributes: ["id", "nickname", "profilePhoto"],
+            },
+            {
+              model: db.User,
+              through: "CommentDislike",
+              as: "CommentDislikers",
+              attributes: ["id", "nickname", "profilePhoto"],
+            },
+          ],
+        },
         {
           model: db.User,
           attributes: ["id", "nickname", "profilePhoto"],
@@ -217,7 +244,24 @@ router.get("/:id/comments", async (req, res, next) => {
         },
       ],
     });
+    console.log("comments! :", comments);
+    console.log("comment Recomment! :", comments.Recomment);
+    console.log("comments! :", JSON.stringify(comments));
     res.json(comments);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.delete("/:id/comment", isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await db.Comment.findOne({ where: { id: req.params.id } });
+    if (!comment) {
+      return res.status(404).send("Comment does not exist.");
+    }
+    await db.Comment.destroy({ where: { id: req.params.id } });
+    res.send(req.params.id);
   } catch (e) {
     console.error(e);
     next(e);
@@ -226,7 +270,52 @@ router.get("/:id/comments", async (req, res, next) => {
 
 router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
   // POST /api/post/1000000/comment  /// !== comments
+  console.log("comment body: ", req.body);
   try {
+    ///for reply to comment
+    ///for reply to comment
+    if (req.body.commentId) {
+      const refComment = await db.Comment.findOne({
+        where: { id: req.body.commentId },
+      });
+      if (!refComment) {
+        return res.status(404).send("Comment does not exist.");
+      }
+
+      const comment = await db.Comment.create({
+        UserId: req.user.id,
+        content: req.body.content,
+        refComment: req.body.commentId,
+      });
+
+      const replyToComment = await db.Comment.findOne({
+        where: {
+          id: comment.id,
+        },
+        include: [
+          {
+            model: db.User,
+            attributes: ["id", "nickname", "profilePhoto"],
+          },
+          {
+            model: db.User,
+            through: "CommentLike",
+            as: "CommentLikers",
+            attributes: ["id", "nickname", "profilePhoto"],
+          },
+          {
+            model: db.User,
+            through: "CommentDislike",
+            as: "CommentDislikers",
+            attributes: ["id", "nickname", "profilePhoto"],
+          },
+        ],
+      });
+
+      return res.json(replyToComment);
+    }
+
+    //for comment to a video
     const video = await db.Video.findOne({ where: { id: req.params.id } });
     if (!video) {
       return res.status(404).send("Video does not exist.");
@@ -236,6 +325,7 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
       UserId: req.user.id,
       content: req.body.content,
     });
+
     await video.addComment(newComment.id);
     const comment = await db.Comment.findOne({
       where: {
@@ -337,7 +427,10 @@ router.post("/:id/commentlike", isLoggedIn, async (req, res, next) => {
     }
     await comment.addCommentLiker(req.user.id);
 
-    const user = await db.User.findOne({ where: { id: req.user.id } });
+    const user = await db.User.findOne({
+      where: { id: req.user.id },
+      attributes: ["id", "nickname", "profilePhoto"],
+    });
     res.json(user);
   } catch (e) {
     console.error(e);
@@ -359,6 +452,78 @@ router.delete("/:id/commentlike", isLoggedIn, async (req, res, next) => {
   }
 });
 
+//recomment
+//recomment
+router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
+  try {
+    console.log("remomment req.body :", req.body);
+    const exComment = await db.Comment.findOne({
+      where: { id: req.params.id },
+    });
+    if (!exComment) {
+      return res.status(404).send("Comment does not exist.");
+    }
+
+    const recomment = await db.Comment.create({
+      content: req.body.content,
+      UserId: req.user.id,
+    });
+
+    const fullComment = await db.Comment.findOne({
+      where: {
+        id: recomment.id,
+      },
+      include: [
+        {
+          model: db.User,
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.User,
+          through: "CommentLike",
+          as: "CommentLikers",
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.User,
+          through: "CommentDislike",
+          as: "CommentDislikers",
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+      ],
+    });
+
+    await exComment.addRecomment(fullComment);
+
+    console.log("full comment :", fullComment);
+
+    res.json(fullComment);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.delete(
+  "/:id/recomment/:recommentId",
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const comment = await db.Comment.findOne({
+        where: { id: req.params.id },
+      });
+      if (!comment) {
+        return res.status(404).send("Comment does not exist.");
+      }
+      await comment.removeRecomment(req.params.recommentId);
+      res.json({ recommentId: req.params.recommentId });
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
+  }
+);
+
 // comment dislike
 // comment dislike
 // comment dislike
@@ -369,9 +534,12 @@ router.post("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
       return res.status(404).send("Comment does not exist.");
     }
     await comment.addCommentDisliker(req.user.id);
-    res.json({
-      userId: req.user.id,
+
+    const user = await db.User.findOne({
+      where: { id: req.user.id },
+      attributes: ["id", "nickname", "profilePhoto"],
     });
+    res.json(user);
   } catch (e) {
     console.error(e);
     next(e);
@@ -393,73 +561,73 @@ router.delete("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
 });
 
 //////////
-router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
-  try {
-    const video = await db.Video.findOne({
-      where: { id: req.params.id }, // video with ':id'
-      include: [
-        {
-          model: db.Video,
-          as: "Retweet", //   db.Video.belongsTo(db.Video, { as: 'Retweet' });
-        }, // this will bring Retweet info. At this point, RetweetId is null, so Retweet is null too.
-      ],
-    });
-    console.log("retweet video :", video);
-    if (!video) {
-      return res.status(404).send("Video does not exist.");
-    }
-    if (
-      req.user.id === video.UserId ||
-      (video.Retweet && video.Retweet.UserId === req.user.id)
-    ) {
-      return res.status(403).send("You cannot retwit your video.");
-    }
-    const retweetTargetId = video.RetweetId || video.id;
-    //RetweetId === null, so, video.id to be used
+// router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
+//   try {
+//     const video = await db.Video.findOne({
+//       where: { id: req.params.id }, // video with ':id'
+//       include: [
+//         {
+//           model: db.Video,
+//           as: "Retweet", //   db.Video.belongsTo(db.Video, { as: 'Retweet' });
+//         }, // this will bring Retweet info. At this point, RetweetId is null, so Retweet is null too.
+//       ],
+//     });
+//     console.log("retweet video :", video);
+//     if (!video) {
+//       return res.status(404).send("Video does not exist.");
+//     }
+//     if (
+//       req.user.id === video.UserId ||
+//       (video.Retweet && video.Retweet.UserId === req.user.id)
+//     ) {
+//       return res.status(403).send("You cannot retwit your video.");
+//     }
+//     const retweetTargetId = video.RetweetId || video.id;
+//     //RetweetId === null, so, video.id to be used
 
-    const exVideo = await db.Video.findOne({
-      where: {
-        UserId: req.user.id,
-        RetweetId: retweetTargetId,
-      },
-    });
-    if (exVideo) {
-      return res.status(403).send("You already retwitted.");
-    }
-    const retweet = await db.Video.create({
-      UserId: req.user.id,
-      RetweetId: retweetTargetId,
-      content: "retweet",
-    });
-    console.log("retweet completed :", retweet);
-    const retweetWithPrevVideo = await db.Video.findOne({
-      where: { id: retweet.id },
-      include: [
-        {
-          model: db.User,
-          attributes: ["id", "nickname", "profilePhoto"],
-        },
-        {
-          model: db.Video,
-          as: "Retweet",
-          include: [
-            {
-              model: db.User,
-              attributes: ["id", "nickname", "profilePhoto"],
-            },
-            {
-              model: db.Image,
-            },
-          ],
-        },
-      ],
-    });
-    console.log("with prev post: ", retweetWithPrevVideo);
-    res.json(retweetWithPrevVideo);
-  } catch (e) {
-    console.error(e);
-    next(e);
-  }
-});
+//     const exVideo = await db.Video.findOne({
+//       where: {
+//         UserId: req.user.id,
+//         RetweetId: retweetTargetId,
+//       },
+//     });
+//     if (exVideo) {
+//       return res.status(403).send("You already retwitted.");
+//     }
+//     const retweet = await db.Video.create({
+//       UserId: req.user.id,
+//       RetweetId: retweetTargetId,
+//       content: "retweet",
+//     });
+//     console.log("retweet completed :", retweet);
+//     const retweetWithPrevVideo = await db.Video.findOne({
+//       where: { id: retweet.id },
+//       include: [
+//         {
+//           model: db.User,
+//           attributes: ["id", "nickname", "profilePhoto"],
+//         },
+//         {
+//           model: db.Video,
+//           as: "Retweet",
+//           include: [
+//             {
+//               model: db.User,
+//               attributes: ["id", "nickname", "profilePhoto"],
+//             },
+//             {
+//               model: db.Image,
+//             },
+//           ],
+//         },
+//       ],
+//     });
+//     console.log("with prev post: ", retweetWithPrevVideo);
+//     res.json(retweetWithPrevVideo);
+//   } catch (e) {
+//     console.error(e);
+//     next(e);
+//   }
+// });
 
 module.exports = router;

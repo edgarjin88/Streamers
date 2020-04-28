@@ -38,6 +38,18 @@ export const UNLIKE_COMMENT_REQUEST = "UNLIKE_COMMENT_REQUEST";
 export const UNLIKE_COMMENT_SUCCESS = "UNLIKE_COMMENT_SUCCESS";
 export const UNLIKE_COMMENT_FAILURE = "UNLIKE_COMMENT_FAILURE";
 
+export const DISLIKE_COMMENT_REQUEST = "DISLIKE_COMMENT_REQUEST";
+export const DISLIKE_COMMENT_SUCCESS = "DISLIKE_COMMENT_SUCCESS";
+export const DISLIKE_COMMENT_FAILURE = "DISLIKE_COMMENT_FAILURE";
+
+export const UNDISLIKE_COMMENT_REQUEST = "UNDISLIKE_COMMENT_REQUEST";
+export const UNDISLIKE_COMMENT_SUCCESS = "UNDISLIKE_COMMENT_SUCCESS";
+export const UNDISLIKE_COMMENT_FAILURE = "UNDISLIKE_COMMENT_FAILURE";
+
+export const REMOVE_COMMENT_REQUEST = "REMOVE_COMMENT_REQUEST";
+export const REMOVE_COMMENT_SUCCESS = "REMOVE_COMMENT_SUCCESS";
+export const REMOVE_COMMENT_FAILURE = "REMOVE_COMMENT_FAILURE";
+
 export const LIKE_VIDEO_REQUEST = "LIKE_VIDEO_REQUEST";
 export const LIKE_VIDEO_SUCCESS = "LIKE_VIDEO_SUCCESS";
 export const LIKE_VIDEO_FAILURE = "LIKE_VIDEO_FAILURE";
@@ -58,9 +70,15 @@ export const ADD_COMMENT_REQUEST = "ADD_COMMENT_REQUEST";
 export const ADD_COMMENT_SUCCESS = "ADD_COMMENT_SUCCESS";
 export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 
+export const ADD_REPLY_TO_COMMENT_REQUEST = "ADD_REPLY_TO_COMMENT_REQUEST";
+export const ADD_REPLY_TO_COMMENT_SUCCESS = "ADD_REPLY_TO_COMMENT_SUCCESS";
+export const ADD_REPLY_TO_COMMENT_FAILURE = "ADD_REPLY_TO_COMMENT_FAILURE";
+
 export const LOAD_COMMENTS_REQUEST = "LOAD_COMMENTS_REQUEST";
 export const LOAD_COMMENTS_SUCCESS = "LOAD_COMMENTS_SUCCESS";
 export const LOAD_COMMENTS_FAILURE = "LOAD_COMMENTS_FAILURE";
+
+export const SET_CURRENT_COMMENT_ID = "SET_CURRENT_COMMENT_ID";
 
 export const RETWEET_REQUEST = "RETWEET_REQUEST";
 export const RETWEET_SUCCESS = "RETWEET_SUCCESS";
@@ -89,9 +107,12 @@ export const REMOVE_VIDEO_REQUEST = "REMOVE_VIDEO_REQUEST";
 export const REMOVE_VIDEO_SUCCESS = "REMOVE_VIDEO_SUCCESS";
 export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
 
+export const TOGGLE_REPLY_COMMENT_FORM = "TOGGLE_REPLY_COMMENT_FORM";
+
 import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
 
 export const initialState = {
+  currentCommentId: null,
   mainVideos: [],
   userVideos: [],
   hasMoreVideos: false,
@@ -116,22 +137,98 @@ export const initialState = {
   //  isAddingComment: false,
   addCommentErrorReason: "",
   commentAdded: false,
+  //reply to comment
+  commentToReply: null,
 };
 
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
-      case LIKE_COMMENT_REQUEST: {
+      case TOGGLE_REPLY_COMMENT_FORM: {
+        if (draft.commentToReply === action.data) {
+          draft.commentToReply = null;
+          break;
+        }
+        draft.commentToReply = action.data;
         break;
       }
 
-      // const postIndex = draft.mainPosts.findIndex(
-      //   v => v.id === action.data.postId
-      // );
-      // draft.mainPosts[postIndex].Likers.unshift({ id: action.data.draft.mainVideos.splice(index, 1);userId });
+      case REMOVE_COMMENT_REQUEST: {
+        draft.isLoading = true;
+        break;
+      }
+      case REMOVE_COMMENT_SUCCESS: {
+        const index = draft.currentVideoComments.findIndex(
+          (v) => v.id === action.data
+        );
+        draft.currentVideoComments.splice(index, 1);
+        draft.isLoading = false;
+        break;
+      }
+      case REMOVE_COMMENT_FAILURE: {
+        draft.isLoading = false;
+        break;
+      }
 
-      // draft.mainVideos.splice(index, 1);
+      case UNDISLIKE_COMMENT_REQUEST: {
+        break;
+      }
+      case UNDISLIKE_COMMENT_SUCCESS: {
+        const index = draft.currentVideoComments.findIndex(
+          (v) => v.id === action.data.commentId
+        );
+        const userIndex = draft.currentVideoComments[
+          index
+        ].CommentLikers.findIndex((v) => v.id === action.data.userInfo.id);
+        draft.currentVideoComments[index].CommentDislikers.splice(userIndex, 1);
+        break;
+      }
+
+      case UNDISLIKE_COMMENT_FAILURE: {
+        break;
+      }
+      case DISLIKE_COMMENT_REQUEST: {
+        break;
+      }
+
+      case DISLIKE_COMMENT_SUCCESS: {
+        const index = draft.currentVideoComments.findIndex(
+          (v) => v.id === action.data.commentId
+        );
+        draft.currentVideoComments[index].CommentDislikers.push(
+          action.data.userInfo
+        );
+        // action.data.commentId
+        // action.data.userId
+        break;
+      }
+      case DISLIKE_COMMENT_FAILURE: {
+        break;
+      }
+
+      case UNLIKE_COMMENT_REQUEST: {
+        break;
+      }
+      case UNLIKE_COMMENT_SUCCESS: {
+        const index = draft.currentVideoComments.findIndex(
+          (v) => v.id === action.data.commentId
+        );
+        const userIndex = draft.currentVideoComments[
+          index
+        ].CommentLikers.findIndex((v) => v.id === action.data.userInfo.id);
+        draft.currentVideoComments[index].CommentLikers.splice(userIndex, 1);
+        break;
+        // 여기서 인덱스는 comment index스기 때문에 안 먹는다.
+      }
+      case UNLIKE_COMMENT_FAILURE: {
+        break;
+      }
+
+      case LIKE_COMMENT_REQUEST: {
+        break;
+      }
+      // draft.repliesToComments[action.data.refComment].push(action.data);
 
       case LIKE_COMMENT_SUCCESS: {
         // 리턴 값은 유저 아이디
@@ -141,7 +238,7 @@ export default (state = initialState, action) => {
           (v) => v.id === action.data.commentId
         );
         draft.currentVideoComments[index].CommentLikers.push(
-          action.data.userId
+          action.data.userInfo
         );
         // action.data.commentId
         // action.data.userId
@@ -161,9 +258,6 @@ export default (state = initialState, action) => {
         break;
       }
       case ADD_COMMENT_SUCCESS: {
-        // const index = draft.mainVideos.findIndex(
-        //   (v) => v.id === action.data.postId
-        // );
         draft.currentVideoComments.push(action.data.comment);
         draft.isLoading = false;
         draft.commentAdded = true;
@@ -182,13 +276,6 @@ export default (state = initialState, action) => {
         break;
       }
       case REMOVE_VIDEO_SUCCESS: {
-        // console.log("action checking: ", action);
-        // const index = draft.mainVideos.findIndex(
-        //   (v) => v.id === action.data.id
-        // );
-        // console.log("index : ", index);
-        // draft.mainVideos.splice(index, 1, action.data);
-
         const index = draft.mainVideos.findIndex((v) => v.id === action.data);
         draft.mainVideos.splice(index, 1);
 

@@ -29,7 +29,7 @@ const Profile = () => {
     hasMoreFollower,
     hasMoreFollowing,
   } = useSelector((state) => state.user);
-  const { mainPosts } = useSelector((state) => state.post);
+  const { mainVideos } = useSelector((state) => state.video);
 
   // console.log('mainposts', mainPosts)
   const onUnfollow = useCallback(

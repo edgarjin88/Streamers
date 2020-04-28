@@ -41,7 +41,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       charset: "utf8",
       collate: "utf8_general_ci", // For multi language
-    }
+    },
+    { hierarchy: true }
   );
 
   User.associate = (db) => {
@@ -49,6 +50,13 @@ module.exports = (sequelize, DataTypes) => {
     db.User.hasMany(db.Video, { as: "Videos" });
     // db.Post > Posts
     db.User.hasMany(db.Comment);
+    db.User.hasMany(db.Comment, { as: "Recomment" });
+
+    //testing
+    db.User.belongsToMany(db.Comment, {
+      through: "RecommentTable",
+      as: "Replies",
+    });
     // db.User.belongsToMany(db.Post, { through: "Like", as: "Liked" });
     db.User.belongsToMany(db.Video, { through: "Like", as: "Liked" });
 
