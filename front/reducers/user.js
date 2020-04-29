@@ -133,6 +133,7 @@ export default (state = initialState, action) => {
       }
       case UPLOAD_PROFILE_SUCCESS: {
         draft.me.profilePhoto = action.data;
+        draft.userInfo.profilePhoto = action.data;
 
         break;
       }

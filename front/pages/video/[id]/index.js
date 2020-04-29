@@ -43,19 +43,3 @@ VideoPage.getInitialProps = async (context) => {
 };
 
 export default VideoPage;
-
-// User.getInitialProps = async (context) => {
-//   const id = parseInt(context.query.id, 10);
-//   context.store.dispatch({
-//     type: LOAD_USER_REQUEST,
-//     data: id,
-//   });
-//   context.store.dispatch({
-//     type: LOAD_USER_POSTS_REQUEST,
-//     data: id,
-//   });
-
-//   return { id };
-// };
-
-// export default User;

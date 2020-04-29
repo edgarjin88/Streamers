@@ -10,13 +10,10 @@ import {
 import { URL } from "../../config/config";
 import moment from "moment";
 
-import styled from "styled-components";
-
-import CommentForm from "../../containers/comment/CommentForm.js";
 import CommentEditBox from "../../containers/comment/CommentEditBox";
 import ResponseComment from "./ResponseComment";
 import ReplyCommentForm from "../../containers/comment/ReplyCommentForm";
-
+import Link from "next/link";
 moment.locale("en");
 
 const CommentList = () => {
@@ -27,26 +24,17 @@ const CommentList = () => {
         commentToReply: video.commentToReply,
         currentVideoComments: video.currentVideoComments,
       };
-    },
-    shallowEqual
+    }
   );
 
   const [showResponse, setShowResponse] = useState([]);
 
-  // this.setState((prevState) => ({
-  //   people: prevState.people.filter((person) => person !== e.target.value),
-  // }));
-
   const toggleShowResponse = (commentId) => (e) => {
-    console.log("togle fired, ID: ", commentId);
-
     const index = showResponse.findIndex((el) => el === commentId);
     if (index > -1) {
       const filteredList = showResponse.filter((el) => el !== commentId);
       setShowResponse(filteredList);
     } else {
-      console.log("commentId not found. Will add this index :", index);
-
       setShowResponse((prev) => {
         return [...prev, commentId];
       });
@@ -60,6 +48,7 @@ const CommentList = () => {
         <Button
           variant="contained"
           name="showResponse"
+          style={{ margin: "1rem" }}
           onClick={toggleShowResponse(id)}
         >
           {show ? "See the response" : "Close"}
@@ -95,17 +84,24 @@ const CommentList = () => {
       const showReplyComments = showResponse.includes(id);
       return (
         <div className="comment my-comment">
-          <img
-            src={
-              profilePhoto
-                ? `${URL}/${profilePhoto}`
-                : "../static/images/profiles/how-to-anything.png"
-            }
-            alt="How To Anything"
-          />
-          <a href="#" title="How To Anything">
-            <span>{comment.User.nickname}</span>
-          </a>
+          <Link href={`/profile/${comment.User.id}`}>
+            <img
+              // style={{ cursor: "pointer" }}
+              src={
+                profilePhoto
+                  ? `${URL}/${profilePhoto}`
+                  : "../static/images/profiles/how-to-anything.png"
+              }
+              alt="How To Anything"
+            />
+          </Link>
+
+          <Link href={`/profile/${comment.User.id}`}>
+            <a title="How To Anything">
+              <span>{comment.User.nickname}</span>
+            </a>
+          </Link>
+
           <p>{comment.content}</p>
           <div
             style={{ display: "flex", justifyContent: "space-between" }}
@@ -123,13 +119,11 @@ const CommentList = () => {
               <ReplyCommentForm commentId={id} />
             </div>
           )}
-
           {/* reply comments */}
           {/* reply comments */}
           {showReplyComments && (
             <ResponseComment commentId={id} Recomment={Recomment} />
           )}
-
           {comment && comment.Recomment && comment.Recomment.length > 0 && (
             <ShowResponseButton id={id} />
           )}

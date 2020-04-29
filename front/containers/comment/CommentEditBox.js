@@ -118,12 +118,13 @@ const CommentEditBox = ({
     }
   };
 
-  const onClickDelete = useCallback(() => {
+  const onClickDelete = () => {
     dispatch({
       type: REMOVE_COMMENT_REQUEST,
       data: commentId,
+      refCommentId,
     });
-  }, [commentId]);
+  };
 
   const showReplyCommentForm = () => {
     dispatch({
@@ -139,10 +140,12 @@ const CommentEditBox = ({
           <BackspaceIcon /> &nbsp; Cancel
         </StyledIcon>
       ) : (
-        <StyledIcon onClick={showReplyCommentForm}>
-          <ReplyAllIcon />
-          &nbsp; Reply
-        </StyledIcon>
+        !refCommentId && (
+          <StyledIcon onClick={showReplyCommentForm}>
+            <ReplyAllIcon />
+            &nbsp; Reply
+          </StyledIcon>
+        )
       )}
       <StyledIconBox liked={liked} onClick={onToggleLike}>
         <ThumbUpIcon /> &nbsp; {CommentLikers && CommentLikers.length}

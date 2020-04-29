@@ -234,7 +234,6 @@ export default function SimpleModal() {
           type="success"
         />
       )}
-      />
     </div>
   );
 }

@@ -198,18 +198,17 @@ router.get("/:id/comments", async (req, res, next) => {
       where: {
         VideoId: req.params.id,
       },
-      order: [["createdAt", "ASC"]],
+      order: [["createdAt", "DESC"]],
       include: [
         {
           model: db.Comment,
           as: "Recomment",
-          attributes: ["id"],
-
+          attributes: ["id", "content", "createdAt"],
+          order: [["createdAt", "DESC"]],
           include: [
             {
               model: db.User,
-              through: "RecommentTable",
-              as: "Repliers",
+              as: "Recommenter",
               attributes: ["id", "nickname", "profilePhoto"],
             },
             {
@@ -256,6 +255,7 @@ router.get("/:id/comments", async (req, res, next) => {
 
 router.delete("/:id/comment", isLoggedIn, async (req, res, next) => {
   try {
+    // if(req.body.refComment)
     const comment = await db.Comment.findOne({ where: { id: req.params.id } });
     if (!comment) {
       return res.status(404).send("Comment does not exist.");
@@ -272,49 +272,6 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
   // POST /api/post/1000000/comment  /// !== comments
   console.log("comment body: ", req.body);
   try {
-    ///for reply to comment
-    ///for reply to comment
-    if (req.body.commentId) {
-      const refComment = await db.Comment.findOne({
-        where: { id: req.body.commentId },
-      });
-      if (!refComment) {
-        return res.status(404).send("Comment does not exist.");
-      }
-
-      const comment = await db.Comment.create({
-        UserId: req.user.id,
-        content: req.body.content,
-        refComment: req.body.commentId,
-      });
-
-      const replyToComment = await db.Comment.findOne({
-        where: {
-          id: comment.id,
-        },
-        include: [
-          {
-            model: db.User,
-            attributes: ["id", "nickname", "profilePhoto"],
-          },
-          {
-            model: db.User,
-            through: "CommentLike",
-            as: "CommentLikers",
-            attributes: ["id", "nickname", "profilePhoto"],
-          },
-          {
-            model: db.User,
-            through: "CommentDislike",
-            as: "CommentDislikers",
-            attributes: ["id", "nickname", "profilePhoto"],
-          },
-        ],
-      });
-
-      return res.json(replyToComment);
-    }
-
     //for comment to a video
     const video = await db.Video.findOne({ where: { id: req.params.id } });
     if (!video) {
@@ -332,6 +289,11 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
         id: newComment.id,
       },
       include: [
+        {
+          model: db.Comment,
+          as: "Recomment",
+          attributes: ["id", "content", "createdAt"],
+        },
         {
           model: db.User,
           attributes: ["id", "nickname", "profilePhoto"],
@@ -467,6 +429,7 @@ router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
     const recomment = await db.Comment.create({
       content: req.body.content,
       UserId: req.user.id,
+      RecommenterId: req.user.id,
     });
 
     const fullComment = await db.Comment.findOne({
@@ -476,6 +439,7 @@ router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: db.User,
+          as: "Recommenter",
           attributes: ["id", "nickname", "profilePhoto"],
         },
         {

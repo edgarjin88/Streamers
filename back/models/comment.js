@@ -22,14 +22,13 @@ module.exports = (sequelize, DataTypes) => {
 
   Comment.associate = (db) => {
     db.Comment.belongsTo(db.User);
-    db.Comment.belongsToMany(db.User, {
-      through: "RecommentTable",
-      as: "Repliers",
+    db.Comment.belongsTo(db.User, {
+      // through: "RecommentTable",
+      as: "Recommenter",
     });
 
-    // db.Comment.belongsToMany(db.User, {through:"Recommenter", as : "RecommentUser"});
     db.Comment.belongsTo(db.Video);
-    // db.Comment.belongsTo(db.User, { as: "Recommenter" });
+
     db.Comment.hasMany(db.Comment, { as: "Recomment" });
 
     db.Comment.belongsToMany(db.User, {

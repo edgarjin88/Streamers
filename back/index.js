@@ -13,13 +13,10 @@ const helmet = require("helmet");
 const passportConfig = require("./passport");
 const db = require("./models");
 const userAPIRouter = require("./routes/user");
-// const postAPIRouter = require("./routes/post");
-// const postsAPIRouter = require("./routes/posts");
 const videoAPIRouter = require("./routes/video");
 const videosAPIRouter = require("./routes/videos");
 const hashtagAPIRouter = require("./routes/hashtag");
 
-//multer is in post rout.
 const prod = process.env.NODE_ENV === "production";
 const fs = require("fs");
 var certsPath = path.join(__dirname, "path", "to");
@@ -41,6 +38,7 @@ const options =
 
 dotenv.config();
 //////////////////////For socket IO
+
 const app = express();
 
 const server =

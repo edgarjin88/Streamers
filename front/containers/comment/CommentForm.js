@@ -15,9 +15,10 @@ const CommentForm = () => {
     };
   }, shallowEqual);
 
-  const { myProfilePhoto } = useSelector(({ user }) => {
+  const { myProfilePhoto, me } = useSelector(({ user }) => {
     return {
       myProfilePhoto: user.me.profilePhoto,
+      me: user.me,
     };
   });
 

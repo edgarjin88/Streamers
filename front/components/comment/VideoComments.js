@@ -50,6 +50,10 @@ const VideoComments = () => {
     };
   }, shallowEqual);
 
+  const { me } = useSelector(({ user }) => {
+    return user;
+  }, shallowEqual);
+
   const dispatch = useDispatch();
 
   const handleResponse = () => {
@@ -91,7 +95,7 @@ const VideoComments = () => {
       {renderCommentHeader()}
 
       <div id="comment-list-container">
-        <CommentForm />
+        {me && <CommentForm />}
         {showComment && (
           <CommentList
             showResponse={showResponse}

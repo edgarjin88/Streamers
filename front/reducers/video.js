@@ -145,6 +145,22 @@ export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case ADD_REPLY_TO_COMMENT_SUCCESS: {
+        // const index = draft.commentToReply
+        const index = draft.currentVideoComments.findIndex((eachComment) => {
+          return eachComment.id === draft.commentToReply;
+        });
+        if (index !== -1) {
+          draft.currentVideoComments[index].Recomment.unshift(
+            action.data.comment
+          );
+          draft.isLoading = false;
+          draft.commentAdded = true;
+          break;
+        }
+        break;
+      }
+
       case TOGGLE_REPLY_COMMENT_FORM: {
         if (draft.commentToReply === action.data) {
           draft.commentToReply = null;
@@ -159,11 +175,41 @@ export default (state = initialState, action) => {
         break;
       }
       case REMOVE_COMMENT_SUCCESS: {
+        if (action.data.refCommentId) {
+          const refIndex = draft.currentVideoComments.findIndex(
+            (v) => v.id === action.data.refCommentId
+          );
+          console.log("action.data.refCommentId :", action.data.refCommentId);
+          console.log("commentId :", action.data.id);
+          console.log("refIndex :", refIndex);
+          console.log(
+            "draft.currentVideoComments.refIndex.Recomment1 :",
+            draft.currentVideoComments[refIndex].Recomment[1]
+          );
+          const recommentIndex = draft.currentVideoComments[
+            refIndex
+          ].Recomment.findIndex((v) => {
+            console.log("inside v:", v);
+            return v.id === action.data.id;
+          });
+
+          console.log("recommentIndex :", recommentIndex);
+
+          draft.currentVideoComments[refIndex].Recomment.splice(
+            recommentIndex,
+            1
+          );
+
+          break;
+        }
+
+        console.log("remove action:", action);
         const index = draft.currentVideoComments.findIndex(
-          (v) => v.id === action.data
+          (v) => v.id === action.data.id
         );
         draft.currentVideoComments.splice(index, 1);
         draft.isLoading = false;
+
         break;
       }
       case REMOVE_COMMENT_FAILURE: {
@@ -175,12 +221,29 @@ export default (state = initialState, action) => {
         break;
       }
       case UNDISLIKE_COMMENT_SUCCESS: {
+        if (action.data.refCommentId) {
+          const refIndex = draft.currentVideoComments.findIndex(
+            (v) => v.id === action.data.refCommentId
+          );
+          const recommentIndex = draft.currentVideoComments[
+            refIndex
+          ].Recomment.findIndex((v) => v.id === action.data.commentId);
+
+          const userIndex = draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentDislikers.findIndex((v) => v.id === action.data.userInfo.id);
+
+          draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentDislikers.splice(userIndex, 1);
+          break;
+        }
         const index = draft.currentVideoComments.findIndex(
           (v) => v.id === action.data.commentId
         );
         const userIndex = draft.currentVideoComments[
           index
-        ].CommentLikers.findIndex((v) => v.id === action.data.userInfo.id);
+        ].CommentDislikers.findIndex((v) => v.id === action.data.userInfo.id);
         draft.currentVideoComments[index].CommentDislikers.splice(userIndex, 1);
         break;
       }
@@ -193,14 +256,26 @@ export default (state = initialState, action) => {
       }
 
       case DISLIKE_COMMENT_SUCCESS: {
+        if (action.data.refCommentId) {
+          const refIndex = draft.currentVideoComments.findIndex(
+            (v) => v.id === action.data.refCommentId
+          );
+          const recommentIndex = draft.currentVideoComments[
+            refIndex
+          ].Recomment.findIndex((v) => v.id === action.data.commentId);
+
+          draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentDislikers.push(action.data.userInfo);
+          break;
+        }
+
         const index = draft.currentVideoComments.findIndex(
           (v) => v.id === action.data.commentId
         );
         draft.currentVideoComments[index].CommentDislikers.push(
           action.data.userInfo
         );
-        // action.data.commentId
-        // action.data.userId
         break;
       }
       case DISLIKE_COMMENT_FAILURE: {
@@ -211,12 +286,32 @@ export default (state = initialState, action) => {
         break;
       }
       case UNLIKE_COMMENT_SUCCESS: {
+        if (action.data.refCommentId) {
+          const refIndex = draft.currentVideoComments.findIndex(
+            (v) => v.id === action.data.refCommentId
+          );
+          const recommentIndex = draft.currentVideoComments[
+            refIndex
+          ].Recomment.findIndex((v) => v.id === action.data.commentId);
+
+          const userIndex = draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentLikers.findIndex((v) => v.id === action.data.userInfo.id);
+
+          draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentLikers.splice(userIndex, 1);
+          break;
+        }
+
         const index = draft.currentVideoComments.findIndex(
           (v) => v.id === action.data.commentId
         );
+
         const userIndex = draft.currentVideoComments[
           index
         ].CommentLikers.findIndex((v) => v.id === action.data.userInfo.id);
+
         draft.currentVideoComments[index].CommentLikers.splice(userIndex, 1);
         break;
         // 여기서 인덱스는 comment index스기 때문에 안 먹는다.
@@ -228,20 +323,28 @@ export default (state = initialState, action) => {
       case LIKE_COMMENT_REQUEST: {
         break;
       }
-      // draft.repliesToComments[action.data.refComment].push(action.data);
 
       case LIKE_COMMENT_SUCCESS: {
-        // 리턴 값은 유저 아이디
-        // const index = draft.currentVideoComments.findIndex(v => v.id ===action.data.commentId)
-        //   draft.currentVideoComments[index].CommentLikers.splice(index, 1);
+        if (action.data.refCommentId) {
+          const refIndex = draft.currentVideoComments.findIndex(
+            (v) => v.id === action.data.refCommentId
+          );
+          const recommentIndex = draft.currentVideoComments[
+            refIndex
+          ].Recomment.findIndex((v) => v.id === action.data.commentId);
+
+          draft.currentVideoComments[refIndex].Recomment[
+            recommentIndex
+          ].CommentLikers.push(action.data.userInfo);
+          break;
+        }
+
         const index = draft.currentVideoComments.findIndex(
           (v) => v.id === action.data.commentId
         );
         draft.currentVideoComments[index].CommentLikers.push(
           action.data.userInfo
         );
-        // action.data.commentId
-        // action.data.userId
         break;
       }
       case LIKE_COMMENT_FAILURE: {
@@ -258,7 +361,7 @@ export default (state = initialState, action) => {
         break;
       }
       case ADD_COMMENT_SUCCESS: {
-        draft.currentVideoComments.push(action.data.comment);
+        draft.currentVideoComments.unshift(action.data.comment);
         draft.isLoading = false;
         draft.commentAdded = true;
         break;
@@ -318,11 +421,9 @@ export default (state = initialState, action) => {
         break;
       }
       case EDIT_VIDEO_SUCCESS: {
-        console.log("action checking: ", action);
         const index = draft.mainVideos.findIndex(
           (v) => v.id === action.data.id
         );
-        console.log("index : ", index);
         draft.mainVideos.splice(index, 1, action.data);
         draft.isLoading = false;
 

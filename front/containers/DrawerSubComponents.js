@@ -93,7 +93,7 @@ export const MemoUserItemList = memo(function MemoUserItemList() {
   const handleClick = useCallback(
     (target) => (e) => {
       if (target === "My Profile") {
-        Router.push("/profile");
+        Router.push(`/profile/${me.id}`);
       }
       if (target === "Create a new channel") {
         dispatch({

@@ -403,6 +403,8 @@ function* undisLikeVideo(action) {
       type: UNDISLIKE_VIDEO_SUCCESS,
       data: {
         videoId: action.data,
+        refCommentId: action.refCommentId, //not result
+
         userId: result.data.userId,
       },
     });
@@ -589,6 +591,7 @@ function* likeComment(action) {
       type: LIKE_COMMENT_SUCCESS,
       data: {
         commentId: action.data,
+        refCommentId: action.refCommentId, //not result
         userInfo: result.data,
       },
     });
@@ -625,6 +628,7 @@ function* unlikeComment(action) {
       type: UNLIKE_COMMENT_SUCCESS,
       data: {
         commentId: action.data,
+        refCommentId: action.refCommentId,
         userInfo: result.data,
       },
     });
@@ -661,6 +665,8 @@ function* dislikeComment(action) {
       type: DISLIKE_COMMENT_SUCCESS,
       data: {
         commentId: action.data,
+        refCommentId: action.refCommentId, //not result
+
         userInfo: result.data,
       },
     });
@@ -697,6 +703,7 @@ function* undislikeComment(action) {
       type: UNDISLIKE_COMMENT_SUCCESS,
       data: {
         commentId: action.data,
+        refCommentId: action.refCommentId,
         userInfo: result.data,
       },
     });
@@ -726,7 +733,10 @@ function* removeComment(action) {
     const result = yield call(removeCommentAPI, action.data);
     yield put({
       type: REMOVE_COMMENT_SUCCESS,
-      data: result.data,
+      data: {
+        id: result.data,
+        refCommentId: action.refCommentId,
+      },
     });
   } catch (e) {
     console.error(e);

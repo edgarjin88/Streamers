@@ -78,16 +78,6 @@ export default function RecipeReviewCard() {
     setExpanded(!expanded);
   };
 
-  ///logic
-  // const {
-  //   followingList,
-  //   followerList,
-  //   hasMoreFollower,
-  //   hasMoreFollowing,
-  //   id,
-  //   // profilePhoto,
-  // } = useSelector((state) => state.user.userInfo);
-
   const {
     startedEditingNickname,
     startedChangingPassword,

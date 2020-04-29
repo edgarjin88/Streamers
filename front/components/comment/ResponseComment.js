@@ -36,9 +36,9 @@ const ResponseComment = ({ commentId, Recomment }) => {
                 src={
                   eachRecomment &&
                   eachRecomment &&
-                  eachRecomment.User &&
-                  eachRecomment.User.profilePhoto
-                    ? `${URL}/${eachRecomment.User.profilePhoto}`
+                  eachRecomment.Recommenter &&
+                  eachRecomment.Recommenter.profilePhoto
+                    ? `${URL}/${eachRecomment.Recommenter.profilePhoto}`
                     : "../../static/images/profiles/how-to-anything.png"
                 }
                 alt="Profile Photo"
@@ -46,8 +46,8 @@ const ResponseComment = ({ commentId, Recomment }) => {
               <a href="#" title="Profile Photo">
                 <span>
                   {eachRecomment &&
-                    eachRecomment.User &&
-                    eachRecomment.User.nickname}
+                    eachRecomment.Recommenter &&
+                    eachRecomment.Recommenter.nickname}
                 </span>
               </a>
               <p>{eachRecomment && eachRecomment.content}</p>
@@ -68,7 +68,6 @@ const ResponseComment = ({ commentId, Recomment }) => {
                   refCommentId={commentId}
                 />
               </div>
-              Profile: {JSON.stringify(eachRecomment.User)}
             </div>
           );
         })}
@@ -77,27 +76,3 @@ const ResponseComment = ({ commentId, Recomment }) => {
 };
 
 export default ResponseComment;
-
-// <div className="response comment">
-//   <img
-//     src="../static/images/profiles/douglas.png"
-//     alt="Douglas Johannasen"
-//   />
-//   <a href="#" title="Douglas Johannasen">
-//     <span>Douglas Johannasen</span>
-//   </a>
-//   <p>Yeah</p>
-//   <div className="comment-statistics">
-//     <p>6 minutes ago</p>
-//     <p className="comment-status-separator">&middot;</p>
-//     <p>1</p>
-//     <img
-//       src="../static/images/icons/thumbs-up-default.svg"
-//       alt="Thumbs Up"
-//     />
-//     <img
-//       src="../static/images/icons/thumbs-down-default.svg"
-//       alt="Thumbs Down"
-//     />
-//   </div>
-// </div>
