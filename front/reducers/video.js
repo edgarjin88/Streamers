@@ -108,6 +108,7 @@ export const REMOVE_VIDEO_SUCCESS = "REMOVE_VIDEO_SUCCESS";
 export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
 
 export const TOGGLE_REPLY_COMMENT_FORM = "TOGGLE_REPLY_COMMENT_FORM";
+export const UPDATE_CHAT_MESSAGE_LIST = "UPDATE_CHAT_MESSAGE_LIST";
 
 import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
 
@@ -139,12 +140,18 @@ export const initialState = {
   commentAdded: false,
   //reply to comment
   commentToReply: null,
+
+  //Chat message in video
+  messageList: [],
 };
 
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case UPDATE_CHAT_MESSAGE_LIST: {
+        draft.messageList.unshift(action.data);
+      }
       case ADD_REPLY_TO_COMMENT_SUCCESS: {
         // const index = draft.commentToReply
         const index = draft.currentVideoComments.findIndex((eachComment) => {

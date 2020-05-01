@@ -50,7 +50,11 @@ const PORT = 3003;
 
 const io = require("socket.io")(server);
 const socketFunctions = require("./socket/socket");
-socketFunctions(io);
+try {
+  socketFunctions(io);
+} catch (e) {
+  console.log("socket error:", e);
+}
 
 ///////////////////////////////////end of socket
 

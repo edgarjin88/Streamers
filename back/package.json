@@ -13,6 +13,7 @@
     "@sendgrid/mail": "^6.5.5",
     "aws-sdk": "^2.478.0",
     "axios": "^0.18.1",
+    "bad-words": "^3.0.3",
     "bcryptjs": "^2.4.3",
     "connect": "^3.7.0",
     "cookie-parser": "^1.4.4",

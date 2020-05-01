@@ -27,6 +27,8 @@ const Front = ({ Component, pageProps, store }) => {
   );
 };
 
+export let StoreExported = {};
+
 Front.getInitialProps = async (context) => {
   //executed when paged loaded first, and move to other page via link or next/router.
   // store, Apptree, query pathname objects are included in context by next
@@ -72,7 +74,9 @@ const configureStore = (initialState = {}, options) => {
   //inhancer includes everything at this point.
   store.sagaTask = sagaMiddleware.run(rootSaga);
   // console.log("sagaTask: ", store.sagaTask);
+  StoreExported = store;
   return store;
+  // return StoreToExport
 };
 
 export default withRedux(configureStore)(withReduxSaga(Front));
