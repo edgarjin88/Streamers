@@ -2,8 +2,8 @@ const users = [];
 
 const addUser = ({ id, username, room, userId, profilePhoto }) => {
   // Clean the data
-  username = username.trim().toLowerCase();
-  room = room.trim().toLowerCase();
+  username = username.trim();
+  room = room.trim();
 
   // Validate the data
   if (!username || !room) {
@@ -21,7 +21,7 @@ const addUser = ({ id, username, room, userId, profilePhoto }) => {
   // Validate username
   if (existingUser) {
     return {
-      error: "Username is in use!",
+      error: "Same use already in the room!",
     };
   }
 
@@ -55,4 +55,5 @@ module.exports = {
   removeUser,
   getUser,
   getUsersInRoom,
+  userList: users,
 };

@@ -4,6 +4,7 @@ import moment from "moment";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { StyledChatMessageBox } from "../../styles/MessageStyle";
 import { URL } from "../../config/config";
+
 moment.locale("en");
 
 const ChatMessageBox = () => {
@@ -45,7 +46,7 @@ const ChatMessageBox = () => {
                     src={
                       profilePhoto
                         ? `${URL}/${profilePhoto}`
-                        : `../static/images/profiles/how-to-anything.png`
+                        : `../static/images/profiles/defaultUser.png`
                     }
                     alt="Profile Photo"
                   />

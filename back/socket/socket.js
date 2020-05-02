@@ -1,5 +1,11 @@
 const { generateMessage, generateLocationMessage } = require("./messages");
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+  userList,
+} = require("./users");
 const Filter = require("bad-words");
 
 module.exports = (io) => {
@@ -17,13 +23,26 @@ module.exports = (io) => {
 
       socket.join(user.room);
 
-      socket.emit("message", generateMessage("Admin", "Welcome!"));
+      socket.emit(
+        "message",
+        generateMessage(
+          "Streamers",
+          "Admin",
+          undefined,
+          `Welcome ${user.username} !`
+        )
+      );
 
       socket.broadcast
         .to(user.room)
         .emit(
           "message",
-          generateMessage("Admin", `${user.username} has joined!`)
+          generateMessage(
+            "Streamers",
+            "Admin",
+            undefined,
+            `${user.username} has joined!`
+          )
         );
       io.to(user.room).emit("roomData", {
         room: user.room,
@@ -38,12 +57,9 @@ module.exports = (io) => {
 
       console.log("what is socket.id :", socket.id);
       const user = getUser(socket.id);
-      // const filter = new Filter();
 
-      // if (filter.isProfane(message)) {
-      //   return callback("Profanity is not allowed!");
-      // }
-      console.log("user list: ", user);
+      console.log("user: ", user);
+      console.log("userList: ", userList);
       if (user && user.room !== undefined) {
         io.to(user.room).emit(
           "message",

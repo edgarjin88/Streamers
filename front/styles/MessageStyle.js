@@ -1,6 +1,8 @@
 import styled from "styled-components";
 
 export const StyledChatForm = styled.div`
+  z-index: 10;
+  background-color: white;
   & > *,
   & > * > * {
     z-index: 10;
@@ -17,6 +19,7 @@ export const StyledChatForm = styled.div`
 
   #chat-form > img {
     cursor: pointer;
+    /* background-color: white; */
   }
   #chat-form input {
     z-index: 10;
@@ -37,23 +40,26 @@ export const StyledChatMessageBox = styled.div`
   width: 100%;
   height: 100%;
   color: white;
+  padding-bottom: 2rem;
   & .chatMessageList {
-    /* grid-area: chat-message-list; */
     display: flex;
     flex-direction: column-reverse;
     height: 95%;
-    padding: 0 20px;
+    padding: 0 1rem;
     overflow-y: scroll;
   }
 
+  /*message-row는 안에 있는데, 컨텐츠는 밖으로 나간다. 이유는?  */
   & .message-row {
     display: grid;
     grid-template-columns: 70%;
+    grid-template-rows: 100%;
     margin-bottom: 2rem;
   }
 
   & .message-content {
     display: grid;
+    grid-template-columns: auto-fit;
   }
 
   & .you-message {
@@ -65,12 +71,15 @@ export const StyledChatMessageBox = styled.div`
   }
 
   & .other-message {
-    justify-items: start;
+    /* justify-items: start; */
+    justify-content: start;
   }
 
   & .other-message .message-content {
     grid-template-columns: 4.8rem 1fr;
     /* grid-column-gap: 1.5rem; */
+    /*   */
+    justify-items: start;
   }
 
   & .message-row img {
@@ -86,14 +95,17 @@ export const StyledChatMessageBox = styled.div`
   }
 
   & .message-text {
+    display: inline-block;
+    word-wrap: break-word;
     padding: 0.5rem 0.5rem;
     font-size: 1.2rem;
     margin-bottom: 5px;
+    /* max-width: 70%; */
+    /* max-height: 30rem; */
   }
 
   & .you-message .message-text {
     background: rgba(207, 154, 54, 0.801);
-
     color: rgb(255, 255, 255);
     border: none;
     border-radius: 1.4rem 1.4rem 0 1.4rem;
@@ -101,9 +113,11 @@ export const StyledChatMessageBox = styled.div`
 
   & .other-message .message-text {
     background: rgba(255, 249, 249, 0.376);
-    color: white;
+    color: black;
     border: none;
     border-radius: 1.4rem 1.4rem 1.4rem 0;
+    /* 
+            */
   }
   & ::-webkit-scrollbar {
     display: none;
