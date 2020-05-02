@@ -110,6 +110,10 @@ export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
 export const TOGGLE_REPLY_COMMENT_FORM = "TOGGLE_REPLY_COMMENT_FORM";
 export const UPDATE_CHAT_MESSAGE_LIST = "UPDATE_CHAT_MESSAGE_LIST";
 
+export const SEND_CHAT_MESSAGE = "SEND_CHAT_MESSAGE";
+
+export const NULLIFY_SEND_CHAT_MESSAGE = "NULLIFY_SEND_CHAT_MESSAGE";
+
 import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
 
 export const initialState = {
@@ -143,12 +147,22 @@ export const initialState = {
 
   //Chat message in video
   messageList: [],
+
+  //chat message end
+  sendChatMessage: true,
 };
 
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case SEND_CHAT_MESSAGE: {
+        draft.sendChatMessage = true;
+      }
+      case NULLIFY_SEND_CHAT_MESSAGE: {
+        draft.sendChatMessage = false;
+      }
+
       case UPDATE_CHAT_MESSAGE_LIST: {
         draft.messageList.unshift(action.data);
       }

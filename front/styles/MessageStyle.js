@@ -29,7 +29,7 @@ export const StyledChatForm = styled.div`
   }
 `;
 
-export const StyledMessageBox = styled.div`
+export const StyledChatMessageBox = styled.div`
   display: block;
   left: 0;
   top: 0;
@@ -81,7 +81,7 @@ export const StyledMessageBox = styled.div`
   }
 
   & .message-time {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: white;
   }
 
@@ -92,16 +92,17 @@ export const StyledMessageBox = styled.div`
   }
 
   & .you-message .message-text {
-    background: #0048aa;
-    color: #eee;
-    border: 1px solid #0048aa;
+    background: rgba(207, 154, 54, 0.801);
+
+    color: rgb(255, 255, 255);
+    border: none;
     border-radius: 1.4rem 1.4rem 0 1.4rem;
   }
 
   & .other-message .message-text {
-    background: #eee;
-    color: #111;
-    border: 1px solid #ddd;
+    background: rgba(255, 249, 249, 0.376);
+    color: white;
+    border: none;
     border-radius: 1.4rem 1.4rem 1.4rem 0;
   }
   & ::-webkit-scrollbar {
