@@ -33,6 +33,7 @@ const MainVideo = () => {
   }, shallowEqual);
 
   useEffect(() => {
+    console.log("video component loaded");
     if (me) {
       socket.emit(
         "join",
@@ -51,22 +52,35 @@ const MainVideo = () => {
         }
       );
     }
-    //cleanUp may no required here.
-    // return () => {
-    //   socket.close();
-    // };
+    // cleanUp may no required here.
+    return () => {
+      console.log("leave room fired");
+      socket.emit("leaveRoom", {
+        username: nickname,
+        profilePhoto: me.profilePhoto,
+        userId: me.id,
+        room: "a" + queryId,
+      });
+    };
   }, [me]);
 
   return (
-    <div id="main-video" style={{ position: "relative" }}>
-      <img
-        className={"main-content"}
-        src={src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"}
-        alt="How to film your course"
-      />
-      <ChatMessageBox />
-      {me && <ChatMessageForm />}
-    </div>
+    <>
+      {/* <button style={{ zIndex: 1000000000000000 }} onClick={closeSocket}>
+        close socket
+      </button> */}
+      <div id="main-video" style={{ position: "relative" }}>
+        <img
+          className={"main-content"}
+          src={
+            src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"
+          }
+          alt="How to film your course"
+        />
+        <ChatMessageBox />
+        {me && <ChatMessageForm />}
+      </div>
+    </>
   );
 };
 
