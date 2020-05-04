@@ -108,6 +108,7 @@ export const REMOVE_VIDEO_SUCCESS = "REMOVE_VIDEO_SUCCESS";
 export const REMOVE_VIDEO_FAILURE = "REMOVE_VIDEO_FAILURE";
 
 export const TOGGLE_REPLY_COMMENT_FORM = "TOGGLE_REPLY_COMMENT_FORM";
+export const EMPTY_CHAT_MESSAGE_LIST = "EMPTY_CHAT_MESSAGE_LIST";
 export const UPDATE_CHAT_MESSAGE_LIST = "UPDATE_CHAT_MESSAGE_LIST";
 
 export const SEND_CHAT_MESSAGE = "SEND_CHAT_MESSAGE";
@@ -158,13 +159,22 @@ export default (state = initialState, action) => {
     switch (action.type) {
       case SEND_CHAT_MESSAGE: {
         draft.sendChatMessage = true;
+        break;
       }
       case NULLIFY_SEND_CHAT_MESSAGE: {
         draft.sendChatMessage = false;
+        break;
+      }
+
+      case EMPTY_CHAT_MESSAGE_LIST: {
+        draft.messageList = [];
+
+        break;
       }
 
       case UPDATE_CHAT_MESSAGE_LIST: {
         draft.messageList.unshift(action.data);
+        break;
       }
       case ADD_REPLY_TO_COMMENT_SUCCESS: {
         // const index = draft.commentToReply

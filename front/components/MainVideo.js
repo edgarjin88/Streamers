@@ -8,16 +8,20 @@ import { URL } from "../config/config";
 import { useRouter } from "next/router";
 import { socket } from "./socket/socket";
 import ChatMessageForm from "./chat/ChatMessageForm";
+import { EMPTY_CHAT_MESSAGE_LIST } from "../reducers/video";
 
 moment.locale("en");
 
 const MainVideo = () => {
+  const dispatch = useDispatch();
+
   const Router = useRouter();
   const queryId = Router.query.id;
 
   const { src } = useSelector(({ video }) => {
     return {
-      currentVideoId: video.currentVideo && video.currentVideo.id,
+      // currentVideoId: video.currentVideo && video.currentVideo.id,
+
       src:
         video.currentVideo &&
         video.currentVideo.Images &&
@@ -25,6 +29,7 @@ const MainVideo = () => {
         video.currentVideo.Images[0].src,
     };
   }, shallowEqual);
+
   const { nickname, me } = useSelector(({ user }) => {
     return {
       nickname: user && user.me && user.me.nickname,
@@ -61,14 +66,13 @@ const MainVideo = () => {
         userId: me.id,
         room: "a" + queryId,
       });
+
+      dispatch({ type: EMPTY_CHAT_MESSAGE_LIST });
     };
-  }, [me]);
+  }, [me, src]);
 
   return (
     <>
-      {/* <button style={{ zIndex: 1000000000000000 }} onClick={closeSocket}>
-        close socket
-      </button> */}
       <div id="main-video" style={{ position: "relative" }}>
         <img
           className={"main-content"}
@@ -77,7 +81,9 @@ const MainVideo = () => {
           }
           alt="How to film your course"
         />
+
         <ChatMessageBox />
+
         {me && <ChatMessageForm />}
       </div>
     </>
