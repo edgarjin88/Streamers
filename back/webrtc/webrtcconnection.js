@@ -1,11 +1,11 @@
-'use strict';
+// 'use strict';
 
-const DefaultRTCPeerConnection = require('wrtc').RTCPeerConnection;
+const DefaultRTCPeerConnection = require("wrtc").RTCPeerConnection;
 
-const Connection = require('./connection');
+const Connection = require("./connection");
 
 const TIME_TO_CONNECTED = 10000;
-const TIME_TO_HOST_CANDIDATES = 3000;  // NOTE(mroberts): Too long.
+const TIME_TO_HOST_CANDIDATES = 3000; // NOTE(mroberts): Too long.
 const TIME_TO_RECONNECTED = 10000;
 
 class WebRtcConnection extends Connection {
@@ -20,25 +20,27 @@ class WebRtcConnection extends Connection {
       timeToConnected: TIME_TO_CONNECTED,
       timeToHostCandidates: TIME_TO_HOST_CANDIDATES,
       timeToReconnected: TIME_TO_RECONNECTED,
-      ...options
+      ...options,
     };
 
     const {
       RTCPeerConnection,
       beforeOffer,
       timeToConnected,
-      timeToReconnected
+      timeToReconnected,
     } = options;
 
     const peerConnection = new RTCPeerConnection({
-      sdpSemantics: 'unified-plan'
+      sdpSemantics: "unified-plan",
     });
 
     beforeOffer(peerConnection);
 
     let connectionTimer = options.setTimeout(() => {
-      if (peerConnection.iceConnectionState !== 'connected'
-        && peerConnection.iceConnectionState !== 'completed') {
+      if (
+        peerConnection.iceConnectionState !== "connected" &&
+        peerConnection.iceConnectionState !== "completed"
+      ) {
         this.close();
       }
     }, timeToConnected);
@@ -46,16 +48,20 @@ class WebRtcConnection extends Connection {
     let reconnectionTimer = null;
 
     const onIceConnectionStateChange = () => {
-      if (peerConnection.iceConnectionState === 'connected'
-        || peerConnection.iceConnectionState === 'completed') {
+      if (
+        peerConnection.iceConnectionState === "connected" ||
+        peerConnection.iceConnectionState === "completed"
+      ) {
         if (connectionTimer) {
           options.clearTimeout(connectionTimer);
           connectionTimer = null;
         }
         options.clearTimeout(reconnectionTimer);
         reconnectionTimer = null;
-      } else if (peerConnection.iceConnectionState === 'disconnected'
-        || peerConnection.iceConnectionState === 'failed') {
+      } else if (
+        peerConnection.iceConnectionState === "disconnected" ||
+        peerConnection.iceConnectionState === "failed"
+      ) {
         if (!connectionTimer && !reconnectionTimer) {
           const self = this;
           reconnectionTimer = options.setTimeout(() => {
@@ -65,7 +71,10 @@ class WebRtcConnection extends Connection {
       }
     };
 
-    peerConnection.addEventListener('iceconnectionstatechange', onIceConnectionStateChange);
+    peerConnection.addEventListener(
+      "iceconnectionstatechange",
+      onIceConnectionStateChange
+    );
 
     this.doOffer = async () => {
       const offer = await peerConnection.createOffer();
@@ -78,12 +87,15 @@ class WebRtcConnection extends Connection {
       }
     };
 
-    this.applyAnswer = async answer => {
+    this.applyAnswer = async (answer) => {
       await peerConnection.setRemoteDescription(answer);
     };
 
     this.close = () => {
-      peerConnection.removeEventListener('iceconnectionstatechange', onIceConnectionStateChange);
+      peerConnection.removeEventListener(
+        "iceconnectionstatechange",
+        onIceConnectionStateChange
+      );
       if (connectionTimer) {
         options.clearTimeout(connectionTimer);
         connectionTimer = null;
@@ -102,7 +114,7 @@ class WebRtcConnection extends Connection {
         iceConnectionState: this.iceConnectionState,
         localDescription: this.localDescription,
         remoteDescription: this.remoteDescription,
-        signalingState: this.signalingState
+        signalingState: this.signalingState,
       };
     };
 
@@ -110,40 +122,44 @@ class WebRtcConnection extends Connection {
       iceConnectionState: {
         get() {
           return peerConnection.iceConnectionState;
-        }
+        },
       },
       localDescription: {
         get() {
           return descriptionToJSON(peerConnection.localDescription, true);
-        }
+        },
       },
       remoteDescription: {
         get() {
           return descriptionToJSON(peerConnection.remoteDescription);
-        }
+        },
       },
       signalingState: {
         get() {
           return peerConnection.signalingState;
-        }
-      }
+        },
+      },
     });
   }
 }
 
 function descriptionToJSON(description, shouldDisableTrickleIce) {
-  return !description ? {} : {
-    type: description.type,
-    sdp: shouldDisableTrickleIce ? disableTrickleIce(description.sdp) : description.sdp
-  };
+  return !description
+    ? {}
+    : {
+        type: description.type,
+        sdp: shouldDisableTrickleIce
+          ? disableTrickleIce(description.sdp)
+          : description.sdp,
+      };
 }
 
 function disableTrickleIce(sdp) {
-  return sdp.replace(/\r\na=ice-options:trickle/g, '');
+  return sdp.replace(/\r\na=ice-options:trickle/g, "");
 }
 
 async function waitUntilIceGatheringStateComplete(peerConnection, options) {
-  if (peerConnection.iceGatheringState === 'complete') {
+  if (peerConnection.iceGatheringState === "complete") {
     return;
   }
 
@@ -156,19 +172,19 @@ async function waitUntilIceGatheringStateComplete(peerConnection, options) {
   });
 
   const timeout = options.setTimeout(() => {
-    peerConnection.removeEventListener('icecandidate', onIceCandidate);
-    deferred.reject(new Error('Timed out waiting for host candidates'));
+    peerConnection.removeEventListener("icecandidate", onIceCandidate);
+    deferred.reject(new Error("Timed out waiting for host candidates"));
   }, timeToHostCandidates);
 
   function onIceCandidate({ candidate }) {
     if (!candidate) {
       options.clearTimeout(timeout);
-      peerConnection.removeEventListener('icecandidate', onIceCandidate);
+      peerConnection.removeEventListener("icecandidate", onIceCandidate);
       deferred.resolve();
     }
   }
 
-  peerConnection.addEventListener('icecandidate', onIceCandidate);
+  peerConnection.addEventListener("icecandidate", onIceCandidate);
 
   await deferred.promise;
 }

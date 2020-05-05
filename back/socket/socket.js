@@ -75,6 +75,14 @@ module.exports = (io) => {
       }
     });
 
+    socket.on("leaveRoom", (data) => {
+      console.log("socket data :", data);
+      socket.leave(data.room);
+      const user = removeUser(socket.id);
+      console.log("user removed fired :", user);
+      generateMessage("Admin", `${data.username} has left!`);
+    });
+
     socket.on("disconnect", () => {
       console.log("disconnection fired");
       const user = removeUser(socket.id);

@@ -1,9 +1,11 @@
 "use strict";
 
 import React, { useRef } from "react";
+import { GlobalStyleOne } from "../../../styles/styles";
+import HideBar from "../../../containers/HideBar";
 
 import { useRouter } from "next/router";
-import WebRTCController from "../../../webrtc/browser/WebRTCController";
+import CreateExample from "../../../lib/browser/example";
 
 const VideoPage = () => {
   const router = useRouter();
@@ -11,8 +13,13 @@ const VideoPage = () => {
 
   const videoRef = useRef();
 
+  // videoRef.current.autoplay = true;
+  // videoRef.current.muted = true;
+
+  // imageInput.current.click();
+
   const description = "description";
-  const type = "broadcaster";
+  // const createExample = require("../../lib/browser/example");
 
   async function beforeAnswer(peerConnection) {
     console.log("before answer fired");
@@ -49,8 +56,8 @@ const VideoPage = () => {
           autoPlay={true}
           muted={true}
         ></video>
-        <WebRTCController
-          type={type}
+        <CreateExample
+          type={"broadcaster"}
           description={description}
           options={beforeAnswer}
         />

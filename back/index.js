@@ -16,6 +16,7 @@ const userAPIRouter = require("./routes/user");
 const videoAPIRouter = require("./routes/video");
 const videosAPIRouter = require("./routes/videos");
 const hashtagAPIRouter = require("./routes/hashtag");
+const webRTCRouter = require("./routes/connections");
 
 const prod = process.env.NODE_ENV === "production";
 const fs = require("fs");
@@ -106,9 +107,9 @@ app.use(passport.session());
 app.use("/api/user", userAPIRouter);
 app.use("/api/video", videoAPIRouter);
 app.use("/api/videos", videosAPIRouter);
-// app.use("/api/post", postAPIRouter);
-// app.use("/api/posts", postsAPIRouter);
+
 app.use("/api/hashtag", hashtagAPIRouter);
+app.use("/api/connections", webRTCRouter);
 
 server.listen(prod ? 443 : PORT, () =>
   console.log(`Active on ${process.env.PORT}`)

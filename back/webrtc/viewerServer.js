@@ -1,7 +1,7 @@
 "use strict";
 
-const { broadcaster } = require("../broadcaster/server");
-// 이거는브로드 케스터 쪽 view 페이지
+const { broadcaster } = require("./broadcasterServer");
+
 function beforeOffer(peerConnection) {
   const audioTransceiver = peerConnection.addTransceiver("audio");
   const videoTransceiver = peerConnection.addTransceiver("video");
@@ -17,7 +17,6 @@ function beforeOffer(peerConnection) {
 
   if (broadcaster.audioTrack && broadcaster.videoTrack) {
     onNewBroadcast(broadcaster);
-    // 이미 broadcasting이 시작되어 있으며 그냥 그전거 계속 보내주는 거.
   }
 
   const { close } = peerConnection;
@@ -26,10 +25,7 @@ function beforeOffer(peerConnection) {
   peerConnection.close = function () {
     broadcaster.removeListener("newBroadcast", onNewBroadcast);
     return close.apply(this, arguments);
-    // arguments는 어디서 오는가.
   };
-
-  // 모든 펑션들은  beforeOffer 라는 점을 명심.
 }
 
 module.exports = { beforeOffer };
