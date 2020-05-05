@@ -247,6 +247,7 @@ main {
   grid-row: span 3;
   height: 100%;
   width: 100%;
+  object-fit: cover;
 }
 
 #related-videos > ul > li h4 {

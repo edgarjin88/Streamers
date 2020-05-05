@@ -39,7 +39,7 @@ const ResponseComment = ({ commentId, Recomment }) => {
                   eachRecomment.Recommenter &&
                   eachRecomment.Recommenter.profilePhoto
                     ? `${URL}/${eachRecomment.Recommenter.profilePhoto}`
-                    : "../../static/images/profiles/how-to-anything.png"
+                    : "/images/profiles/how-to-anything.png"
                 }
                 alt="Profile Photo"
               />

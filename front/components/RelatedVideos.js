@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
-import Avatar from "@material-ui/core/Avatar";
 import Link from "next/link";
 
 import { URL } from "../config/config";
@@ -73,7 +72,7 @@ const MainVideos = ({ headers = "", videoData = null }) => {
                       src={
                         videoInfo && videoInfo.Images && videoInfo.Images[0]
                           ? `${URL}/${videoInfo.Images[0].src}`
-                          : "../static/images/videos/try-not-to-laugh.png"
+                          : "/images/videos/try-not-to-laugh.png"
                       }
                       alt="Why I laugh at most CEOs"
                     />

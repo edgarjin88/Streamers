@@ -52,16 +52,16 @@ const MainVideo = () => {
       );
     }
     //cleanUp may no required here.
-    // return () => {
-    //   socket.close();
-    // };
+    return () => {
+      socket.close();
+    };
   }, [me]);
 
   return (
     <div id="main-video" style={{ position: "relative" }}>
       <img
         className={"main-content"}
-        src={src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"}
+        src={src ? `${URL}/${src}` : "/images/videos/novideoimage.jpg"}
         alt="How to film your course"
       />
       <ChatMessageBox />

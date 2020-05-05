@@ -448,6 +448,7 @@ main {
     height: 26.6vw;
     min-height: 141px;
     max-height: 202px;
+    object-fit: cover;
   }
 
   .related-video-details h4 {

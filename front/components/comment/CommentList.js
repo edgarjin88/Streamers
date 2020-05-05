@@ -17,10 +17,14 @@ import Link from "next/link";
 moment.locale("en");
 
 const CommentList = () => {
-  const { id, currentVideoComments, commentToReply } = useSelector(
+  const { videoUserId, currentVideoComments, commentToReply } = useSelector(
     ({ video }) => {
       return {
-        id: video.currentVideo.id,
+        videoUserId:
+          video &&
+          video.currentVideo &&
+          video.currentVideo.User &&
+          video.currentVideo.User.id,
         commentToReply: video.commentToReply,
         currentVideoComments: video.currentVideoComments,
       };
@@ -57,8 +61,7 @@ const CommentList = () => {
     );
   };
 
-  const renderEachComment = (comments) => {
-    const dispatch = useDispatch();
+  const renderEachComment = (comments, videoUserId) => {
     return comments.map((comment) => {
       const {
         id,
@@ -72,6 +75,7 @@ const CommentList = () => {
       } = {
         createdAt: comment.createdAt,
         content: comment.content,
+
         nickname: comment.User,
         profilePhoto: comment.User.profilePhoto,
         id: comment.id,
@@ -83,21 +87,25 @@ const CommentList = () => {
       const showReplyForm = commentToReply === id;
       const showReplyComments = showResponse.includes(id);
       return (
-        <div className="comment my-comment">
+        <div
+          className={`comment ${
+            comment.User.id == videoUserId ? "my-comment" : ""
+          }`}
+        >
           <Link href={`/profile/${comment.User.id}`}>
             <img
               // style={{ cursor: "pointer" }}
               src={
                 profilePhoto
                   ? `${URL}/${profilePhoto}`
-                  : "../static/images/profiles/how-to-anything.png"
+                  : "/images/profiles/how-to-anything.png"
               }
-              alt="How To Anything"
+              alt="Profile Photo"
             />
           </Link>
 
           <Link href={`/profile/${comment.User.id}`}>
-            <a title="How To Anything">
+            <a title="Profile Photo">
               <span>{comment.User.nickname}</span>
             </a>
           </Link>
@@ -119,8 +127,6 @@ const CommentList = () => {
               <ReplyCommentForm commentId={id} />
             </div>
           )}
-          {/* reply comments */}
-          {/* reply comments */}
           {showReplyComments && (
             <ResponseComment commentId={id} Recomment={Recomment} />
           )}
@@ -132,7 +138,11 @@ const CommentList = () => {
     });
   };
 
-  return <div id="comment-list">{renderEachComment(currentVideoComments)}</div>;
+  return (
+    <div id="comment-list">
+      {renderEachComment(currentVideoComments, videoUserId)}
+    </div>
+  );
 };
 
 export default CommentList;

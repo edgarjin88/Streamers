@@ -46,7 +46,7 @@ const ReplyCommentForm = ({ commentId }) => {
         src={
           myProfilePhoto
             ? `${URL}/${myProfilePhoto}`
-            : "../static/images/profiles/how-to-anything.png"
+            : "/images/profiles/how-to-anything.png"
         }
         alt="User Profile Photo"
       />

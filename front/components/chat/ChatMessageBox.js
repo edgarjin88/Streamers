@@ -46,7 +46,7 @@ const ChatMessageBox = () => {
                     src={
                       profilePhoto
                         ? `${URL}/${profilePhoto}`
-                        : `../static/images/profiles/defaultUser.png`
+                        : `/images/profiles/defaultUser.png`
                     }
                     alt="Profile Photo"
                   />

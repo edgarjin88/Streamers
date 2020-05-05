@@ -74,7 +74,7 @@ const VideoComments = () => {
             onClick={handleBoolean}
             name="showComment"
             id="comment-uptick"
-            src="../static/images/icons/up-tick.svg"
+            src="/images/icons/up-tick.svg"
             alt="Hide Comments"
           />
         ) : (
@@ -82,7 +82,7 @@ const VideoComments = () => {
             onClick={handleBoolean}
             name="showComment"
             id="comment-downtick"
-            src="../static/images/icons/down-tick.svg"
+            src="/images/icons/down-tick.svg"
             alt="Show Comments"
           />
         )}

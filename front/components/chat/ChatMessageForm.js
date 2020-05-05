@@ -46,7 +46,7 @@ const ChatMessageForm = () => {
       <div id="chat-form">
         <img
           onMouseDown={handleSubmit}
-          src="../static/images/icons/attachment-logo.svg"
+          src="/images/icons/attachment-logo.svg"
           alt="Add Attachment"
         />
         <input

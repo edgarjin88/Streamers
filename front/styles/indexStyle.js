@@ -593,10 +593,11 @@ main {
 
   #related-videos > ul > li img {
  
-    min-height: 131px;
+    // min-height: 131px;
     object-fit: cover;
-    height: 100%;
+    // height: 100%;
   width: 100%;
+  
   }
 }
 

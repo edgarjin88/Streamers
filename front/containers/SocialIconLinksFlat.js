@@ -8,7 +8,7 @@ import {
   faInstagram,
   faLinkedin,
   faGoogle,
-  faFacebookF
+  faFacebookF,
 } from "@fortawesome/free-brands-svg-icons";
 import styled from "styled-components";
 import {
@@ -16,7 +16,7 @@ import {
   KAKAO_SIGN_IN_REQUEST,
   FACEBOOK_SIGN_IN_REQUEST,
   LINKEDIN_SIGN_IN_REQUEST,
-  OAUTH_SIGN_IN_REQUEST
+  OAUTH_SIGN_IN_REQUEST,
 } from "../reducers/user";
 
 const StyledIconList = styled.li`
@@ -76,7 +76,7 @@ export const KakaoOAUTH = () => {
   return (
     <StyledIconList backgroundColor={"#ffe812"}>
       <a href="http://localhost:3003/api/user/auth/kakao">
-        <img src="../static/images/icons/kakaotalk.svg" />
+        <img src="/images/icons/kakaotalk.svg" />
       </a>
     </StyledIconList>
   );
@@ -158,7 +158,7 @@ export const SocialLinks = () => {
           margin: 0,
           padding: 0,
           display: "flex",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
       >
         <FacebookOAUTH />

@@ -79,7 +79,7 @@ export default function SignInSide() {
             <SocialLinks />
             <Grid container>
               <Grid item xs>
-                <Link href={"/resetpassword"} text="For got password?" />
+                <Link href={"/passwordreset"} text="For got password?" />
               </Grid>
 
               <Grid item>
