@@ -10,6 +10,7 @@ import { socket } from "./socket/socket";
 import ChatMessageForm from "./chat/ChatMessageForm";
 import { EMPTY_CHAT_MESSAGE_LIST } from "../reducers/video";
 
+import WebRTCVideo from "./WebRTCVideo";
 moment.locale("en");
 
 const MainVideo = () => {
@@ -18,10 +19,10 @@ const MainVideo = () => {
   const Router = useRouter();
   const queryId = Router.query.id;
 
-  const { src } = useSelector(({ video }) => {
+  const { src, streamingOn } = useSelector(({ video }) => {
     return {
       // currentVideoId: video.currentVideo && video.currentVideo.id,
-
+      streamingOn: video.streamingOn,
       src:
         video.currentVideo &&
         video.currentVideo.Images &&
@@ -57,30 +58,34 @@ const MainVideo = () => {
         }
       );
     }
-    // cleanUp may no required here.
     return () => {
-      console.log("leave room fired");
-      socket.emit("leaveRoom", {
-        username: nickname,
-        profilePhoto: me.profilePhoto,
-        userId: me.id,
-        room: "a" + queryId,
-      });
+      if (me) {
+        console.log("leave room fired");
+        socket.emit("leaveRoom", {
+          username: nickname,
+          profilePhoto: me.profilePhoto,
+          userId: me.id,
+          room: "a" + queryId,
+        });
 
-      dispatch({ type: EMPTY_CHAT_MESSAGE_LIST });
+        dispatch({ type: EMPTY_CHAT_MESSAGE_LIST });
+      }
     };
   }, [me, src]);
 
   return (
     <>
       <div id="main-video" style={{ position: "relative" }}>
-        <img
-          className={"main-content"}
-          src={
-            src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"
-          }
-          alt="How to film your course"
-        />
+        {!streamingOn && (
+          <img
+            className={"main-content"}
+            src={
+              src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"
+            }
+            alt="How to film your course"
+          />
+        )}
+        <WebRTCVideo />
 
         <ChatMessageBox />
 

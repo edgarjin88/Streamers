@@ -62,6 +62,8 @@ try {
 db.sequelize.sync();
 passportConfig();
 
+app.use(require("express-status-monitor")());
+
 if (prod) {
   app.use(hpp());
   app.use(helmet());
@@ -84,7 +86,7 @@ if (prod) {
 
 app.use("/", express.static("uploads")); //static file directory setting
 
-app.use(express.json());
+app.use(express.json()); //중요
 app.use(express.urlencoded({ extended: true })); //for formdata process
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(

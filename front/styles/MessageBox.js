@@ -6,6 +6,7 @@ export const MessageBoxGlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+   
   }
 
   html,
@@ -182,6 +183,8 @@ export const MessageBoxGlobalStyle = createGlobalStyle`
     flex-direction: column-reverse;
     padding: 0 20px;
     overflow-y: scroll;
+         scrollbar-width: none;
+
   }
 
   .message-row {
@@ -263,7 +266,9 @@ export const MessageBoxGlobalStyle = createGlobalStyle`
     font-size: 1.4rem;
   }
 
-  ::-webkit-scrollbar {
-    display: none;
-  }
+  // ::scrollbar {
+  //   display: none;
+  // }
+
+  
 `;

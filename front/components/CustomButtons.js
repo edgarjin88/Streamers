@@ -13,6 +13,7 @@ export const StyledButton1 = styled.button`
   text-decoration: none;
   border: none;
   border-bottom: 1px solid ${({ color }) => (color ? color : "#55c57a")};
+  border-radius: 0;
   padding: 3px;
   transition: all 0.2s;
   :hover {

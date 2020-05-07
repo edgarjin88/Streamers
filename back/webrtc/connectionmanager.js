@@ -3,11 +3,11 @@
 const uuidv4 = require("uuid/v4");
 
 const DefaultConnection = require("./connection");
-// default connection은 무엇인가?
 class ConnectionManager {
   constructor(options = {}) {
     options = {
       Connection: DefaultConnection,
+      // defaultconnection, just event and state.
       generateId: uuidv4,
       ...options,
     };
@@ -17,11 +17,6 @@ class ConnectionManager {
     const connections = new Map();
     const closedListeners = new Map();
 
-    // 이 부분들은 나중에 유저 id로 바꿔 줘야 할듯.
-    // 이 부분들은 나중에 유저 id로 바꿔 줘야 할듯.
-    // 이 부분들은 나중에 유저 id로 바꿔 줘야 할듯.
-    // createId() 이 부분은 반드시 바뀌어야 한다.
-    // createId() 이 부분은 반드시 바뀌어야 한다.
     function createId() {
       do {
         const id = generateId();
@@ -42,38 +37,42 @@ class ConnectionManager {
       connections.delete(connection.id);
     }
 
-    this.createConnection = () => {
+    this.createConnection = (room) => {
+      console.log("room info fired in createConnection:", room);
       const id = createId();
-      const connection = new Connection(id);
+      console.log("id craeted :", id);
+      // 여기까지는 이상 무.
+      const connection = new Connection(id, room);
+      // console.log("creating Connection :", e);
 
       // 1. Add the "closed" listener.
+      //to listen "clesed" event.
       function closedListener() {
         deleteConnection(connection);
       }
       closedListeners.set(connection, closedListener);
       connection.once("closed", closedListener);
 
-      // 2. Add the Connection to the Map.
       connections.set(connection.id, connection);
 
       return connection;
     };
 
     this.getConnection = (id) => {
+      console.log("getConnection fired connections:", connections);
       return connections.get(id) || null;
     };
 
     this.getConnections = () => {
       return [...connections.values()];
+      // beautiful
     };
   }
 
   toJSON() {
     return this.getConnections().map((connection) => {
-      console.log("connection toJson :", connection.toJSON());
       return connection.toJSON();
     });
-    // JSON을 리턴한다?
   }
 }
 

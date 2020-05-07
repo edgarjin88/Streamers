@@ -9,9 +9,10 @@ const TIME_TO_HOST_CANDIDATES = 3000; // NOTE(mroberts): Too long.
 const TIME_TO_RECONNECTED = 10000;
 
 class WebRtcConnection extends Connection {
-  constructor(id, options = {}) {
-    super(id);
-
+  // peerConnection made here only once
+  constructor(id, options = {}, room) {
+    super(id, room);
+    //id used right here.
     options = {
       RTCPeerConnection: DefaultRTCPeerConnection,
       beforeOffer() {},
@@ -34,7 +35,12 @@ class WebRtcConnection extends Connection {
       sdpSemantics: "unified-plan",
     });
 
-    beforeOffer(peerConnection);
+    console.log("error room :", room);
+
+    // peerConnection.room = room
+
+    beforeOffer(peerConnection, room);
+    //viewer, broadcaster will share "broadcaster" object as an event bus.
 
     let connectionTimer = options.setTimeout(() => {
       if (
@@ -75,13 +81,19 @@ class WebRtcConnection extends Connection {
       "iceconnectionstatechange",
       onIceConnectionStateChange
     );
+    //state별로 대응
 
     this.doOffer = async () => {
       const offer = await peerConnection.createOffer();
+      //this is the only one place to create the offer, not on the client side, to store, and share the offer.
+
       await peerConnection.setLocalDescription(offer);
       try {
         await waitUntilIceGatheringStateComplete(peerConnection, options);
       } catch (error) {
+        console.log(
+          "error occurred while waitUntilIceGatheringStateComplete :"
+        );
         this.close();
         throw error;
       }
@@ -141,6 +153,12 @@ class WebRtcConnection extends Connection {
       },
     });
   }
+
+  // end of constructor
+  // end of constructor
+  // end of constructor
+  // end of constructor
+  // end of constructor
 }
 
 function descriptionToJSON(description, shouldDisableTrickleIce) {

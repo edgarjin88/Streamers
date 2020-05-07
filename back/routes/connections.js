@@ -5,10 +5,12 @@ const { isLoggedIn } = require("./middleware");
 const router = express.Router();
 
 const WebRtcConnectionManager = require("../webrtc/webrtcconnectionmanager");
+
 const broadCasterServer = require("../webrtc/broadcasterServer");
 const viewerServer = require("../webrtc/viewerServer");
 
 const viewerConnectionManager = WebRtcConnectionManager.create(viewerServer);
+
 const broadcasterConnectionManager = WebRtcConnectionManager.create(
   broadCasterServer
 );
@@ -25,14 +27,13 @@ router.get(`/:type`, (req, res) => {
       : viewerConnectionManager;
   try {
     res.send(connectionManager.getConnections());
-    // connection을 먼저 만들어야 하나?} catch (e) {
   } catch (e) {
-    console.log(`Error while getting connetion list for type :${type} :`, e);
+    console.log(`Error while getting connetion list for type :${type} :`);
   }
 });
 
-router.post(`/:type/`, async (req, res) => {
-  const { type, id } = req.params;
+router.post(`/:type/:room`, async (req, res) => {
+  const { type, id, room } = req.params;
 
   const connectionManager =
     type === "broadcaster"
@@ -40,10 +41,11 @@ router.post(`/:type/`, async (req, res) => {
       : viewerConnectionManager;
 
   try {
-    const connection = await connectionManager.createConnection();
+    const connection = await connectionManager.createConnection(room);
+
     res.send(connection);
   } catch (e) {
-    console.error(`error creating connection for type: ${type} :`, e);
+    console.error(`error creating connection for type: ${type} :`);
     res.sendStatus(500);
   }
 });
@@ -63,7 +65,7 @@ router.delete(`/:type/:id`, (req, res) => {
     connection.close();
     res.send(connection);
   } catch (e) {
-    console.log(`error deleting connection for type: ${type} :`, e);
+    console.log(`error deleting connection for type: ${type} :`);
   }
 });
 
@@ -81,7 +83,7 @@ router.get(`/:type/:id`, (req, res) => {
     }
     res.send(connection);
   } catch (e) {
-    console.log(`error getting one connection for type: ${type} :`, e);
+    console.log(`error getting one connection for type: ${type} :`);
   }
 });
 
@@ -100,8 +102,7 @@ router.get(`/:type/:id/local-description`, (req, res) => {
     res.send(connection.toJSON().localDescription);
   } catch (e) {
     console.log(
-      `error getting getting a local-description for type: ${type} :`,
-      e
+      `error getting getting a local-description for type: ${type} :`
     );
   }
 });
@@ -124,8 +125,7 @@ router.get(`/:type/:id/remote-description`, (req, res) => {
     res.send(connection.toJSON().remoteDescription);
   } catch (e) {
     console.log(
-      `error getting getting a remote-description for type: ${type} :`,
-      e
+      `error getting getting a remote-description for type: ${type} :`
     );
   }
 });
@@ -141,6 +141,7 @@ router.post(`/:type/:id/remote-description`, async (req, res) => {
     const connection = connectionManager.getConnection(id);
 
     if (!connection) {
+      console.log("connection does not exist");
       res.sendStatus(404);
       return;
     }
@@ -148,8 +149,7 @@ router.post(`/:type/:id/remote-description`, async (req, res) => {
     res.send(connection.toJSON().remoteDescription);
   } catch (e) {
     console.log(
-      `error getting creating a remote-description for type: ${type} :`,
-      e
+      `error getting creating a remote-description for type: ${type} :`
     );
     res.sendStatus(400);
   }

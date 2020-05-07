@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-export const GlobalStyleOne = createGlobalStyle`
+export const VideoPageGlobalStyle = createGlobalStyle`
   * {
   margin: 0;
   padding: 0;
@@ -487,7 +487,6 @@ main {
       "video-details related-videos" max-content
       "video-comments related-videos" 1fr
       / 1fr 256px;
-    // margin-top: 48px;
   }
 
   #relatead-videos {
@@ -520,13 +519,13 @@ main {
 
 @media (min-width: 1280px) and (orientation: landscape) {
   main {
-    grid-template-columns: 1fr 500px;
-    max-width: 1600px;
+    grid-template-columns: 90rem 50rem;
+    max-width: 160rem;
     margin: auto;
   }
 
-  #related-videos {
-    width: 500px;
+  #related-videos { 
+    width: 50rem;
   }
 
   #related-videos > ul {

@@ -22,6 +22,7 @@ const VideoPage = () => {
     peerConnection.close = function () {
       videoRef.current.srcObject = null;
       return close.apply(this, arguments);
+      // 굉장히 중요.
     };
   }
 
@@ -39,6 +40,19 @@ const VideoPage = () => {
           type={type}
           description={description}
           options={beforeAnswer}
+          currentVideoId={9}
+        />
+        <WebRTCController
+          type={type}
+          description={description}
+          options={beforeAnswer}
+          currentVideoId={9}
+        />
+        <WebRTCController
+          type={type}
+          description={description}
+          options={beforeAnswer}
+          currentVideoId={10}
         />
       </main>
     </div>

@@ -1,23 +1,25 @@
-'use strict';
+"use strict";
 
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 
 class Connection extends EventEmitter {
-  constructor(id) {
+  constructor(id, room) {
     super();
     this.id = id;
-    this.state = 'open';
+    this.state = "open";
+    this.room = room;
   }
 
   close() {
-    this.state = 'closed';
-    this.emit('closed');
+    this.state = "closed";
+    this.emit("closed");
   }
 
   toJSON() {
     return {
       id: this.id,
-      state: this.state
+      state: this.state,
+      room: this.room,
     };
   }
 }

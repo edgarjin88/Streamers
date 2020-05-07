@@ -10,7 +10,7 @@ const { imageLink, upload } = require("../utilities/multerOptions");
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
     const hashtags = req.body.description.match(/#[^\s]+/g);
-    console.log("form in body :", req.body);
+    // console.log("form in body :", req.body);
     const newVideo = await db.Video.create({
       title: req.body.title,
       description: req.body.description,
@@ -24,7 +24,7 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
           })
         )
       );
-      console.log(result);
+      // console.log(result);
       await newVideo.addHashtags(result.map((r) => r[0]));
     }
 
@@ -66,8 +66,8 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
 router.post("/image", upload.array("image"), (req, res) => {
   res.json(
     req.files.map((v) => {
-      console.log("each v :", v);
-      console.log("each v[imageLink] :", v[imageLink]);
+      // console.log("each v :", v);
+      // console.log("each v[imageLink] :", v[imageLink]);
       return v[imageLink];
     })
   );
@@ -88,7 +88,7 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
       where: { VideoId: exVideo.id },
     });
 
-    console.log("image liset: ", images);
+    // console.log("image liset: ", images);
     await exVideo.removeImages(images);
 
     await exVideo.update({
@@ -119,7 +119,7 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
         },
       ],
     });
-    console.log("video :", video);
+    // console.log("video :", video);
 
     res.send(video);
   } catch (e) {
@@ -243,9 +243,6 @@ router.get("/:id/comments", async (req, res, next) => {
         },
       ],
     });
-    console.log("comments! :", comments);
-    console.log("comment Recomment! :", comments.Recomment);
-    console.log("comments! :", JSON.stringify(comments));
     res.json(comments);
   } catch (e) {
     console.error(e);
@@ -270,7 +267,6 @@ router.delete("/:id/comment", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
   // POST /api/post/1000000/comment  /// !== comments
-  console.log("comment body: ", req.body);
   try {
     //for comment to a video
     const video = await db.Video.findOne({ where: { id: req.params.id } });
@@ -312,7 +308,6 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
         },
       ],
     });
-    console.log("comment info :", comment);
     return res.json(comment);
   } catch (e) {
     console.error(e);
@@ -418,7 +413,7 @@ router.delete("/:id/commentlike", isLoggedIn, async (req, res, next) => {
 //recomment
 router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
   try {
-    console.log("remomment req.body :", req.body);
+    // console.log("remomment req.body :", req.body);
     const exComment = await db.Comment.findOne({
       where: { id: req.params.id },
     });
@@ -458,8 +453,6 @@ router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
     });
 
     await exComment.addRecomment(fullComment);
-
-    console.log("full comment :", fullComment);
 
     res.json(fullComment);
   } catch (e) {
@@ -523,75 +516,5 @@ router.delete("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
     next(e);
   }
 });
-
-//////////
-// router.post("/:id/retweet", isLoggedIn, async (req, res, next) => {
-//   try {
-//     const video = await db.Video.findOne({
-//       where: { id: req.params.id }, // video with ':id'
-//       include: [
-//         {
-//           model: db.Video,
-//           as: "Retweet", //   db.Video.belongsTo(db.Video, { as: 'Retweet' });
-//         }, // this will bring Retweet info. At this point, RetweetId is null, so Retweet is null too.
-//       ],
-//     });
-//     console.log("retweet video :", video);
-//     if (!video) {
-//       return res.status(404).send("Video does not exist.");
-//     }
-//     if (
-//       req.user.id === video.UserId ||
-//       (video.Retweet && video.Retweet.UserId === req.user.id)
-//     ) {
-//       return res.status(403).send("You cannot retwit your video.");
-//     }
-//     const retweetTargetId = video.RetweetId || video.id;
-//     //RetweetId === null, so, video.id to be used
-
-//     const exVideo = await db.Video.findOne({
-//       where: {
-//         UserId: req.user.id,
-//         RetweetId: retweetTargetId,
-//       },
-//     });
-//     if (exVideo) {
-//       return res.status(403).send("You already retwitted.");
-//     }
-//     const retweet = await db.Video.create({
-//       UserId: req.user.id,
-//       RetweetId: retweetTargetId,
-//       content: "retweet",
-//     });
-//     console.log("retweet completed :", retweet);
-//     const retweetWithPrevVideo = await db.Video.findOne({
-//       where: { id: retweet.id },
-//       include: [
-//         {
-//           model: db.User,
-//           attributes: ["id", "nickname", "profilePhoto"],
-//         },
-//         {
-//           model: db.Video,
-//           as: "Retweet",
-//           include: [
-//             {
-//               model: db.User,
-//               attributes: ["id", "nickname", "profilePhoto"],
-//             },
-//             {
-//               model: db.Image,
-//             },
-//           ],
-//         },
-//       ],
-//     });
-//     console.log("with prev post: ", retweetWithPrevVideo);
-//     res.json(retweetWithPrevVideo);
-//   } catch (e) {
-//     console.error(e);
-//     next(e);
-//   }
-// });
 
 module.exports = router;

@@ -1,6 +1,12 @@
 "use strict";
 
 import { URL } from "../../config/config";
+import {
+  START_STREAMING_REQUEST,
+  STOP_STREAMING_REQUEST,
+} from "../../reducers/video";
+import { StoreExported } from "../../pages/_app";
+
 const fetch = require("node-fetch");
 const DefaultRTCPeerConnection = require("wrtc").RTCPeerConnection;
 const { RTCSessionDescription } = require("wrtc");
@@ -20,15 +26,16 @@ class ConnectionClient {
     };
 
     const { RTCPeerConnection, prefix, host } = options;
-    // const { RTCPeerConnection, prefix, host } = options;
 
     console.log(
       "const { RTCPeerConnection, prefix, host } = options;",
       options
     );
 
-    this.createConnection = async (func, typePassed) => {
+    this.createConnection = async (func, typePassed, currentVideoId) => {
+      // func, typePassed, roomId
       options = {
+        // roomId : roomId
         beforeAnswer: func,
         stereo: false,
         type: typePassed,
@@ -37,18 +44,30 @@ class ConnectionClient {
 
       const { beforeAnswer, stereo, type } = options;
 
-      const response1 = await fetch(`${URL}/api/connections/${type}`, {
-        method: "POST",
-      });
+      const response1 = await fetch(
+        `${URL}/api/connections/${type}/${currentVideoId}`,
+        {
+          method: "POST",
+        }
+      );
+      // roomId to be passed into Router
 
       const remotePeerConnection = await response1.json();
-      const { id } = remotePeerConnection;
+      console.log(
+        "remote  peerconnection made on the serverside here: ",
+        remotePeerConnection
+      );
 
+      const { id } = remotePeerConnection;
       const localPeerConnection = new RTCPeerConnection({
         sdpSemantics: "unified-plan",
       });
 
       localPeerConnection.close = function () {
+        StoreExported.dispatch({
+          type: STOP_STREAMING_REQUEST,
+        });
+        console.log("delete  session fired");
         fetch(`${URL}/api/connections/${typePassed}/${id}`, {
           method: "delete",
         }).catch(() => {});
@@ -84,6 +103,7 @@ class ConnectionClient {
 
         return localPeerConnection;
       } catch (error) {
+        console.log("error occurred. session will be deleted :", error);
         localPeerConnection.close();
         throw error;
       }

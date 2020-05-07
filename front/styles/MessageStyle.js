@@ -47,6 +47,7 @@ export const StyledChatMessageBox = styled.div`
     height: 95%;
     padding: 0 1rem;
     overflow-y: scroll;
+    scrollbar-width: none;
   }
 
   /*message-row는 안에 있는데, 컨텐츠는 밖으로 나간다. 이유는?  */

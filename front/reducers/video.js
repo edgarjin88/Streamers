@@ -117,6 +117,13 @@ export const NULLIFY_SEND_CHAT_MESSAGE = "NULLIFY_SEND_CHAT_MESSAGE";
 
 import { UNFOLLOW_USER_SUCCESS, FOLLOW_USER_SUCCESS } from "./user";
 
+export const START_STREAMING_REQUEST = "START_STREAMING_REQUEST";
+export const START_STREAMING_FAILURE = "START_STREAMING_FAILURE";
+export const START_STREAMING_SUCCESS = "START_STREAMING_SUCCESS";
+export const STOP_STREAMING_REQUEST = "STOP_STREAMING_REQUEST";
+export const STOP_STREAMING_FAILURE = "STOP_STREAMING_FAILURE";
+export const STOP_STREAMING_SUCCESS = "STOP_STREAMING_SUCCESS";
+
 export const initialState = {
   currentCommentId: null,
   mainVideos: [],
@@ -151,12 +158,22 @@ export const initialState = {
 
   //chat message end
   sendChatMessage: true,
+  streamingOn: false,
 };
 
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case STOP_STREAMING_REQUEST: {
+        draft.streamingOn = false;
+        break;
+      }
+      case START_STREAMING_REQUEST: {
+        draft.streamingOn = true;
+        break;
+      }
+
       case SEND_CHAT_MESSAGE: {
         draft.sendChatMessage = true;
         break;

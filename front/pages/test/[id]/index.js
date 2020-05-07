@@ -16,7 +16,6 @@ const VideoPage = () => {
 
   async function beforeAnswer(peerConnection) {
     console.log("before answer fired");
-    console.log("window : ", window);
     const localStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,

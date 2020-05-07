@@ -1,4 +1,4 @@
-import { GlobalStyleOne } from "../../../styles/styles";
+import { VideoPageGlobalStyle } from "../../../styles/styles";
 import HideBar from "../../../containers/HideBar";
 import VideoDetails from "../../../components/VideoDetails";
 import RelatedVideos from "../../../components/RelatedVideos";
@@ -14,7 +14,7 @@ import {
 const VideoPage = () => {
   return (
     <div className="container">
-      <GlobalStyleOne />
+      <VideoPageGlobalStyle />
       <HideBar />
       <main>
         <MainVideo />

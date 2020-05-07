@@ -2,28 +2,28 @@
 
 const { broadcaster } = require("./broadcasterServer");
 
-function beforeOffer(peerConnection) {
+function beforeOffer(peerConnection, room) {
+  const eventName = `a${room.toString()}`;
+  console.log("fired before offer :", room);
+  console.log("fired before offer eventName :", eventName);
   const audioTransceiver = peerConnection.addTransceiver("audio");
   const videoTransceiver = peerConnection.addTransceiver("video");
 
-  function onNewBroadcast({ audioTrack, videoTrack }) {
-    audioTransceiver.sender.replaceTrack(audioTrack),
-      videoTransceiver.sender.replaceTrack(videoTrack);
+  async function onNewBroadcast({ audioTrack, videoTrack }) {
+    await audioTransceiver.sender.replaceTrack(audioTrack),
+      await videoTransceiver.sender.replaceTrack(videoTrack);
   }
 
-  // The audio transceiver's RTCRtpSender's replaceTrack() method is used to set the outgoing audio track to the first track of the microphone's audio stream.
+  broadcaster.on(`${eventName}`, onNewBroadcast);
 
-  broadcaster.on("newBroadcast", onNewBroadcast);
-
-  if (broadcaster.audioTrack && broadcaster.videoTrack) {
-    onNewBroadcast(broadcaster);
+  if (broadcaster[eventName].audioTrack && broadcaster[eventName].videoTrack) {
+    onNewBroadcast(broadcaster[eventName]);
   }
 
   const { close } = peerConnection;
 
-  console.log("this is close :", close);
   peerConnection.close = function () {
-    broadcaster.removeListener("newBroadcast", onNewBroadcast);
+    broadcaster.removeListener(`${eventName}`, onNewBroadcast);
     return close.apply(this, arguments);
   };
 }

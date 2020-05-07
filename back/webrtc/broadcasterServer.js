@@ -5,15 +5,24 @@ const { EventEmitter } = require("events");
 const broadcaster = new EventEmitter();
 const { on } = broadcaster;
 
-function beforeOffer(peerConnection) {
-  const audioTrack = (broadcaster.audioTrack = peerConnection.addTransceiver(
-    "audio"
-  ).receiver.track);
-  const videoTrack = (broadcaster.videoTrack = peerConnection.addTransceiver(
-    "video"
-  ).receiver.track);
+console.log("broadcaster before beforeOffer:", broadcaster);
+function beforeOffer(peerConnection, room) {
+  // console.log("beforeOffer Broadcast fired :", room);
 
-  broadcaster.emit("newBroadcast", {
+  const eventName = `a${room.toString()}`;
+  broadcaster[eventName] = {};
+
+  // console.log("broadcaster[eventName] fired :", broadcaster[eventName]);
+  const audioTrack = (broadcaster[
+    eventName
+  ].audioTrack = peerConnection.addTransceiver("audio").receiver.track);
+
+  const videoTrack = (broadcaster[
+    eventName
+  ].videoTrack = peerConnection.addTransceiver("video").receiver.track);
+
+  console.log("event name :", eventName);
+  broadcaster.emit(`${eventName}`, {
     audioTrack,
     videoTrack,
   });
@@ -24,6 +33,8 @@ function beforeOffer(peerConnection) {
     videoTrack.stop();
     return close.apply(this, arguments);
   };
+
+  console.log("broadcaster after beforeOffer:", broadcaster);
 }
 
 module.exports = {
