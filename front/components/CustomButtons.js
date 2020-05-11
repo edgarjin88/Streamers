@@ -6,10 +6,10 @@ export const StyledButton1 = styled.button`
   color: ${({ color }) => (color ? color : "#55c57a")};
   font-size: ${({ size }) => (size ? size : "inherit")};
   cursor: pointer;
-  /* margin-top: 1rem; */
   margin: 1rem;
   background-color: transparent;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   text-decoration: none;
   border: none;
   border-bottom: 1px solid ${({ color }) => (color ? color : "#55c57a")};

@@ -62,7 +62,7 @@ try {
 db.sequelize.sync();
 passportConfig();
 
-app.use(require("express-status-monitor")());
+// app.use(require("express-status-monitor")());
 
 if (prod) {
   app.use(hpp());

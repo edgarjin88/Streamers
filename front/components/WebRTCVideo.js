@@ -12,33 +12,58 @@ const WebRTCVideo = () => {
 
   const videoRef = useRef();
 
-  const description = "description";
-  const type = "broadcaster";
-
-  async function beforeAnswer(peerConnection) {
-    console.log("before answer fired");
-    console.log("window : ", window);
-    const localStream = await window.navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
-
-    // console.log("local stream here :", localStream);
-    localStream
-      .getTracks()
-      .forEach((track) => peerConnection.addTrack(track, localStream));
-
-    videoRef.current.srcObject = localStream;
-
-    const { close } = peerConnection;
-    peerConnection.close = function () {
-      videoRef.current.srcObject = null;
-
-      localStream.getTracks().forEach((track) => track.stop());
-
-      return close.apply(this, arguments);
+  const { myId, videoOwnerId, me } = useSelector((state) => {
+    return {
+      me: state.user && state.user.me,
+      myId: state.user.me && state.user.me.id,
+      videoOwnerId: state.video.currentVideo.UserId,
     };
-  }
+  }, shallowEqual);
+
+  const type = myId === videoOwnerId ? "broadcaster" : "viwer";
+
+  console.log("mytype ", type);
+
+  const typeFunction = async (peerConnection) => {
+    if (type === "broadcaster") {
+      console.log("before answer fired");
+      console.log("window : ", window);
+      const localStream = await window.navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+
+      console.log("local stream here :", localStream);
+      localStream
+        .getTracks()
+        .forEach((track) => peerConnection.addTrack(track, localStream));
+
+      videoRef.current.srcObject = localStream;
+
+      const { close } = peerConnection;
+      peerConnection.close = function () {
+        videoRef.current.srcObject = null;
+
+        localStream.getTracks().forEach((track) => track.stop());
+
+        return close.apply(this, arguments);
+      };
+    } else {
+      const remoteStream = new MediaStream(
+        peerConnection.getReceivers().map((receiver) => receiver.track)
+      );
+      videoRef.current.srcObject = remoteStream;
+
+      const { close } = peerConnection;
+      peerConnection.close = function () {
+        videoRef.current.srcObject = null;
+        return close.apply(this, arguments);
+        // 굉장히 중요.
+      };
+    }
+  };
+
+  const beforeAnswer = typeFunction;
 
   const StyledVideoComponent = styled.div`
     position: relative;
@@ -76,13 +101,14 @@ const WebRTCVideo = () => {
           muted={true}
         ></video>
       )}
-      <WebRTCController
-        className="controller"
-        type={type}
-        description={description}
-        options={beforeAnswer}
-        currentVideoId={currentVideoId}
-      />
+      {me && (
+        <WebRTCController
+          className="controller"
+          type={type}
+          options={beforeAnswer}
+          currentVideoId={currentVideoId}
+        />
+      )}
     </StyledVideoComponent>
   );
 };

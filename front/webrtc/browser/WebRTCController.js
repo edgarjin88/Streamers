@@ -7,6 +7,8 @@ import {
   STOP_STREAMING_REQUEST,
 } from "../../reducers/video";
 
+import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
+import StopIcon from "@material-ui/icons/Stop";
 const WebRTCController = ({ type, description, options, currentVideoId }) => {
   const { streamingOn, currentVideoOwner, myId } = useSelector((state) => {
     return {
@@ -15,6 +17,7 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
       myId: state.user.me && state.user.me.id,
     };
   }, shallowEqual);
+  const owner = myId === currentVideoOwner;
   const connectionClient = new ConnectionClient();
   let peerConnection = null;
 
@@ -25,16 +28,15 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
       type,
       currentVideoId
     );
-    // type, id to be included
-    // console.log('peer')
-    // console.log("peerConnection? :", peerConnection);
     window.peerConnection = peerConnection;
   };
 
   const dispatch = useDispatch();
 
   const onStop = () => {
-    window.peerConnection.close();
+    if (window.peerConnection) {
+      window.peerConnection.close();
+    }
   };
 
   const handleStart = (e) => {
@@ -66,13 +68,9 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
   return (
     <div>
       {!streamingOn ? (
-        <StyledButton1
-          // disabled={startDisabled}
-          size={"1.2rem"}
-          color="orange"
-          onClick={handleStart}
-        >
-          Start Streaming
+        <StyledButton1 size={"1.2rem"} color="orange" onClick={handleStart}>
+          <PlayCircleFilledIcon fontSize="large" />
+          {owner ? "Start Streaming" : "Join Streaming"}
         </StyledButton1>
       ) : (
         <StyledButton1
@@ -82,7 +80,8 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
           onClick={handleStop}
           // disabled={stopDisabled}
         >
-          Stop Streaming
+          <StopIcon fontSize="large" />
+          {owner ? "Stop Streaming" : "Quit Streaming"}
         </StyledButton1>
       )}
     </div>
