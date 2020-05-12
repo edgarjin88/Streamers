@@ -65,14 +65,15 @@ const CommentList = () => {
     return comments.map((comment) => {
       const {
         id,
-        content,
-        nickname,
+
         profilePhoto,
         createdAt,
         CommentLikers,
         CommentDislikers,
         Recomment,
+        UserId,
       } = {
+        UserId: comment.UserId,
         createdAt: comment.createdAt,
         content: comment.content,
 
@@ -118,6 +119,7 @@ const CommentList = () => {
             <p> {`${moment(createdAt).format("DD.MM.YYYY")}`}</p>
             <CommentEditBox
               commentId={id}
+              commentOwner={UserId}
               CommentLikers={CommentLikers}
               CommentDislikers={CommentDislikers}
             />

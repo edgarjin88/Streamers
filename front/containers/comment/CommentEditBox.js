@@ -46,16 +46,16 @@ const CommentEditBox = ({
   commentId,
   refCommentId,
   CommentDislikers,
+  commentOwner,
   CommentLikers,
 }) => {
   const dispatch = useDispatch();
 
-  const { me } = useSelector(({ user }) => {
-    return { me: user.me };
-  }, shallowEqual);
-
-  const { commentToReply } = useSelector(({ video }) => {
-    return { commentToReply: video.commentToReply };
+  const { me, commentToReply } = useSelector((state) => {
+    return {
+      me: state.user.me,
+      commentToReply: state.video.commentToReply,
+    };
   }, shallowEqual);
 
   const liked =
@@ -132,6 +132,7 @@ const CommentEditBox = ({
       data: commentId,
     });
   };
+  const showDeletebutton = commentOwner === (me && me.id);
 
   return (
     <div style={{ display: "flex", justifyContent: "space-around" }}>
@@ -153,9 +154,11 @@ const CommentEditBox = ({
       <StyledIconBox disliked={disliked} onClick={onToggleDislike}>
         <ThumbDownIcon /> &nbsp; {CommentDislikers && CommentDislikers.length}
       </StyledIconBox>
-      <StyledIcon onClick={onClickDelete}>
-        <DeleteIcon />
-      </StyledIcon>
+      {showDeletebutton && (
+        <StyledIcon onClick={onClickDelete}>
+          <DeleteIcon />
+        </StyledIcon>
+      )}
     </div>
   );
 };
