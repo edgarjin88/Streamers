@@ -5,17 +5,18 @@ import { ServerStyleSheet } from "styled-components";
 import { ServerStyleSheets as MaterialUiServerStyleSheets } from "@material-ui/core/styles";
 
 class MyDocument extends Document {
-  static getInitialProps(context) {
-    console.log("initiall props fired");
+  static async getInitialProps(context) {
+    // console.log("initiall props fired");
     const sheet = new ServerStyleSheet();
     const materialUI = new MaterialUiServerStyleSheets();
     try {
-      const page = context.renderPage((App) => (props) => {
-        console.log("props in document :", props);
+      const page = await context.renderPage((App) => (props) => {
+        // console.log("props in document :", props);
         return sheet.collectStyles(materialUI.collect(<App {...props} />));
       });
 
-      const styleTags = sheet.getStyleElement();
+      const styleTags = await sheet.getStyleElement();
+      // const initialProps = await Document.getInitialProps(context);
       return { ...page, helmet: Helmet.renderStatic(), styleTags };
     } finally {
       sheet.seal();
