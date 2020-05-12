@@ -22,8 +22,6 @@ const WebRTCVideo = () => {
 
   const type = myId === videoOwnerId ? "broadcaster" : "viwer";
 
-  console.log("mytype ", type);
-
   const typeFunction = async (peerConnection) => {
     if (type === "broadcaster") {
       console.log("before answer fired");
@@ -93,14 +91,14 @@ const WebRTCVideo = () => {
 
   return (
     <StyledVideoComponent>
-      {streamingOn && (
-        <video
-          className="main-content"
-          ref={videoRef}
-          autoPlay={true}
-          muted={true}
-        ></video>
-      )}
+      <video
+        style={{ display: streamingOn ? "block" : "none" }}
+        className="main-content"
+        ref={videoRef}
+        autoPlay={true}
+        muted={true}
+      ></video>
+
       {me && (
         <WebRTCController
           className="controller"

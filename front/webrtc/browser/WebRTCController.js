@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import ConnectionClient from "../client/index";
 import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -9,7 +8,8 @@ import {
 
 import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
-const WebRTCController = ({ type, description, options, currentVideoId }) => {
+const WebRTCController = ({ type, options, currentVideoId }) => {
+  const dispatch = useDispatch();
   const { streamingOn, currentVideoOwner, myId } = useSelector((state) => {
     return {
       streamingOn: state.video.streamingOn,
@@ -31,8 +31,6 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
     window.peerConnection = peerConnection;
   };
 
-  const dispatch = useDispatch();
-
   const onStop = () => {
     if (window.peerConnection) {
       window.peerConnection.close();
@@ -40,31 +38,26 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
   };
 
   const handleStart = (e) => {
-    console.log("start button fired");
     try {
-      onStart();
       dispatch({
         type: START_STREAMING_REQUEST,
       });
+      onStart();
     } catch (error) {
-      // startButton.disabled = false;
       throw error;
     }
   };
   const handleStop = (e) => {
-    console.log("stopButton fired");
     try {
-      onStop();
-      // setStreaming(false);
       dispatch({
         type: STOP_STREAMING_REQUEST,
       });
-      // setStopDisabled(true);
-      // setStartDisabled(false);
+      onStop();
     } catch (error) {
       throw error;
     }
   };
+
   return (
     <div>
       {!streamingOn ? (
@@ -73,13 +66,7 @@ const WebRTCController = ({ type, description, options, currentVideoId }) => {
           {owner ? "Start Streaming" : "Join Streaming"}
         </StyledButton1>
       ) : (
-        <StyledButton1
-          size={"1.2rem"}
-          color="red"
-          // disabled={false}
-          onClick={handleStop}
-          // disabled={stopDisabled}
-        >
+        <StyledButton1 size={"1.2rem"} color="red" onClick={handleStop}>
           <StopIcon fontSize="large" />
           {owner ? "Stop Streaming" : "Quit Streaming"}
         </StyledButton1>
