@@ -600,21 +600,24 @@ export default (state = initialState, action) => {
         draft.currentVideo = action.data;
         break;
       }
-      case LOAD_MAIN_VIDEOS_REQUEST: {
+      case LOAD_MAIN_VIDEOS_REQUEST:
+      case LOAD_HASHTAG_VIDEOS_REQUEST: {
         draft.mainVideos = !action.lastId ? [] : draft.mainVideos;
 
         draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
 
         break;
       }
-      case LOAD_MAIN_VIDEOS_SUCCESS: {
+      case LOAD_MAIN_VIDEOS_SUCCESS:
+      case LOAD_HASHTAG_VIDEOS_SUCCESS: {
         action.data.forEach((d) => {
           draft.mainVideos.push(d);
         });
         draft.hasMorePost = action.data.length === 10;
         break;
       }
-      case LOAD_MAIN_VIDEOS_FAILURE: {
+      case LOAD_MAIN_VIDEOS_FAILURE:
+      case LOAD_HASHTAG_VIDEOS_FAILURE: {
         break;
       }
       case NULLIFY_VIDEO_ADDED: {

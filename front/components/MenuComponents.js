@@ -22,7 +22,7 @@ export const LogoAndName = memo(function LogoAndName() {
             justifyItems: "center",
             alignItems: "center",
             textDecoration: "none",
-            color: "black"
+            color: "black",
           }}
         >
           <VideocamIcon

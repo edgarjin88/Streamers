@@ -1,21 +1,12 @@
 import React, { memo, useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import Slide from "@material-ui/core/Slide";
-
-import { useTheme } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -29,6 +20,7 @@ import { useStyles } from "../styles/HideBarStyle";
 
 import { OPEN_DRAWER, CLOSE_DRAWER } from "../reducers/menu";
 import { SET_SEARCH_VALUE } from "../reducers/input";
+import { LOAD_HASHTAG_VIDEOS_REQUEST } from "../reducers/video";
 
 export const MemoMenuItems = memo(function MemoMenuItems() {
   const classes = useStyles();
@@ -38,10 +30,13 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
+  const { userNotification } = useSelector(({ user }) => {
+    return { userNotification: user.me && user.me.notification.toI };
+  }, shallowEqual);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleProfileMenuOpen = event => {
+  const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -55,7 +50,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   };
   const menuId = "primary-search-account-menu";
 
-  const handleMobileMenuOpen = event => {
+  const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
   const renderMenu = (
@@ -93,9 +88,10 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
         </IconButton>
         <p>Messages</p>
       </MenuItem>
+
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
+        <IconButton color="inherit">
+          <Badge badgeContent={userNotification} color="secondary">
             <NotificationsIcon fontSize="large" />
           </Badge>
         </IconButton>
@@ -123,7 +119,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
           </Badge>
         </IconButton>
         <IconButton aria-label="show 17 new notifications" color="inherit">
-          <Badge badgeContent={17} color="secondary">
+          <Badge badgeContent={userNotification} color="secondary">
             <NotificationsIcon fontSize="large" />
           </Badge>
         </IconButton>
@@ -163,7 +159,7 @@ export const MemoMenuIcon = memo(function MemoMenuIcon() {
 
   const handleDrawerOpen = useCallback(() => {
     dispatch({
-      type: OPEN_DRAWER
+      type: OPEN_DRAWER,
     });
   }, []);
 
@@ -179,7 +175,7 @@ export const MemoMenuIcon = memo(function MemoMenuIcon() {
       <MenuIcon
         style={{
           fontSize: "30px",
-          color: "black"
+          color: "black",
         }}
       />
     </IconButton>
@@ -197,11 +193,19 @@ export const MemoSearchInput = memo(function MemoSearchInput() {
     return { searchValue: input.searchValue };
   }, shallowEqual);
 
+  const handleEnter = (e) => {
+    console.log("key chnage fired");
+    if (e.key === "Enter") {
+      console.log("enter  fired");
+      dispatch({ type: LOAD_HASHTAG_VIDEOS_REQUEST, data: searchValue });
+    }
+  };
+
   const handleChange = useCallback(
-    e => {
+    (e) => {
       dispatch({
         type: SET_SEARCH_VALUE,
-        data: e.target.value
+        data: e.target.value,
       });
     },
     [searchValue]
@@ -210,11 +214,12 @@ export const MemoSearchInput = memo(function MemoSearchInput() {
     <>
       <InputBase
         onChange={handleChange}
+        onKeyDown={handleEnter}
         style={{ fontSize: "15px", fontWeight: "bold", color: "orange" }}
         placeholder="Search videos..."
         classes={{
           root: classes.inputRoot,
-          input: classes.inputInput
+          input: classes.inputInput,
         }}
         inputProps={{ "aria-label": "search" }}
       />

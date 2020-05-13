@@ -71,25 +71,12 @@ export default function HideAppBar(props) {
               [classes.appBarShift]: false,
             })}
           >
-            <Toolbar
-              className={classes.toolBar}
-              style={{
-                padding: "0 20px 0 20px",
-                width: "80%",
-                placeSelf: "center",
-              }}
-            >
+            <Toolbar className={classes.toolBar}>
               <MemoMenuIcon />
               <LogoAndName />
               <div className={classes.search}>
                 <div>
-                  <SearchIcon
-                    style={{
-                      fontSize: "25px",
-                      fontWeight: "bold",
-                    }}
-                    className={classes.searchIcon}
-                  />
+                  <SearchIcon className={classes.searchIcon} />
                 </div>
                 <MemoSearchInput />
               </div>

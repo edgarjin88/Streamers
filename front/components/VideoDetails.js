@@ -21,6 +21,8 @@ import ReportIcon from "@material-ui/icons/Report";
 import EditAndDeleteBox from "../containers/EditAndDeleteBox";
 import FollowButton from "../containers/FollowButton";
 
+import VideoDescription from "./Hashtag";
+
 const VideoDetails = () => {
   const dispatch = useDispatch();
   const { me } = useSelector(({ user }) => {
@@ -156,11 +158,10 @@ const VideoDetails = () => {
   return (
     <section id="video-details">
       <header>
-        <h4>#hash tags1 #hash tag2</h4>
         <h2>
           <strong>{title}</strong>
         </h2>
-        <span style={{ fontSize: "1.4rem" }}>{description && description}</span>
+        {description && <VideoDescription description={description} />}
         <div id="video-views-count">{viewCount ? viewCount : 0} views</div>
       </header>
       {renderSocialContainer()}

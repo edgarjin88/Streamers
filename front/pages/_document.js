@@ -6,17 +6,14 @@ import { ServerStyleSheets as MaterialUiServerStyleSheets } from "@material-ui/c
 
 class MyDocument extends Document {
   static async getInitialProps(context) {
-    // console.log("initiall props fired");
     const sheet = new ServerStyleSheet();
     const materialUI = new MaterialUiServerStyleSheets();
     try {
       const page = await context.renderPage((App) => (props) => {
-        // console.log("props in document :", props);
         return sheet.collectStyles(materialUI.collect(<App {...props} />));
       });
 
       const styleTags = await sheet.getStyleElement();
-      // const initialProps = await Document.getInitialProps(context);
       return { ...page, helmet: Helmet.renderStatic(), styleTags };
     } finally {
       sheet.seal();
