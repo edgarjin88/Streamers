@@ -10,7 +10,6 @@ const { imageLink, upload } = require("../utilities/multerOptions");
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
     const hashtags = req.body.description.match(/#[^\s]+/g);
-    // console.log("form in body :", req.body);
     const newVideo = await db.Video.create({
       title: req.body.title,
       description: req.body.description,
@@ -91,6 +90,19 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
     // console.log("image liset: ", images);
     await exVideo.removeImages(images);
 
+    const hashtags = req.body.description.match(/#[^\s]+/g);
+    // console.log("form in body :", req.body);
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          db.Hashtag.findOrCreate({
+            where: { name: tag.slice(1).toLowerCase() },
+          })
+        )
+      );
+      await exVideo.addHashtags(result.map((r) => r[0]));
+    }
+
     await exVideo.update({
       description: req.body.description,
       title: req.body.title,
@@ -119,7 +131,6 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
         },
       ],
     });
-    // console.log("video :", video);
 
     res.send(video);
   } catch (e) {
@@ -352,6 +363,22 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
       return res.status(404).send("Video does not exist.");
     }
     await video.addLiker(req.user.id);
+
+    const likerName = await db.User.findOne({ where: { id: req.user.id } });
+
+    const event = await db.Event.create({
+      content: `${likerName.nickname} liked your channel ${video.title}.`,
+      targetVideoId: req.params.id,
+      UserId: req.user.id,
+      TargetUserId: video.UserId,
+    });
+
+    //여기서 event를 발싸 해서 socket 쪽에서 임포트
+    // 소켓에서 유저리스트에서 관련 유저 아이디가 있는지 참조. 그이후 그 아이디에 정보 전송.
+    //현재 유저 리스트가 방에만 만들어져 있으니,
+    //루트 에서도 만들 도록 하자.
+    //또한 usernotification counter도 여기서 올리도록 하자.
+
     res.json({
       userId: req.user.id,
     });
@@ -368,6 +395,7 @@ router.delete("/:id/like", isLoggedIn, async (req, res, next) => {
       return res.status(404).send("Video does not exist.");
     }
     await video.removeLiker(req.user.id);
+
     res.json({ userId: req.user.id });
   } catch (e) {
     console.error(e);

@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT("medium"),
         allowNull: true,
       },
+      notification: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
     },
     {
       charset: "utf8",
@@ -46,10 +51,9 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.associate = (db) => {
-    // db.User.hasMany(db.Post, { as: "Posts" });
     db.User.hasMany(db.Video, { as: "Videos" });
-    // db.Post > Posts
     db.User.hasMany(db.Comment);
+    db.User.hasMany(db.Event);
     // db.User.hasMany(db.Comment, { as: "Recomment" });
 
     db.User.belongsToMany(db.Video, { through: "Like", as: "Liked" });

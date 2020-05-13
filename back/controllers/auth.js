@@ -3,8 +3,6 @@ const db = require("../models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const expressJWT = require("express-jwt");
-const _ = require("lodash");
 require("dotenv").config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -18,22 +16,8 @@ exports.confirmPasswordReset = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 12);
     console.log("password :", hashedPassword);
     const exUser = await db.User.findOne({
-      where: { resetPasswordLink: resetPasswordLink }
+      where: { resetPasswordLink: resetPasswordLink },
     });
-
-    console.log(" exUser :", exUser);
-    // if (resetPasswordLink) {
-    //   jwt.verify(
-    //     resetPasswordLink,
-    //     process.env.JWT_RESET_PASSWORD,
-    //     (err, decoded) => {
-    //       if (err) {
-    //         return res.status(400).send("Expired Link. Try again");
-    //       }
-    //     }
-    //   );
-    // } else {
-    // }
     if (!exUser) {
       return res
         .status(400)
@@ -41,7 +25,7 @@ exports.confirmPasswordReset = async (req, res, next) => {
     }
     await exUser.update({
       password: hashedPassword,
-      resetPasswordLink: ""
+      resetPasswordLink: "",
     });
     return res.send("Updated you passowrd successfully");
   } catch (e) {
@@ -54,11 +38,10 @@ exports.confirmPasswordReset = async (req, res, next) => {
 exports.passwordReset = async (req, res) => {
   const { userId } = req.body;
 
-  console.log("this is userId :", userId);
   const exUser = await db.User.findOne({
     where: {
-      userId: userId
-    }
+      userId: userId,
+    },
   });
   if (!exUser) {
     return res
@@ -83,14 +66,14 @@ exports.passwordReset = async (req, res) => {
       <hr/>
       <p>This email may contain sensetive information</p>
       <p>${process.env.CLIENT_URL} 'what is this?' </p>
-      `
+      `,
   };
   try {
     console.log("updated token :", token);
     await exUser.update({ resetPasswordLink: token });
 
     console.log("updated user :", exUser);
-    sgMail.send(emailData).then(sent => {
+    sgMail.send(emailData).then((sent) => {
       return res
         .status(200)
         .send(
@@ -110,8 +93,8 @@ exports.signup = async (req, res) => {
 
   const exUser = await db.User.findOne({
     where: {
-      userId: userId
-    }
+      userId: userId,
+    },
   });
   if (exUser) {
     return res.status(400).send("Someone is already using the ID");
@@ -135,18 +118,18 @@ exports.signup = async (req, res) => {
                 <hr />
                 <p>This email may contain sensetive information</p>
                 <p>${process.env.CLIENT_URL}</p>
-            `
+            `,
   };
 
   sgMail
     .send(emailData)
-    .then(sent => {
+    .then((sent) => {
       // console.log('SIGNUP EMAIL SENT', sent)
       return res.send(
         `Activation email has been sent to ${userId}. Follow the instruction to activate your account`
       );
     })
-    .catch(err => {
+    .catch((err) => {
       // console.log('SIGNUP EMAIL SENT ERROR', err)
       return res.send(err.message);
     });
@@ -156,7 +139,7 @@ exports.accountActivation = (req, res) => {
   const { token } = req.body;
   console.log("activation fired :", token);
   if (token) {
-    jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, async function(
+    jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, async function (
       err,
       decoded
     ) {
@@ -170,8 +153,8 @@ exports.accountActivation = (req, res) => {
 
       const exUser = await db.User.findOne({
         where: {
-          userId: userId
-        }
+          userId: userId,
+        },
       });
       if (exUser) {
         return res.status(400).send("Someone is already using the ID");
@@ -181,7 +164,7 @@ exports.accountActivation = (req, res) => {
       const newUser = await db.User.create({
         nickname,
         userId,
-        password: hashedPassword
+        password: hashedPassword,
       });
       delete newUser.password;
       console.log("new user without password", newUser);
@@ -200,14 +183,14 @@ exports.passwordChange = async (req, res, next) => {
     console.log("user id:", req.user.id);
     const me = await db.User.findOne({
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     if (!me) {
       return res.status(400).send("User not found");
     }
     await me.update({
-      password: hashedPassword
+      password: hashedPassword,
     });
     return res.status(200).send("Password updated successfully");
   } catch (e) {

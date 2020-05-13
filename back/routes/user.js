@@ -10,11 +10,13 @@ const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
 const _ = require("lodash");
 
-// const fetch = require("node-fetch");
 require("dotenv").config();
 
 const router = express.Router();
 
+const { socketList } = require("../socket/socket");
+
+console.log("socket list imported :", socketList);
 const {
   accountActivation,
   signup,
@@ -24,9 +26,11 @@ const {
 } = require("../controllers/auth");
 
 router.get("/", isLoggedIn, (req, res) => {
-  // /api/user/
+  const io = req.app.get("io");
+
   const user = Object.assign({}, req.user.toJSON());
-  delete user.password; //password
+
+  delete user.password;
   return res.json(user);
 });
 
@@ -41,13 +45,7 @@ router.post(
   isLoggedIn,
   upload.single("image"),
   async (req, res, next) => {
-    //image from "image" in formdata
-    //req.body.image, req.body.content
-    // if different name for each file, you can use upload.fields()
-    console.log("req.files", req.file);
-    // res.json(req.file[imageLink]);
     try {
-      console.log("profilePhoto address", req.file[imageLink]);
       await db.User.update(
         {
           profilePhoto: req.file[imageLink],
@@ -143,9 +141,15 @@ router.post("/login", (req, res, next) => {
               attributes: ["id"],
             },
           ],
-          attributes: ["id", "nickname", "userId", "profilePhoto"],
+          attributes: [
+            "id",
+            "nickname",
+            "userId",
+            "profilePhoto",
+            "notification",
+          ],
         });
-        console.log(fullUser);
+
         return res.json(fullUser);
       } catch (e) {
         next(e);
@@ -276,7 +280,6 @@ router.get("/:id/videos", async (req, res, next) => {
 
 router.patch("/nickname", isLoggedIn, async (req, res, next) => {
   //partial update, isLoggedIn to be checked
-  console.log("nickname body:", req.body);
   try {
     await db.User.update(
       {
@@ -300,7 +303,6 @@ router.patch("/password", isLoggedIn, passwordChange);
 router.patch("/confirm-password-reset", confirmPasswordReset);
 
 router.patch("/description", isLoggedIn, async (req, res, next) => {
-  console.log("description :", req.body);
   try {
     const exUser = await db.User.findOne({
       where: {
@@ -339,7 +341,6 @@ router.get(
     failureRedirect: "/http://localhost:3000/signin",
   }),
   (req, res) => {
-    console.log("fired here");
     res.redirect("http://localhost:3000/signin");
   }
 );
@@ -357,7 +358,8 @@ router.get(
     failureRedirect: "/http://localhost:3000/signin",
   }),
   (req, res) => {
-    console.log("fired here");
+    // socketList[req.user.id] = req.session.socketId;
+
     res.redirect("http://localhost:3000/signin");
   }
 );
@@ -374,10 +376,10 @@ router.get(
     failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
-    console.log("fired here");
     res.redirect("http://localhost:3000/signin");
   }
 );
+
 router.get(
   "/auth/kakao",
   passport.authenticate("kakao", {
@@ -391,7 +393,6 @@ router.get(
     failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
-    console.log("kakao fired here");
     res.redirect("http://localhost:3000/");
   }
 );
@@ -409,7 +410,6 @@ router.get(
     failureRedirect: "http://localhost:3000/signin",
   }),
   (req, res) => {
-    console.log(" linkedin fired here");
     res.redirect("http://localhost:3000/signin");
   }
 );

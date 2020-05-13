@@ -12,6 +12,7 @@ const user = {};
 module.exports = () => {
   passport.serializeUser((user, done) => {
     console.log("serializeUser fired");
+
     return done(null, user.id);
   });
 

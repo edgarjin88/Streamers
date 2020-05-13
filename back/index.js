@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const expressSession = require("express-session");
+const session = require("express-session");
 const dotenv = require("dotenv");
 const passport = require("passport");
 const path = require("path");
@@ -12,6 +12,7 @@ const helmet = require("helmet");
 
 const passportConfig = require("./passport");
 const db = require("./models");
+const { webSocket, socketList } = require("./socket/socket");
 const userAPIRouter = require("./routes/user");
 const videoAPIRouter = require("./routes/video");
 const videosAPIRouter = require("./routes/videos");
@@ -38,7 +39,7 @@ const options =
     : null;
 
 dotenv.config();
-//////////////////////For socket IO
+//////////////////////For socket I
 
 const app = express();
 
@@ -47,22 +48,21 @@ const server =
     ? require("https").Server(options, app)
     : require("http").Server(app);
 
-const PORT = 3003;
+const PORT = prod ? 443 : 3003;
 
-const io = require("socket.io")(server);
-const socketFunctions = require("./socket/socket");
-try {
-  socketFunctions(io);
-} catch (e) {
-  console.log("socket error:", e);
-}
-
-///////////////////////////////////end of socket
+const sessionMiddleware = session({
+  resave: true,
+  saveUninitialized: true,
+  autoSave: true,
+  secret: process.env.COOKIE_SECRET,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+  },
+});
 
 db.sequelize.sync();
 passportConfig();
-
-// app.use(require("express-status-monitor")());
 
 if (prod) {
   app.use(hpp());
@@ -86,26 +86,15 @@ if (prod) {
 
 app.use("/", express.static("uploads")); //static file directory setting
 
-app.use(express.json()); //중요
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //for formdata process
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(
-  expressSession({
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.COOKIE_SECRET,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production" ? false : false,
-      domain: prod && ".websiteName.com", // without '.'  api.sumotee won't work. For subdomain as well.
-    },
-    name: "websiteName", //cookie name to change. Name of cookie from browser
-  })
-);
-app.use(passport.initialize()); //I will be initialized everytime. In real product, to be cached.
+app.use(sessionMiddleware);
+app.use(passport.initialize());
 
 app.use(passport.session());
 
+webSocket(server, app, sessionMiddleware);
 app.use("/api/user", userAPIRouter);
 app.use("/api/video", videoAPIRouter);
 app.use("/api/videos", videosAPIRouter);
@@ -113,6 +102,4 @@ app.use("/api/videos", videosAPIRouter);
 app.use("/api/hashtag", hashtagAPIRouter);
 app.use("/api/connections", webRTCRouter);
 
-server.listen(prod ? 443 : PORT, () =>
-  console.log(`Active on ${process.env.PORT}`)
-);
+server.listen(PORT, () => console.log(`Active on ${process.env.PORT}`));

@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
   Comment.associate = (db) => {
     db.Comment.belongsTo(db.User);
     db.Comment.belongsTo(db.User, {
-      // through: "RecommentTable",
       as: "Recommenter",
     });
 

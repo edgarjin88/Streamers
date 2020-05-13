@@ -1,4 +1,6 @@
-const { generateMessage, generateLocationMessage } = require("./messages");
+const SocketIO = require("socket.io");
+
+const { generateMessage } = require("./messages");
 const {
   addUser,
   removeUser,
@@ -6,11 +8,31 @@ const {
   getUsersInRoom,
   userList,
 } = require("./users");
+
 const Filter = require("bad-words");
 
-module.exports = (io) => {
+const socketList = {};
+
+const webSocket = (server, app, sessionMiddleware) => {
+  const io = SocketIO(server, { path: "/socket.io" });
+  app.set("io", io);
+
+  io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res, next);
+  });
+
   io.on("connection", (socket) => {
-    console.log("New WebSocket connection");
+    const req = socket.request;
+
+    req.session.socketInfo = socket.id;
+
+    req.session.save();
+
+    socket.on("loginInfo", (userId) => {
+      socketList[userId] = socket.id;
+      console.log("login info received :", userId);
+      console.log("socketinfo :", socketList);
+    });
 
     socket.on("join", (options, callback) => {
       const { error, user } = addUser({ id: socket.id, ...options });
@@ -53,9 +75,6 @@ module.exports = (io) => {
     });
 
     socket.on("sendMessage", (message, callback) => {
-      console.log("message received :", message);
-
-      console.log("what is socket.id :", socket.id);
       const user = getUser(socket.id);
 
       console.log("user: ", user);
@@ -102,39 +121,7 @@ module.exports = (io) => {
   });
 };
 
-// module.exports = (io) => {
-//   io.on("connection", function (socket) {
-//     console.log("socket connected ");
-
-//     socket.emit("messageFromServer", { message: "Welcome!!" });
-
-//     socket.on("messageToServer", (msg) => {
-//       socket.to(msg.room).emit("messageFromServer", msg);
-//     });
-
-//     socket.on("ready", function (req) {
-//       socket.join(req.chat_room); //will be postId
-//       socket.join(req.signal_room);
-//       console.log("shake socketid", socket.id);
-//     });
-//     socket.on("send", function (req) {
-//       socket.to(req.room).emit("message", {
-//         message: req.message,
-//         author: req.author,
-//       });
-//     });
-
-//     socket.on("signal", function (req) {
-//       socket.to(req.room).emit("signaling_message", {
-//         type: req.type,
-//         message: req.message,
-//       });
-//     });
-//     socket.on("close", (data) => {
-//       console.log("before leave room", data);
-//       socket.leave(data.signalRoom);
-//       socket.leave(data.room);
-//       //rejoin issue to be solved
-//     });
-//   });
-// };
+module.exports = {
+  socketList,
+  webSocket,
+};

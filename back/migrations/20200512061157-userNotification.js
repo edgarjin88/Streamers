@@ -3,9 +3,10 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.addColumn("Comments", "CommentId", {
+      queryInterface.addColumn("Users", "notification", {
         type: Sequelize.INTEGER,
         allowNull: true,
+        defaultValue: 0,
       }),
     ]);
   },

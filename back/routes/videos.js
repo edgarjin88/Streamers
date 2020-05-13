@@ -3,7 +3,11 @@ const db = require("../models");
 
 const router = express.Router();
 
+const { socketList } = require("../socket/socket");
+
 router.get("/", async (req, res, next) => {
+  const io = req.app.get("io");
+
   try {
     let where = {}; //two different "wheres"
     if (parseInt(req.query.lastId, 10)) {
