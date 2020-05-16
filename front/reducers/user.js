@@ -32,6 +32,9 @@ export const initialState = {
   startedEditingDescription: false,
   editDescriptionSuccess: false,
   editDescriptionErrorReason: "",
+  deleteNotificationErrorReason: "",
+  notificationList: [],
+  notificationCount: 0,
   // profilePhoto: null,
 };
 
@@ -125,9 +128,55 @@ export const OAUTH_SIGN_IN_REQUEST = "OAUTH_SIGN_IN_REQUEST";
 export const OAUTH_SIGN_IN_SUCCESS = "OAUTH_SIGN_IN_SUCCESS";
 export const OAUTH_SIGN_IN_FAILURE = "OAUTH_SIGN_IN_FAILURE";
 
+export const UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION";
+
+export const DELETE_NOTIFICATION_REQUEST = "DELETE_NOTIFICATION_REQUEST";
+export const DELETE_NOTIFICATION_SUCCESS = "DELETE_NOTIFICATION_SUCCESS";
+export const DELETE_NOTIFICATION_FAILURE = "DELETE_NOTIFICATION_FAILURE";
+
+export const DELETE_SINGLE_NOTIFICATION_REQUEST =
+  "DELETE_SINGLE_NOTIFICATION_REQUEST";
+export const DELETE_SINGLE_NOTIFICATION_SUCCESS =
+  "DELETE_SINGLE_NOTIFICATION_SUCCESS";
+export const DELETE_SINGLE_NOTIFICATION_FAILURE =
+  "DELETE_SINGLE_NOTIFICATION_FAILURE";
+
 export default (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case DELETE_SINGLE_NOTIFICATION_REQUEST: {
+        break;
+      }
+      case DELETE_SINGLE_NOTIFICATION_SUCCESS: {
+        const index = draft.notificationList.findIndex(
+          (v) => v.id === action.data
+        );
+
+        draft.notificationList.splice(index, 1);
+        break;
+      }
+      case DELETE_SINGLE_NOTIFICATION_FAILURE: {
+        break;
+      }
+
+      case DELETE_NOTIFICATION_REQUEST: {
+        break;
+      }
+      case DELETE_NOTIFICATION_SUCCESS: {
+        draft.notificationList = action.data.reverse();
+        draft.notificationCount = 0;
+        break;
+      }
+      case DELETE_NOTIFICATION_FAILURE: {
+        draft.deleteNotificationErrorReason = action.error;
+        break;
+      }
+
+      case UPDATE_NOTIFICATION: {
+        draft.notificationCount++;
+        break; //
+      }
+
       case UPLOAD_PROFILE_REQUEST: {
         break; //
       }
@@ -230,6 +279,7 @@ export default (state = initialState, action) => {
         draft.signInErrorReason = "";
         draft.signInSuccess = true;
         draft.me = action.data;
+        draft.notificationCount = action.data.notification;
         break;
       }
       case OAUTH_SIGN_IN_FAILURE: {
@@ -311,17 +361,23 @@ export default (state = initialState, action) => {
       case SIGN_IN_REQUEST: {
         draft.isLoading = true;
         draft.signInErrorReason = "";
+        draft.signInSuccess = false;
         break;
       }
       case SIGN_IN_SUCCESS: {
+        draft.signInSuccess = true;
         draft.isLoading = false;
         draft.signOutSuccess = false;
         draft.signInErrorReason = "";
         draft.me = action.data;
+        draft.notificationCount = action.data.notification;
+        //to prevent rerendering issue when notification updated
         break;
       }
       case SIGN_IN_FAILURE: {
         draft.isLoading = false;
+        draft.signInSuccess = false;
+
         draft.signInErrorReason = action.reason;
         draft.me = null;
         break;
@@ -334,6 +390,8 @@ export default (state = initialState, action) => {
         draft.isLoading = false;
         draft.signOutSuccess = true;
         draft.me = null;
+        draft.signInSuccess = false;
+
         break;
       }
       case SIGN_UP_REQUEST: {

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import { CLOSE_MODAL } from "../reducers/menu";
 import Button from "@material-ui/core/Button";
 import Modal from "@material-ui/core/Modal";
 import { makeStyles } from "@material-ui/core/styles";
@@ -75,10 +74,6 @@ export default function SimpleModal() {
   const [title, setTitle] = useState(videoTitle);
   const imageInput = useRef(); //
   const dispatch = useDispatch();
-
-  // const { openModal } = useSelector(({ menu }) => {
-  //   return { openModal: menu.openModal };
-  // }, shallowEqual);
 
   const onChangeVideoImages = useCallback((e) => {
     const imageFormData = new FormData();

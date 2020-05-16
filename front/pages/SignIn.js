@@ -12,7 +12,6 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
-import Toaster from "../components/Toaster";
 import { useStyles } from "../styles/SigniningStyle";
 // to be moved to styling folder later.
 
@@ -61,20 +60,7 @@ export default function SignInSide() {
           <form className={classes.form} noValidate>
             <MemoEmail />
             <MemoPassword />
-            {me && (
-              <Toaster
-                message="You are signed in succesfully. Redirecting to the main page."
-                type="success"
-                whereTo="/"
-              />
-            )}
-            {true && (
-              <Toaster
-                message={signInErrorReason}
-                type="error"
-                whereTo={false}
-              />
-            )}
+
             <MemoSignIn className={classes.submit} />
             <SocialLinks />
             <Grid container>

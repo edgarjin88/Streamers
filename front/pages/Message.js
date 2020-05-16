@@ -3,8 +3,6 @@ import { useSelector, shallowEqual, useDispatch } from "react-redux";
 
 import { MessageBoxGlobalStyle } from "../styles/MessageBox";
 import HideBar from "../containers/HideBar";
-import RelatedVideos from "../components/RelatedVideos";
-import Toaster from "../components/Toaster";
 import MessageBox from "../containers/MessageBox/MessageBox";
 
 import socketIOClient from "socket.io-client";
@@ -15,8 +13,6 @@ const socket = socketIOClient(endpoint, {
   secure: true,
   rejectUnauthorized: false,
 });
-
-// import SimpleModal from "../containers/CreateChannel";
 
 const Index = () => {
   const dispatch = useDispatch();

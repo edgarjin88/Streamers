@@ -118,6 +118,7 @@ const CommentList = () => {
           >
             <p> {`${moment(createdAt).format("DD.MM.YYYY")}`}</p>
             <CommentEditBox
+              refCommentId={undefined}
               commentId={id}
               commentOwner={UserId}
               CommentLikers={CommentLikers}
@@ -130,7 +131,11 @@ const CommentList = () => {
             </div>
           )}
           {showReplyComments && (
-            <ResponseComment commentId={id} Recomment={Recomment} />
+            <ResponseComment
+              commentId={id}
+              Recomment={Recomment}
+              videoUserId={videoUserId}
+            />
           )}
           {comment && comment.Recomment && comment.Recomment.length > 0 && (
             <ShowResponseButton id={id} />

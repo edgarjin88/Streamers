@@ -7,11 +7,3 @@ export const socket = socketIOClient(URL, {
   secure: true,
   rejectUnauthorized: false,
 });
-
-socket.on("message", (message) => {
-  console.log("message received here:", message);
-  StoreExported.dispatch({
-    type: UPDATE_CHAT_MESSAGE_LIST,
-    data: message,
-  });
-});

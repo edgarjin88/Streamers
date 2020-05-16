@@ -6,6 +6,7 @@ const { isLoggedIn } = require("./middleware");
 const router = express.Router();
 
 const { imageLink, upload } = require("../utilities/multerOptions");
+const { socketList } = require("../socket/socket");
 
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
@@ -358,26 +359,40 @@ router.delete("/:id/dislike", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/like", isLoggedIn, async (req, res, next) => {
   try {
-    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    const videoId = req.params.id;
+    const video = await db.Video.findOne({ where: { id: videoId } });
     if (!video) {
       return res.status(404).send("Video does not exist.");
     }
     await video.addLiker(req.user.id);
 
-    const likerName = await db.User.findOne({ where: { id: req.user.id } });
-
+    const liker = await db.User.findOne({ where: { id: req.user.id } });
+    const targetUser = await db.User.findOne({ where: { id: video.UserId } });
+    await targetUser.update({ notification: targetUser.notification + 1 });
+    console.log("this is user :", req.user);
     const event = await db.Event.create({
-      content: `${likerName.nickname} liked your channel ${video.title}.`,
-      targetVideoId: req.params.id,
+      content: `${liker.nickname} liked your Streaming Channel: ${video.title}.`,
+      targetVideoId: videoId,
       UserId: req.user.id,
+      userProfile: req.user.profilePhoto,
       TargetUserId: video.UserId,
     });
 
-    //여기서 event를 발싸 해서 socket 쪽에서 임포트
-    // 소켓에서 유저리스트에서 관련 유저 아이디가 있는지 참조. 그이후 그 아이디에 정보 전송.
-    //현재 유저 리스트가 방에만 만들어져 있으니,
-    //루트 에서도 만들 도록 하자.
-    //또한 usernotification counter도 여기서 올리도록 하자.
+    // io.to(socketId).emit("hey", "I just met you");
+    const io = req.app.get("io");
+
+    const targetSocket = socketList[video.UserId];
+    console.log("this is io :", io);
+
+    if (targetSocket) {
+      console.log("targetSocket2 :", targetSocket);
+
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: videoId,
+        icon: liker.profilePhoto,
+      });
+    }
 
     res.json({
       userId: req.user.id,

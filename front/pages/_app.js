@@ -13,7 +13,7 @@ import SimpleModal from "../containers/CreateChannel";
 import rootSaga from "../sagas";
 import reducer from "../reducers";
 import { LOAD_USER_REQUEST } from "../reducers/user";
-import WrapperComponent from "../components/WrapperComponent";
+import WrapperComponent from "../containers/WrapperComponent";
 
 const Front = ({ Component, pageProps, store }) => {
   return (

@@ -10,7 +10,6 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
-import Toaster from "../../../components/Toaster";
 import { useStyles } from "../../../styles/SigniningStyle";
 // to be moved to styling folder later.
 
@@ -40,27 +39,24 @@ export default function SignInSide() {
       </div>
     </div>
   );
-  const handleClick = e => {
+  const handleClick = (e) => {
     e.preventDefault();
     console.log("data  !!!!!!!!!:", userId, password, nickname);
     dispatch({
       type: ACTIVATION_REQUEST,
       data: {
-        token
-      }
+        token,
+      },
     });
   };
 
-  const { isActivated, isLoading, activationErrorReason } = useSelector(
-    ({ user }) => {
-      return {
-        isActivated: user.isActivated,
-        isLoading: user.isLoading,
-        activationErrorReason: user.activationErrorReason
-      };
-    },
-    shallowEqual
-  );
+  const { isActivated } = useSelector(({ user }) => {
+    return {
+      isActivated: user.isActivated,
+      isLoading: user.isLoading,
+      activationErrorReason: user.activationErrorReason,
+    };
+  }, shallowEqual);
 
   useEffect(() => {
     if (isActivated) {
@@ -91,7 +87,7 @@ export default function SignInSide() {
               style={{
                 display: "flex",
                 justifyContent: "center",
-                border: "none"
+                border: "none",
               }}
             >
               <StyledButton1
@@ -106,20 +102,6 @@ export default function SignInSide() {
             </div>
             {isActivated && <LinearDeterminate />}
 
-            {isActivated && (
-              <Toaster
-                message={`Activation Success. Signin and enjoy STREAMERS! `}
-                type="success"
-                whereTo={"/signin"}
-              />
-            )}
-            {activationErrorReason && (
-              <Toaster
-                message={activationErrorReason}
-                type="error"
-                whereTo={false}
-              />
-            )}
             <Box mt={5}>
               <Copyright text="Streamers" />
             </Box>

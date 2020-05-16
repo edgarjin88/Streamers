@@ -7,6 +7,12 @@ export const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexGrow: 1,
   },
+  list: {
+    overflowY: "auto",
+    margin: 0,
+    padding: 0,
+    backgroundColor: "red",
+  },
   toolBar: {
     display: "flex",
     justifyContent: "center",
@@ -83,6 +89,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
+    outline: "none",
     // size: "large"
   },
   hide: {
@@ -122,11 +129,13 @@ export const useStyles = makeStyles((theme) => ({
   ///icons
   sectionDesktop: {
     display: "none",
+    outline: "none",
     [theme.breakpoints.up("md")]: {
       display: "flex",
     },
   },
   sectionMobile: {
+    outline: "none",
     display: "flex",
     [theme.breakpoints.up("md")]: {
       display: "none",

@@ -19,9 +19,8 @@ import { URL } from "../../config/config";
 import moment from "moment";
 import CommentEditBox from "../../containers/comment/CommentEditBox";
 moment.locale("en");
-const ResponseComment = ({ commentId, Recomment }) => {
-  const dispatch = useDispatch();
 
+const ResponseComment = ({ commentId, Recomment, videoUserId }) => {
   const { me } = useSelector(({ user }) => {
     return { me: user.me };
   }, shallowEqual);
@@ -31,7 +30,11 @@ const ResponseComment = ({ commentId, Recomment }) => {
       {Recomment &&
         Recomment.map((eachRecomment) => {
           return (
-            <div className="comment my-comment">
+            <div
+              className={`comment ${
+                eachRecomment.Recommenter.id == videoUserId ? "my-comment" : ""
+              }`}
+            >
               <img
                 src={
                   eachRecomment &&
@@ -66,6 +69,7 @@ const ResponseComment = ({ commentId, Recomment }) => {
                   CommentLikers={eachRecomment.CommentLikers}
                   CommentDislikers={eachRecomment.CommentDislikers}
                   refCommentId={commentId}
+                  commentOwner={eachRecomment.Recommenter.id}
                 />
               </div>
             </div>

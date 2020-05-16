@@ -13,15 +13,11 @@ import { useStyles } from "../styles/HideBarStyle";
 
 import { Drawers } from "./Drawers";
 import { SignInButton } from "./SignInButton";
-import {
-  MemoSearchInput,
-  MemoMenuItems,
-  MemoMenuIcon,
-} from "./MenuBarSubComponents";
+import { MemoSearchInput, MemoMenuIcon } from "./MenuBarSubComponents";
+import { MemoMenuItems } from "./MemoMenuItems";
 import { LogoAndName } from "../components/MenuComponents";
 
 import { CLOSE_DRAWER } from "../reducers/menu";
-///////// stylings to be seperated
 const HideOnScroll = (props) => {
   const { children, window } = props;
   const trigger = useScrollTrigger({ target: window ? window() : undefined });

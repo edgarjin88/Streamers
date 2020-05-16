@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import Router from "next/router";
 import { useSelector, shallowEqual } from "react-redux";
-import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
 import Toaster from "../components/Toaster";
@@ -21,7 +19,7 @@ import {
   MemoPassword,
   MemoPasswordCheck,
   MemoTerm,
-  MemoSignUp
+  MemoSignUp,
 } from "../containers/InputComponents";
 
 import LinearDeterminate from "../components/Progressbar";
@@ -34,10 +32,9 @@ export default function SignInSide() {
   const classes = useStyles();
   /////////Logic //////////
 
-  const { isLoading, signUpErrorReason } = useSelector(({ user }) => {
+  const { isLoading } = useSelector(({ user }) => {
     return {
       isLoading: user.isLoading,
-      signUpErrorReason: user.signUpErrorReason
     };
   }, shallowEqual);
   useEffect(() => {
@@ -72,13 +69,7 @@ export default function SignInSide() {
                 whereTo="/signin"
               />
             )}
-            {signUpErrorReason && (
-              <Toaster
-                message={signUpErrorReason}
-                type="error"
-                whereTo={false}
-              />
-            )}
+
             <MemoSignUp className={classes.submit} />
             {isLoading && <LinearDeterminate />}
             <SocialLinks />

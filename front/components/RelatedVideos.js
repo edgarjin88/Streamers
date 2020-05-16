@@ -12,13 +12,6 @@ const MainVideos = ({ headers = "", videoData = null }) => {
   const countRef = useRef([]);
 
   const dispatch = useDispatch();
-  // if (!videoData) {
-  //   useEffect(() => {
-  //     dispatch({
-  //       type: LOAD_MAIN_VIDEOS_REQUEST,
-  //     });
-  //   }, []);
-  // }
 
   const videoList = videoData && videoData.length > 0 ? videoData : mainVideos;
 
@@ -30,7 +23,6 @@ const MainVideos = ({ headers = "", videoData = null }) => {
       if (hasMoreVideos) {
         const lastId = mainVideos[mainVideos.length - 1].id; //
         if (!countRef.current.includes(lastId)) {
-          // dispatch, if no current id
           dispatch({
             type: LOAD_MAIN_VIDEOS_REQUEST,
             lastId, // lastid : lastId
@@ -72,9 +64,8 @@ const MainVideos = ({ headers = "", videoData = null }) => {
                       src={
                         videoInfo && videoInfo.Images && videoInfo.Images[0]
                           ? `${URL}/${videoInfo.Images[0].src}`
-                          : "/images/videos/try-not-to-laugh.png"
+                          : "/images/videos/noimage.png"
                       }
-                      alt="Why I laugh at most CEOs"
                     />
                     {`Created on ${moment(videoInfo.createdAt).format(
                       "DD.MM.YYYY"

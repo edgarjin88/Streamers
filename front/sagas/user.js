@@ -59,6 +59,12 @@ import {
   UPLOAD_PROFILE_REQUEST,
   UPLOAD_PROFILE_FAILURE,
   UPLOAD_PROFILE_SUCCESS,
+  DELETE_NOTIFICATION_REQUEST,
+  DELETE_NOTIFICATION_FAILURE,
+  DELETE_NOTIFICATION_SUCCESS,
+  DELETE_SINGLE_NOTIFICATION_REQUEST,
+  DELETE_SINGLE_NOTIFICATION_FAILURE,
+  DELETE_SINGLE_NOTIFICATION_SUCCESS,
 } from "../reducers/user";
 
 import {
@@ -577,8 +583,68 @@ function* uploadProfileImages(action) {
 function* watchUploadProfileImages() {
   yield takeLatest(UPLOAD_PROFILE_REQUEST, uploadProfileImages);
 }
+
+//remove user notification
+
+function deleteUserNotificationAPI() {
+  return axios.delete("/user/deletenotifications", {
+    withCredentials: true,
+    httpsAgent,
+  });
+}
+
+function* deleteUserNotification() {
+  try {
+    const result = yield call(deleteUserNotificationAPI);
+    yield put({
+      type: DELETE_NOTIFICATION_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    yield put({
+      type: DELETE_NOTIFICATION_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchDeleteNotification() {
+  yield takeLatest(DELETE_NOTIFICATION_REQUEST, deleteUserNotification);
+}
+
+function deleteSingleNotificationAPI(notificationId) {
+  return axios.delete(`/user/deletesinglenotification/${notificationId}`, {
+    withCredentials: true,
+    httpsAgent,
+  });
+}
+
+function* deleteSingleNotification(action) {
+  try {
+    const result = yield call(deleteSingleNotificationAPI, action.data);
+    yield put({
+      type: DELETE_SINGLE_NOTIFICATION_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    yield put({
+      type: DELETE_SINGLE_NOTIFICATION_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchDeleteSingleNotification() {
+  yield takeLatest(
+    DELETE_SINGLE_NOTIFICATION_REQUEST,
+    deleteSingleNotification
+  );
+}
+
 export default function* userSaga() {
   yield all([
+    fork(watchDeleteSingleNotification),
+    fork(watchDeleteNotification),
     fork(watchUploadProfileImages),
     fork(watchEditDescription),
     fork(watchConfirmPasswordReset),

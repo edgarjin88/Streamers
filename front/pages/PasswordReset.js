@@ -17,9 +17,7 @@ import Copyright from "../components/Copyright";
 
 import {
   MemoEmail,
-  MemoPassword,
-  MemoSignIn,
-  MemoSubmitPasswordReset
+  MemoSubmitPasswordReset,
 } from "../containers/InputComponents";
 
 import { SocialLinks } from "../containers/SocialIconLinksFlat";
@@ -31,7 +29,7 @@ export default function SignInSide() {
     ({ user }) => {
       return {
         resetPasswordErrorReason: user.resetPasswordErrorReason,
-        resetPasswordSuccess: user.resetPasswordSuccess
+        resetPasswordSuccess: user.resetPasswordSuccess,
       };
     },
     shallowEqual
@@ -59,7 +57,9 @@ export default function SignInSide() {
             )}
             {resetPasswordSuccess && (
               <Toaster
-                message={resetPasswordSuccess}
+                message={
+                  "Password recovery link sent. Please check your email."
+                }
                 type="success"
                 whereTo={"/signin"}
               />
@@ -68,7 +68,7 @@ export default function SignInSide() {
               style={{
                 display: "flex",
                 justifyContent: "center",
-                border: "none"
+                border: "none",
               }}
             >
               <MemoSubmitPasswordReset />

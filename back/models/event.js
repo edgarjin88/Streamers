@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      userProfile: {
+        type: DataTypes.STRING(300),
+        allowNull: true,
+      },
     },
     {
       charset: "utf8mb4",

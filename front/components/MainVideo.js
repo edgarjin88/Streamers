@@ -21,7 +21,6 @@ const MainVideo = () => {
 
   const { src, streamingOn } = useSelector(({ video }) => {
     return {
-      // currentVideoId: video.currentVideo && video.currentVideo.id,
       streamingOn: video.streamingOn,
       src:
         video.currentVideo &&
@@ -79,9 +78,7 @@ const MainVideo = () => {
         {!streamingOn && (
           <img
             className={"main-content"}
-            src={
-              src ? `${URL}/${src}` : "../static/images/videos/novideoimage.jpg"
-            }
+            src={src ? `${URL}/${src}` : "/images/videos/noimage.png"}
             alt="How to film your course"
           />
         )}

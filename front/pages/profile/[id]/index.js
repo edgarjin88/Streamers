@@ -24,13 +24,6 @@ const Profile = () => {
 
   const dispatch = useDispatch();
 
-  ///////////logic 1//
-  ///////////logic 1//
-  //id로 유저 정보 불러오기.
-  //내 정보는 me.id로 클릭하기.
-
-  // 내 프로필이 아니면 저장 못하게 하기.
-
   const { nickname } = useSelector((state) => state.user.userInfo);
 
   const { userVideos } = useSelector((state) => state.video);
@@ -48,8 +41,6 @@ const Profile = () => {
       me: user.me,
     };
   }, shallowEqual);
-
-  // const { mainPosts } = useSelector((state) => state.post);
 
   const onUnfollow = useCallback(
     (userId) => () => {
