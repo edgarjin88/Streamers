@@ -51,7 +51,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
   const { userNotification } = useSelector(({ user }) => {
-    return { userNotification: user.notificationCount };
+    return { userNotification: user.me && user.me.notification };
   }, shallowEqual);
 
   const dispatch = useDispatch();
@@ -179,30 +179,39 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
       open={isNotificationOpen}
       onClose={handleMenuClose}
     >
-      {notificationList.map((el) => {
-        const wordIndex = el.content.indexOf(
-          "liked" || "disliked" || "subscribed" || "unsubscribed"
-        );
+      {/* b.match(/( vid|audo)/).index */}
+      {notificationList.map((el, i) => {
+        const wordIndex = el.content.match(
+          /( disliked|liked|unsubscribed|subscribed|commented|replied)/
+        ).index;
         const name = el.content.slice(0, wordIndex);
         const message = el.content.slice(wordIndex);
+        const { UserId, userProfile, targetVideoId } = el;
+        console.log("targetVideoId :", targetVideoId);
+        console.log("UserId :", UserId);
         return (
-          <StyledMenuItem>
+          <StyledMenuItem key={i}>
             <div className="notificationItem">
               {" "}
-              <Link href={`/profile/[id]`} as={`/profile/${el && el.UserId}`}>
+              <Link key={1} href={`/profile/[id]`} as={`/profile/${UserId}`}>
                 <a>
                   <img
                     src={
                       el.userProfile
-                        ? `${URL}/${el.userProfile}`
+                        ? `${URL}/${userProfile}`
                         : `/images/profiles/how-to-anything.png`
                     }
                   />
                 </a>
               </Link>
               <Link
-                href={`/video/[id]`}
-                as={`/video/${el && el.targetVideoId}`}
+                key={2}
+                href={targetVideoId ? `/video/[id]` : `/profile/[id]`}
+                as={
+                  targetVideoId
+                    ? `/video/${targetVideoId}`
+                    : `/profile/${UserId}`
+                }
               >
                 <a>
                   <span>

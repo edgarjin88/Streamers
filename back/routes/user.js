@@ -26,10 +26,11 @@ const {
 } = require("../controllers/auth");
 
 router.get("/", isLoggedIn, (req, res) => {
-  const io = req.app.get("io");
+  // const io = req.app.get("io");
 
   const user = Object.assign({}, req.user.toJSON());
 
+  console.log("user info: "), user;
   delete user.password;
   return res.json(user);
 });
@@ -219,6 +220,7 @@ router.delete("/:id/follower", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/follow", isLoggedIn, async (req, res, next) => {
   try {
+    const targetUserId = req.params.id;
     const me = await db.User.findOne({
       //req.user.id. cache user first to prevent unexpected errors.
       where: {
@@ -226,6 +228,33 @@ router.post("/:id/follow", isLoggedIn, async (req, res, next) => {
       },
     });
     await me.addFollowing(req.params.id);
+
+    const targetUser = await db.User.findOne({
+      where: {
+        id: targetUserId,
+      },
+    });
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
+    const event = await db.Event.create({
+      content: `${me.nickname} subscribed your Streaming Channels.`,
+      UserId: req.user.id,
+      userProfile: req.user.profilePhoto,
+      TargetUserId: targetUserId,
+    });
+
+    const io = req.app.get("io");
+
+    const targetSocket = socketList[targetUserId];
+
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        icon: me.profilePhoto,
+        profileLink: me.id,
+      });
+    }
+
     res.send(req.params.id);
   } catch (e) {
     console.error(e);
@@ -235,12 +264,39 @@ router.post("/:id/follow", isLoggedIn, async (req, res, next) => {
 
 router.delete("/:id/follow", isLoggedIn, async (req, res, next) => {
   try {
+    const targetUserId = req.params.id;
     const me = await db.User.findOne({
       where: {
         id: req.user.id,
       },
     });
     await me.removeFollowing(req.params.id);
+
+    const targetUser = await db.User.findOne({
+      where: {
+        id: targetUserId,
+      },
+    });
+
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
+    const event = await db.Event.create({
+      content: `${me.nickname} unsubscribed your Streaming Channels.`,
+      UserId: req.user.id,
+      userProfile: req.user.profilePhoto,
+      TargetUserId: targetUserId,
+    });
+    const io = req.app.get("io");
+
+    const targetSocket = socketList[targetUserId];
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        icon: me.profilePhoto,
+        profileLink: me.id,
+      });
+    }
+
     res.send(req.params.id);
   } catch (e) {
     console.error(e);

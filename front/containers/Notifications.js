@@ -1,14 +1,6 @@
 import React, { memo, useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-
-import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
-import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import MoreIcon from "@material-ui/icons/MoreVert";
 
 import { useStyles } from "../styles/HideBarStyle";
 import {
@@ -68,14 +60,6 @@ const StyledMenuItem = styled.div`
     height: 3.4rem;
   }
 `;
-const deleteSingleNotification = (notificationId) => (e) => {
-  console.log("this should be event :", e);
-  console.log("this should be notificationId :", notificationId);
-  dispatch({
-    type: DELETE_SINGLE_NOTIFICATION_REQUEST,
-    data: notificationId,
-  });
-};
 
 const RenderNotification = () => {
   const classes = useStyles();
@@ -83,15 +67,18 @@ const RenderNotification = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
-  const { userNotification } = useSelector(({ user }) => {
-    return { userNotification: user.notificationCount };
-  }, shallowEqual);
 
   const dispatch = useDispatch();
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isNotificationOpen = Boolean(notificationAnchorEl);
+
+  const deleteSingleNotification = (notificationId) => (e) => {
+    console.log("this should be event :", e);
+    console.log("this should be notificationId :", notificationId);
+    dispatch({
+      type: DELETE_SINGLE_NOTIFICATION_REQUEST,
+      data: notificationId,
+    });
+  };
 
   const handleClickNotification = (e) => {
     dispatch({

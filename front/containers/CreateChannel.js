@@ -136,10 +136,14 @@ export default function SimpleModal() {
       <div style={modalStyle} className={classes.paper}>
         <h2
           id="simple-modal-title"
-          style={{ display: "flex", alignItems: "center" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <VideocamIcon
-            style={{ marginLeft: "15px", fontSize: "35px", color: "black" }}
+            style={{ margin: "0 1.5rem", fontSize: "3.5rem", color: "black" }}
           />
           Create Your Streaming Channel here!
         </h2>

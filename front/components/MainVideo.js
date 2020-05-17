@@ -70,7 +70,7 @@ const MainVideo = () => {
         dispatch({ type: EMPTY_CHAT_MESSAGE_LIST });
       }
     };
-  }, [me, queryId]);
+  }, [queryId]);
 
   return (
     <>

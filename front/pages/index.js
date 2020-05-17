@@ -6,6 +6,7 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
+import { LOAD_USER_REQUEST } from "../reducers/user";
 
 const Index = () => {
   return (
@@ -22,8 +23,6 @@ const Index = () => {
 };
 
 Index.getInitialProps = async (context) => {
-  const { id } = context.query;
-
   await context.store.dispatch({
     type: LOAD_MAIN_VIDEOS_REQUEST,
   });

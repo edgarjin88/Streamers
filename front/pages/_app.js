@@ -18,10 +18,9 @@ import WrapperComponent from "../containers/WrapperComponent";
 const Front = ({ Component, pageProps, store }) => {
   return (
     <Provider store={store}>
-      <WrapperComponent>
-        <Component {...pageProps} />
-        <SimpleModal />
-      </WrapperComponent>
+      <Component {...pageProps} />
+      <SimpleModal />
+      <WrapperComponent />
     </Provider>
   );
 };
@@ -40,7 +39,7 @@ Front.getInitialProps = async (context) => {
   }
 
   if (!state.user.me) {
-    // console.log('getinitialprops fired');
+    console.log("getinitialprops fired");
     ctx.store.dispatch({
       type: LOAD_USER_REQUEST,
     });

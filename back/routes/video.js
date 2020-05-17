@@ -320,6 +320,36 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
         },
       ],
     });
+
+    const commenter = await db.User.findOne({ where: { id: req.user.id } });
+    const targetUser = await db.User.findOne({
+      where: { id: video.UserId },
+    });
+
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
+    const event = await db.Event.create({
+      content: `${commenter.nickname} commented on your channel: ${video.title}.`,
+      targetVideoId: video.id,
+      UserId: commenter.id,
+      userProfile: commenter.profilePhoto,
+      TargetUserId: video.UserId,
+    });
+
+    const io = req.app.get("io");
+
+    const targetSocket = socketList[video.UserId];
+
+    if (targetSocket) {
+      console.log("targetSocket2 :", targetSocket);
+
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: video.id,
+        icon: commenter.profilePhoto,
+      });
+    }
+
     return res.json(comment);
   } catch (e) {
     console.error(e);
@@ -329,11 +359,39 @@ router.post("/:id/comment", isLoggedIn, async (req, res, next) => {
 
 router.post("/:id/dislike", isLoggedIn, async (req, res, next) => {
   try {
-    const video = await db.Video.findOne({ where: { id: req.params.id } });
+    const videoId = req.params.id;
+
+    const video = await db.Video.findOne({ where: { id: videoId } });
     if (!video) {
       return res.status(404).send("Video does not exist.");
     }
     await video.addDisliker(req.user.id);
+
+    const disliker = await db.User.findOne({ where: { id: req.user.id } });
+    const targetUser = await db.User.findOne({ where: { id: video.UserId } });
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
+    const event = await db.Event.create({
+      content: `${disliker.nickname} disliked your Streaming Channel: ${video.title}.`,
+      targetVideoId: videoId,
+      UserId: req.user.id,
+      userProfile: req.user.profilePhoto,
+      TargetUserId: video.UserId,
+    });
+
+    // io.to(socketId).emit("hey", "I just met you");
+    const io = req.app.get("io");
+
+    const targetSocket = socketList[video.UserId];
+
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: videoId,
+        icon: disliker.profilePhoto,
+      });
+    }
+
     res.json({
       userId: req.user.id,
     });
@@ -369,7 +427,7 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
     const liker = await db.User.findOne({ where: { id: req.user.id } });
     const targetUser = await db.User.findOne({ where: { id: video.UserId } });
     await targetUser.update({ notification: targetUser.notification + 1 });
-    console.log("this is user :", req.user);
+
     const event = await db.Event.create({
       content: `${liker.nickname} liked your Streaming Channel: ${video.title}.`,
       targetVideoId: videoId,
@@ -382,7 +440,6 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
     const io = req.app.get("io");
 
     const targetSocket = socketList[video.UserId];
-    console.log("this is io :", io);
 
     if (targetSocket) {
       console.log("targetSocket2 :", targetSocket);
@@ -417,6 +474,7 @@ router.delete("/:id/like", isLoggedIn, async (req, res, next) => {
     next(e);
   }
 });
+
 ///comment like
 ///comment like
 router.post("/:id/commentlike", isLoggedIn, async (req, res, next) => {
@@ -427,10 +485,36 @@ router.post("/:id/commentlike", isLoggedIn, async (req, res, next) => {
     }
     await comment.addCommentLiker(req.user.id);
 
+    const targetUser = await db.User.findOne({
+      where: { id: comment.UserId },
+    });
+
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
     const user = await db.User.findOne({
       where: { id: req.user.id },
       attributes: ["id", "nickname", "profilePhoto"],
     });
+
+    const event = await db.Event.create({
+      content: `${user.nickname} liked your comment.`,
+      targetVideoId: comment.VideoId,
+      UserId: user.id,
+      userProfile: user.profilePhoto,
+      TargetUserId: comment.UserId,
+    });
+
+    const io = req.app.get("io");
+    const targetSocket = socketList[comment.UserId];
+
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: comment.VideoId,
+        icon: user.profilePhoto,
+      });
+    }
+
     res.json(user);
   } catch (e) {
     console.error(e);
@@ -456,7 +540,6 @@ router.delete("/:id/commentlike", isLoggedIn, async (req, res, next) => {
 //recomment
 router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
   try {
-    // console.log("remomment req.body :", req.body);
     const exComment = await db.Comment.findOne({
       where: { id: req.params.id },
     });
@@ -497,6 +580,36 @@ router.post("/:id/recomment", isLoggedIn, async (req, res, next) => {
 
     await exComment.addRecomment(fullComment);
 
+    const targetUser = await db.User.findOne({
+      where: { id: fullComment.UserId },
+    });
+
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
+    const user = await db.User.findOne({
+      where: { id: req.user.id },
+      attributes: ["id", "nickname", "profilePhoto"],
+    });
+
+    const event = await db.Event.create({
+      content: `${user.nickname} replied to your comment.`,
+      targetVideoId: exComment.VideoId,
+      UserId: user.id,
+      userProfile: user.profilePhoto,
+      TargetUserId: fullComment.UserId,
+    });
+
+    const io = req.app.get("io");
+    const targetSocket = socketList[fullComment.UserId];
+
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: fullComment.VideoId,
+        icon: user.profilePhoto,
+      });
+    }
+
     res.json(fullComment);
   } catch (e) {
     console.error(e);
@@ -535,10 +648,35 @@ router.post("/:id/commentDislike", isLoggedIn, async (req, res, next) => {
     }
     await comment.addCommentDisliker(req.user.id);
 
+    const targetUser = await db.User.findOne({
+      where: { id: comment.UserId },
+    });
+    await targetUser.update({ notification: targetUser.notification + 1 });
+
     const user = await db.User.findOne({
       where: { id: req.user.id },
       attributes: ["id", "nickname", "profilePhoto"],
     });
+
+    const event = await db.Event.create({
+      content: `${user.nickname} disliked your comment.`,
+      targetVideoId: comment.VideoId,
+      UserId: user.id,
+      userProfile: user.profilePhoto,
+      TargetUserId: comment.UserId,
+    });
+
+    const io = req.app.get("io");
+    const targetSocket = socketList[comment.UserId];
+
+    if (targetSocket) {
+      io.to(targetSocket).emit("eventSentFromServer", {
+        message: event.content,
+        videoId: comment.VideoId,
+        icon: user.profilePhoto,
+      });
+    }
+
     res.json(user);
   } catch (e) {
     console.error(e);

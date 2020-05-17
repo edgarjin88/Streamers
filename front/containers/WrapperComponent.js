@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import Toaster from "../components/Toaster";
 import { socket } from "../components/socket/socket";
 import { UPDATE_CHAT_MESSAGE_LIST } from "../reducers/video";
 import { FRONTURL, URL } from "../config/config";
@@ -8,8 +7,10 @@ import { UPDATE_NOTIFICATION } from "../reducers/user";
 
 import Toasters from "./Toasters";
 //all socket logic to be added here
-const createNotification = (title, { icon, message, videoId }) => {
-  const link = `${FRONTURL}/video/${videoId}`;
+const createNotification = (title, { icon, message, videoId, profileLink }) => {
+  const link = videoId
+    ? `${FRONTURL}/video/${videoId}`
+    : `${FRONTURL}/profile/${profileLink}`;
 
   const options = {
     body: message,
@@ -23,7 +24,7 @@ const createNotification = (title, { icon, message, videoId }) => {
   setTimeout(n.close.bind(n), 4000);
 };
 
-const WrapperComponent = ({ children }) => {
+const WrapperComponent = () => {
   const dispatch = useDispatch();
 
   const { me } = useSelector(({ user }) => {
@@ -59,7 +60,6 @@ const WrapperComponent = ({ children }) => {
 
   return (
     <>
-      {children}
       <Toasters />
     </>
   );

@@ -40,8 +40,8 @@ export default function HideAppBar(props) {
 
   const classes = useStyles();
 
-  const { me } = useSelector(({ user }) => {
-    return { me: user.me };
+  const { userId } = useSelector(({ user }) => {
+    return { userId: user.me.id };
   }, shallowEqual);
   const handleClose = useCallback(() => {
     dispatch({
@@ -76,7 +76,7 @@ export default function HideAppBar(props) {
                 </div>
                 <MemoSearchInput />
               </div>
-              {me ? <MemoMenuItems /> : <SignInButton />}
+              {userId ? <MemoMenuItems /> : <SignInButton />}
             </Toolbar>
           </AppBar>
         </HideOnScroll>

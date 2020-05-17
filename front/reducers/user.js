@@ -164,7 +164,7 @@ export default (state = initialState, action) => {
       }
       case DELETE_NOTIFICATION_SUCCESS: {
         draft.notificationList = action.data.reverse();
-        draft.notificationCount = 0;
+        draft.me.notification = 0;
         break;
       }
       case DELETE_NOTIFICATION_FAILURE: {
@@ -173,7 +173,7 @@ export default (state = initialState, action) => {
       }
 
       case UPDATE_NOTIFICATION: {
-        draft.notificationCount++;
+        draft.me.notification++;
         break; //
       }
 
@@ -279,7 +279,7 @@ export default (state = initialState, action) => {
         draft.signInErrorReason = "";
         draft.signInSuccess = true;
         draft.me = action.data;
-        draft.notificationCount = action.data.notification;
+        draft.notificationCount = draft.me.notification;
         break;
       }
       case OAUTH_SIGN_IN_FAILURE: {
@@ -370,7 +370,8 @@ export default (state = initialState, action) => {
         draft.signOutSuccess = false;
         draft.signInErrorReason = "";
         draft.me = action.data;
-        draft.notificationCount = action.data.notification;
+        const temp = draft.me.notification;
+        draft.notificationCount = temp;
         //to prevent rerendering issue when notification updated
         break;
       }
@@ -417,6 +418,7 @@ export default (state = initialState, action) => {
       case LOAD_USER_SUCCESS: {
         if (action.me) {
           draft.me = action.data;
+          // draft.notificationCount
           break;
         }
         draft.userInfo = action.data;
