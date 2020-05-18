@@ -41,7 +41,7 @@ export default function HideAppBar(props) {
   const classes = useStyles();
 
   const { userId } = useSelector(({ user }) => {
-    return { userId: user.me.id };
+    return { userId: user && user.me && user.me.id };
   }, shallowEqual);
   const handleClose = useCallback(() => {
     dispatch({

@@ -593,9 +593,7 @@ main {
 
   #related-videos > ul > li img {
  
-    // min-height: 131px;
     object-fit: cover;
-    // height: 100%;
   width: 100%;
   
   }
@@ -613,17 +611,27 @@ main {
     grid: auto-flow max-content / repeat(auto-fill, minmax(250px, 1fr));
   }
 
+  @media (min-width: 1280px) and (orientation: landscape) {
+
+     #related-videos > ul {
+       max-width: 1280px;
+       margin: auto;
+  }
+
+  }
 
 
-  // #left-side-bar{
-  //   grid-area : left-side-bar;
-  //   background-color: white;
-  //   color: red;
-  //   margin-top:48px;
-  //   position:fixed;
-  //   width: 256px; 
-  //   height: 100vh
-  // }
+
+/* 
+   #left-side-bar{
+     grid-area : left-side-bar;
+     background-color: white;
+     color: red;
+     margin-top:48px;
+     position:fixed;
+     width: 256px; 
+     height: 100vh
+   } */
 
 }
 

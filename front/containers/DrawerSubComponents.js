@@ -1,16 +1,14 @@
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback } from "react";
 import Router from "next/router";
-import { SIGN_OUT_REQUEST, NULLIFY_SIGN_OUT } from "../reducers/user";
-import { OPEN_DRAWER, CLOSE_DRAWER, OPEN_MODAL } from "../reducers/menu";
+import { SIGN_OUT_REQUEST } from "../reducers/user";
+import { CLOSE_DRAWER, OPEN_MODAL } from "../reducers/menu";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import LogOut from "@material-ui/icons/PowerSettingsNew";
 import Typography from "@material-ui/core/Typography";
 
 import IconButton from "@material-ui/core/IconButton";
 
-import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
@@ -31,7 +29,7 @@ import { useStyles } from "../styles/HideBarStyle";
 import { useTheme } from "@material-ui/core/styles";
 
 export const MemoSystemItemList = memo(function MemoSystemItemList() {
-  const { me, signOutSuccess } = useSelector(({ user }) => {
+  const { me } = useSelector(({ user }) => {
     return { me: user.me, signOutSuccess: user.signOutSuccess };
   }, shallowEqual);
 
@@ -47,6 +45,7 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
         });
       }
       if (target === "Sign In") {
+        console.log("sign in clicked");
         Router.push("/signin");
       }
     },
@@ -95,11 +94,22 @@ export const MemoUserItemList = memo(function MemoUserItemList() {
       if (target === "My Profile") {
         Router.push(`/profile/${me.id}`);
       }
+      if (target === "My Channels") {
+        Router.push(`/mychannels`);
+      }
+      if (target === "Popular Channels") {
+        Router.push(`/popularchannels`);
+      }
+      if (target === "Favorite Channels") {
+        Router.push(`/favorite`);
+      }
       if (target === "Create a new channel") {
         dispatch({
           type: OPEN_MODAL,
         });
       }
+
+      dispatch({ type: CLOSE_DRAWER });
     },
     [me]
   );
@@ -150,9 +160,6 @@ export const MemoUserItemList = memo(function MemoUserItemList() {
   );
 });
 
-//actions
-/////MemoCloseButton;
-/////MemoCloseButton;
 /////MemoCloseButton;
 export const MemoCloseButton = memo(function MemoCloseButton() {
   const classes = useStyles();

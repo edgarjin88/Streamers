@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      streaming: {
+        type: DataTypes.STRING(5),
+        defaultValue: "OFF",
+        allowNull: true,
+      },
     },
     {
       charset: "utf8mb4", //  emoji.

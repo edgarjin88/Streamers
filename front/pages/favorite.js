@@ -5,9 +5,9 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
-import { LOAD_USER_VIDEOS_REQUEST } from "../reducers/video";
+import { LOAD_FAVORITE_VIDEOS_REQUEST } from "../reducers/video";
 import Router from "next/router";
-const Mychannels = () => {
+const Favorite = () => {
   const { userVideos, me } = useSelector((state) => {
     return {
       userVideos: state.video.userVideos,
@@ -25,16 +25,16 @@ const Mychannels = () => {
       <IndexGlobalStyle />
       <HideBar style={{ zIndex: 3000 }} />
       <main>
-        <RelatedVideos headers={`Your video channels`} />
+        <RelatedVideos headers={`Your favorite video channels`} />
       </main>
     </div>
   );
 };
 
-Mychannels.getInitialProps = async (context) => {
+Favorite.getInitialProps = async (context) => {
   await context.store.dispatch({
-    type: LOAD_USER_VIDEOS_REQUEST,
+    type: LOAD_FAVORITE_VIDEOS_REQUEST,
   });
 };
 
-export default Mychannels;
+export default Favorite;

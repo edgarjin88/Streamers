@@ -5,15 +5,12 @@ import { IndexGlobalStyle } from "../../../styles/indexStyle";
 
 import HideBar from "../../../containers/HideBar";
 import RelatedVideos from "../../../components/RelatedVideos";
-import Toaster from "../../../components/Toaster";
-import {
-  NULLIFY_SIGN_OUT,
-  NULLIFY_SIGN_IN_SUCCESS,
-} from "../../../reducers/user";
+
 import { LOAD_HASHTAG_VIDEOS_REQUEST } from "../../../reducers/video";
 
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
+  console.log("tag  here :", tag);
 
   const { mainVideos, hasMoreVideo } = useSelector((state) => state.video);
 
@@ -48,7 +45,7 @@ const Hashtag = ({ tag }) => {
       <HideBar style={{ zIndex: 3000 }} />
 
       <main>
-        <RelatedVideos />
+        <RelatedVideos headers={`VIDEOS RELATED TO HASHTAG: ${tag}`} />
       </main>
     </div>
   );

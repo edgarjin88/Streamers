@@ -304,13 +304,19 @@ router.delete("/:id/follow", isLoggedIn, async (req, res, next) => {
   }
 });
 
-router.get("/:id/videos", async (req, res, next) => {
+router.get("/:id/favorite", async (req, res, next) => {
   try {
-    const vidoes = await db.Video.findAll({
-      where: {
-        UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0, //if "0", still send information.
-        RetweetId: null, // If it is my post, retweetId is null.
-      },
+    let where = {};
+    if (parseInt(req.query.lastId, 10)) {
+      where = {
+        id: { [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10) },
+      }; // less than last id.
+    }
+    const user = await db.User.findOne({
+      where: { id: req.user.id },
+    });
+    const likedVideos = await user.getLiked({
+      where,
       include: [
         {
           model: db.User,
@@ -326,8 +332,50 @@ router.get("/:id/videos", async (req, res, next) => {
           attributes: ["id", "profilePhoto"],
         },
       ],
+      order: [["createdAt", "DESC"]], // DESC, ASC
+      limit: parseInt(req.query.limit, 10),
     });
-    res.json(vidoes);
+
+    res.json(likedVideos);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.get("/:id/videos", async (req, res, next) => {
+  try {
+    let where = {
+      UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,
+    }; //two different "wheres"
+    console.log("last id: ", parseInt(req.query.lastId, 10));
+    console.log("paramsaaa id: ", parseInt(req.params.id, 10));
+    if (parseInt(req.query.lastId, 10)) {
+      where.id = { [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10) }; // less than last id.
+    }
+
+    const videos = await db.Video.findAll({
+      where,
+      include: [
+        {
+          model: db.User,
+          attributes: ["id", "nickname", "profilePhoto"],
+        },
+        {
+          model: db.Image,
+        },
+        {
+          model: db.User,
+          through: "Like",
+          as: "Likers",
+          attributes: ["id", "profilePhoto"],
+        },
+      ],
+      order: [["createdAt", "DESC"]], // DESC, ASC
+      limit: parseInt(req.query.limit, 10),
+    });
+    console.log("full videos :", videos.length);
+    res.json(videos);
   } catch (e) {
     console.error(e);
     next(e);

@@ -515,6 +515,7 @@ main {
   #video-comments {
     border-bottom: 0;
   }
+  
 }
 
 @media (min-width: 1280px) and (orientation: landscape) {
@@ -531,6 +532,7 @@ main {
   #related-videos > ul {
     grid-template-columns: repeat(2, 1fr);
   }
+  
 }
 
 `;

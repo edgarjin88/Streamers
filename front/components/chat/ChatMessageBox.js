@@ -38,14 +38,14 @@ const ChatMessageBox = () => {
                 const myMessage = userId === me.id;
 
                 return myMessage ? (
-                  <div className="message-row you-message">
+                  <div key={createdAt} className="message-row you-message">
                     <div className="message-content">
                       <div className="message-text">{text}</div>
                       <div className="message-time">{time}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="message-row other-message">
+                  <div key={createdAt} className="message-row other-message">
                     <div className="message-content">
                       <img
                         src={

@@ -89,6 +89,7 @@ const CommentList = () => {
       const showReplyComments = showResponse.includes(id);
       return (
         <div
+          key={id}
           className={`comment ${
             comment.User.id == videoUserId ? "my-comment" : ""
           }`}

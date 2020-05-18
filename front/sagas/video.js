@@ -43,6 +43,12 @@ import {
   LOAD_MAIN_VIDEOS_FAILURE,
   LOAD_MAIN_VIDEOS_REQUEST,
   LOAD_MAIN_VIDEOS_SUCCESS,
+  LOAD_POPULAR_VIDEOS_FAILURE,
+  LOAD_POPULAR_VIDEOS_REQUEST,
+  LOAD_POPULAR_VIDEOS_SUCCESS,
+  LOAD_FAVORITE_VIDEOS_FAILURE,
+  LOAD_FAVORITE_VIDEOS_REQUEST,
+  LOAD_FAVORITE_VIDEOS_SUCCESS,
   LOAD_USER_VIDEOS_FAILURE,
   LOAD_USER_VIDEOS_REQUEST,
   LOAD_USER_VIDEOS_SUCCESS,
@@ -163,8 +169,15 @@ function* watchLoadHashtagVideos() {
   yield takeLatest(LOAD_HASHTAG_VIDEOS_REQUEST, loadHashtagVideos);
 }
 
-function loadUserVideosAPI(id) {
-  return axios.get(`/user/${id || 0}/videos`, {
+// function loadMainVideosAPI(lastId = 0, limit = 10) {
+//   return axios.get(`/videos?lastId=${lastId}&limit=${limit}`, {
+//     httpsAgent,
+//     withCredentials: true,
+//   });
+
+function loadUserVideosAPI(id, lastId = 0, limit = 10) {
+  return axios.get(`/user/${id || 0}/videos?lastId=${lastId}&limit=${limit}`, {
+    // return axios.get(`/user/${id || 0}/videos`, {
     // if no ide, 0 == my video
     httpsAgent,
     withCredentials: true,
@@ -173,7 +186,7 @@ function loadUserVideosAPI(id) {
 
 function* loadUserVideos(action) {
   try {
-    const result = yield call(loadUserVideosAPI, action.data);
+    const result = yield call(loadUserVideosAPI, action.data, action.lastId);
     yield put({
       type: LOAD_USER_VIDEOS_SUCCESS,
       data: result.data,
@@ -187,7 +200,7 @@ function* loadUserVideos(action) {
 }
 
 function* watchLoadUserVideos() {
-  yield takeLatest(LOAD_USER_VIDEOS_REQUEST, loadUserVideos);
+  yield throttle(2000, LOAD_USER_VIDEOS_REQUEST, loadUserVideos);
 }
 
 ///////review above
@@ -790,6 +803,62 @@ function* watchAddReplyToComment() {
   yield takeLatest(ADD_REPLY_TO_COMMENT_REQUEST, addReplyToComment);
 }
 
+function loadPopularVideosAPI(lastId = 0, limit = 10) {
+  return axios.get(`/videos/popular?lastId=${lastId}&limit=${limit}`, {
+    httpsAgent,
+    withCredentials: true,
+  });
+  //lastId=0 as a default value otherwise, sequelize can make an error with the value "undefined"
+}
+
+function* loadPopularVideos(action) {
+  try {
+    const result = yield call(loadPopularVideosAPI, action.lastId);
+    yield put({
+      type: LOAD_POPULAR_VIDEOS_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    yield put({
+      type: LOAD_POPULAR_VIDEOS_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchLoadPopularVideos() {
+  yield throttle(2000, LOAD_POPULAR_VIDEOS_REQUEST, loadPopularVideos);
+}
+
+function loadFavoriteVideosAPI(id, lastId = 0, limit = 10) {
+  return axios.get(
+    `/user/${id || 0}/favorite?lastId=${lastId}&limit=${limit}`,
+    {
+      httpsAgent,
+      withCredentials: true,
+    }
+  );
+}
+
+function* loadFavoriteVideos(action) {
+  try {
+    const result = yield call(loadFavoriteVideosAPI, action.id, action.lastId);
+    yield put({
+      type: LOAD_FAVORITE_VIDEOS_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    yield put({
+      type: LOAD_FAVORITE_VIDEOS_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchLoadFavoriteVideos() {
+  yield throttle(2000, LOAD_FAVORITE_VIDEOS_REQUEST, loadFavoriteVideos);
+}
+
 export default function* videoSaga() {
   yield all([
     fork(watchRemoveComment),
@@ -800,7 +869,9 @@ export default function* videoSaga() {
     fork(watchDislikeVideo),
     fork(watchUndislikeVideo),
     fork(watchUploadVideoeImages),
+    fork(watchLoadFavoriteVideos),
     fork(watchLoadMainVideos),
+    fork(watchLoadPopularVideos),
     fork(watchAddVideo),
     fork(watchAddReplyToComment),
     fork(watchAddComment),

@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { useRouter } from "next/router";
 
 import { ProfileStyle } from "../../../styles/profileStyle";
 import HideBar from "../../../containers/HideBar";
@@ -20,47 +19,27 @@ import {
 import { LOAD_USER_VIDEOS_REQUEST } from "../../../reducers/video";
 
 const Profile = () => {
-  const Router = useRouter();
-
   const dispatch = useDispatch();
 
-  const { nickname } = useSelector((state) => state.user.userInfo);
-
-  const { userVideos } = useSelector((state) => state.video);
-
   const {
+    userVideos,
+    nickname,
     changePasswordSuccess,
     editNicknameSuccess,
     editDescriptionSuccess,
     me,
-  } = useSelector(({ user }) => {
+    profilePhoto,
+  } = useSelector((state) => {
     return {
-      editNicknameSuccess: user.editNicknameSuccess,
-      changePasswordSuccess: user.changePasswordSuccess,
-      editDescriptionSuccess: user.editDescriptionSuccess,
-      me: user.me,
+      profilePhoto: state.user.userInfo.profilePhoto,
+      userVideos: state.video.userVideos,
+      nickname: state.user.userInfo.nickname,
+      editNicknameSuccess: state.user.editNicknameSuccess,
+      changePasswordSuccess: state.user.changePasswordSuccess,
+      editDescriptionSuccess: state.user.editDescriptionSuccess,
+      me: state.user.me,
     };
   }, shallowEqual);
-
-  const onUnfollow = useCallback(
-    (userId) => () => {
-      dispatch({
-        type: UNFOLLOW_USER_REQUEST,
-        data: userId,
-      });
-    },
-    []
-  );
-
-  const onRemoveFollower = useCallback(
-    (userId) => () => {
-      dispatch({
-        type: REMOVE_FOLLOWER_REQUEST,
-        data: userId,
-      });
-    },
-    []
-  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -73,7 +52,7 @@ const Profile = () => {
       });
     }, 1000);
   }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
-
+  console.log("userVideos value: ", userVideos);
   return (
     <div className="container">
       <ProfileStyle />
@@ -83,6 +62,7 @@ const Profile = () => {
         <Card />
 
         <RelatedVideos
+          profilePhoto={profilePhoto}
           videoData={userVideos}
           headers={`${nickname}'s other streamings`}
         />
@@ -107,8 +87,6 @@ const Profile = () => {
 };
 
 Profile.getInitialProps = async (context) => {
-  const state = context.store.getState();
-
   const { id } = context.query;
   // await context.store.dispatch({
   //   type: LOAD_VIDEO_REQUEST,

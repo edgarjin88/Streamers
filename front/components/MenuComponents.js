@@ -6,13 +6,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import VideocamIcon from "@material-ui/icons/Videocam";
+import { useDispatch } from "react-redux";
+import { CLOSE_DRAWER } from "../reducers/menu";
 export const LogoAndName = memo(function LogoAndName() {
   const classes = useStyles();
-  // to add animation log later
+  const dispatch = useDispatch();
+
+  const handleClick = useCallback(() => {
+    dispatch({ type: CLOSE_DRAWER });
+  }, []);
   return (
     <Typography className={classes.title} variant="h4" noWrap>
-      <Link href="/index">
+      <Link href="/">
         <a
+          onClick={handleClick}
           style={{
             display: "flex",
             justifyItems: "center",

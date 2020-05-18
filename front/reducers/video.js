@@ -8,6 +8,14 @@ export const LOAD_MAIN_VIDEOS_REQUEST = "LOAD_MAIN_VIDEOS_REQUEST";
 export const LOAD_MAIN_VIDEOS_SUCCESS = "LOAD_MAIN_VIDEOS_SUCCESS";
 export const LOAD_MAIN_VIDEOS_FAILURE = "LOAD_MAIN_VIDEOS_FAILURE";
 
+export const LOAD_FAVORITE_VIDEOS_REQUEST = "LOAD_FAVORITE_VIDEOS_REQUEST";
+export const LOAD_FAVORITE_VIDEOS_SUCCESS = "LOAD_FAVORITE_VIDEOS_SUCCESS";
+export const LOAD_FAVORITE_VIDEOS_FAILURE = "LOAD_FAVORITE_VIDEOS_FAILURE";
+
+export const LOAD_POPULAR_VIDEOS_REQUEST = "LOAD_POPULAR_VIDEOS_REQUEST";
+export const LOAD_POPULAR_VIDEOS_SUCCESS = "LOAD_POPULAR_VIDEOS_SUCCESS";
+export const LOAD_POPULAR_VIDEOS_FAILURE = "LOAD_POPULAR_VIDEOS_FAILURE";
+
 export const LOAD_HASHTAG_VIDEOS_REQUEST = "LOAD_HASHTAG_VIDEOS_REQUEST";
 export const LOAD_HASHTAG_VIDEOS_SUCCESS = "LOAD_HASHTAG_VIDEOS_SUCCESS";
 export const LOAD_HASHTAG_VIDEOS_FAILURE = "LOAD_HASHTAG_VIDEOS_FAILURE";
@@ -503,24 +511,6 @@ export default (state = initialState, action) => {
         break;
       }
 
-      case LOAD_USER_VIDEOS_REQUEST: {
-        draft.userVideos = !action.lastId ? [] : draft.userVideos;
-
-        draft.hasMoreVideos = action.lastId ? draft.hasMoreVideos : true;
-
-        break;
-      }
-      case LOAD_USER_VIDEOS_SUCCESS: {
-        action.data.forEach((d) => {
-          draft.userVideos.push(d);
-        });
-        draft.hasMoreVideos = action.data.length === 10;
-        break;
-      }
-      case LOAD_USER_VIDEOS_FAILURE: {
-        break;
-      }
-
       case INCREASE_SUBSCRIPTION: {
         draft.currentVideo.User.Followers.unshift(action.data);
 
@@ -598,25 +588,40 @@ export default (state = initialState, action) => {
       case LOAD_VIDEO_FAILURE: {
         draft.loadCurrentVideoErrorReason = action.error;
         draft.currentVideo = action.data;
+        draft.isLoading = false;
+
         break;
       }
+      case LOAD_POPULAR_VIDEOS_REQUEST:
+      case LOAD_USER_VIDEOS_REQUEST:
       case LOAD_MAIN_VIDEOS_REQUEST:
+      case LOAD_FAVORITE_VIDEOS_REQUEST:
       case LOAD_HASHTAG_VIDEOS_REQUEST: {
+        // debugger;
         draft.mainVideos = !action.lastId ? [] : draft.mainVideos;
-
-        draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
-
+        draft.hasMoreVideos = action.lastId ? draft.hasMoreVideos : true;
+        draft.isLoading = true;
         break;
       }
+
+      case LOAD_POPULAR_VIDEOS_SUCCESS:
       case LOAD_MAIN_VIDEOS_SUCCESS:
+      case LOAD_FAVORITE_VIDEOS_SUCCESS:
+      case LOAD_USER_VIDEOS_SUCCESS:
       case LOAD_HASHTAG_VIDEOS_SUCCESS: {
         action.data.forEach((d) => {
           draft.mainVideos.push(d);
         });
-        draft.hasMorePost = action.data.length === 10;
+        draft.hasMoreVideos = action.data.length === 10;
+
+        draft.isLoading = false;
+
         break;
       }
+      case LOAD_POPULAR_VIDEOS_FAILURE:
+      case LOAD_USER_VIDEOS_FAILURE:
       case LOAD_MAIN_VIDEOS_FAILURE:
+      case LOAD_FAVORITE_VIDEOS_FAILURE:
       case LOAD_HASHTAG_VIDEOS_FAILURE: {
         break;
       }

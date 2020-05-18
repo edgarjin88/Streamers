@@ -5,29 +5,27 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
-import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
-const Index = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch({ type: LOAD_MAIN_VIDEOS_REQUEST });
-  }, []);
-  console.log("fired here?");
+import {
+  LOAD_USER_VIDEOS_REQUEST,
+  LOAD_POPULAR_VIDEOS_REQUEST,
+} from "../reducers/video";
+const PopularVideos = () => {
   return (
     <div className="container">
       <IndexGlobalStyle />
       <HideBar style={{ zIndex: 3000 }} />
 
       <main>
-        <RelatedVideos />
+        <RelatedVideos headers={`Currently trending channels`} />
       </main>
     </div>
   );
 };
 
-Index.getInitialProps = async (context) => {
+PopularVideos.getInitialProps = async (context) => {
   await context.store.dispatch({
-    type: LOAD_MAIN_VIDEOS_REQUEST,
+    type: LOAD_POPULAR_VIDEOS_REQUEST,
   });
 };
 
-export default Index;
+export default PopularVideos;
