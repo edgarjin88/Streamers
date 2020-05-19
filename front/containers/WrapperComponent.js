@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { socket } from "../components/socket/socket";
-import { UPDATE_CHAT_MESSAGE_LIST } from "../reducers/video";
+import {
+  UPDATE_CHAT_MESSAGE_LIST,
+  UPDATE_STREAMING_ON,
+  UPDATE_STREAMING_OFF,
+} from "../reducers/video";
 import { FRONTURL, URL } from "../config/config";
 import { UPDATE_NOTIFICATION } from "../reducers/user";
 
@@ -54,6 +58,20 @@ const WrapperComponent = () => {
       dispatch({
         type: UPDATE_CHAT_MESSAGE_LIST,
         data: message,
+      });
+    });
+    socket.on("streamingOn", (message) => {
+      console.log("streamingOn received here:", message);
+      dispatch({
+        type: UPDATE_STREAMING_ON,
+        data: message.id,
+      });
+    });
+    socket.on("streamingOff", (message) => {
+      console.log("streamingOff received here:", message);
+      dispatch({
+        type: UPDATE_STREAMING_OFF,
+        data: message.id,
       });
     });
   }, []);

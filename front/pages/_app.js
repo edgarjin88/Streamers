@@ -61,7 +61,10 @@ const configureStore = (initialState = {}, options) => {
           applyMiddleware(...middlewares),
           !options.isServer &&
             typeof window.__REDUX_DEVTOOLS_EXTENSION__ !== "undefined"
-            ? window.__REDUX_DEVTOOLS_EXTENSION__()
+            ? window.__REDUX_DEVTOOLS_EXTENSION__({
+                serialize: true,
+                trace: true,
+              })
             : (f) => f
         );
   const store = createStore(reducer, initialState, enhancer);

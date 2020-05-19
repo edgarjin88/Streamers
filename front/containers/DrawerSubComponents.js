@@ -27,7 +27,7 @@ import CreateIcon from "@material-ui/icons/Create";
 import SignIn from "@material-ui/icons/ExitToApp";
 import { useStyles } from "../styles/HideBarStyle";
 import { useTheme } from "@material-ui/core/styles";
-
+const itemStyle = { color: "black", fontSize: "2.5rem" };
 export const MemoSystemItemList = memo(function MemoSystemItemList() {
   const { me } = useSelector(({ user }) => {
     return { me: user.me, signOutSuccess: user.signOutSuccess };
@@ -61,15 +61,13 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
         {ItemList.map((text, index) => (
           <ListItem onClick={handleClick(text)} button key={text}>
             <ListItemIcon>
-              {(text === "Sign Out" && <LogOut fontSize="large" />) ||
-                (text === "Sign In" && (
-                  <SignIn color="black" fontSize="large" />
-                )) ||
-                (text === "Settings" && <SettingsIcon fontSize="large" />) ||
+              {(text === "Sign Out" && <LogOut style={itemStyle} />) ||
+                (text === "Sign In" && <SignIn style={itemStyle} />) ||
+                (text === "Settings" && <SettingsIcon style={itemStyle} />) ||
                 (text === "Privacy and Policies" && (
-                  <PolicyIcon fontSize="large" />
+                  <PolicyIcon style={itemStyle} />
                 )) ||
-                (text === "Drafts" && <MyVideo fontSize="large" />)}
+                (text === "Drafts" && <MyVideo style={itemStyle} />)}
             </ListItemIcon>
             <ListItemText
               primary={<Typography variant="h6">{text}</Typography>}
@@ -127,29 +125,32 @@ export const MemoUserItemList = memo(function MemoUserItemList() {
       ]
     : ["Popular Channels", "Favorite Channels", "Library", "History"];
   //if signed in,
+
   return (
     <List>
       {ItemList.map((text, index) => (
         <ListItem onClick={handleClick(text)} button key={text}>
           <ListItemIcon>
             {(text === "My Profile" && (
-              <AccountCircleIcon fontSize="large" />
+              <AccountCircleIcon style={itemStyle} />
             )) ||
-              (text === "My Channels" && <MyVideo fontSize="large" />) ||
+              (text === "My Channels" && <MyVideo style={itemStyle} />) ||
               (text === "Create a new channel" && (
-                <CreateIcon fontSize="large" />
+                <CreateIcon style={itemStyle} />
               )) ||
               (text === "Favorite Channels" && (
-                <ThumbUpIcon fontSize="large" />
+                <ThumbUpIcon style={itemStyle} />
               )) ||
-              (text === "Library" && <VideoLibraryIcon fontSize="large" />) ||
-              (text === "History" && <HistoryIcon fontSize="large" />) ||
+              (text === "Library" && <VideoLibraryIcon style={itemStyle} />) ||
+              (text === "History" && <HistoryIcon style={itemStyle} />) ||
               (text === "Popular Channels" && (
-                <TrendingUpIcon fontSize="large" />
+                <TrendingUpIcon style={itemStyle} />
               )) ||
-              (text === "Favorite Channels" && <MyVideo fontSize="large" />) ||
-              (text === "Messages" && <MessageIcon fontSize="large" />) ||
-              (text === "Create a new channel" && <MyVideo fontSize="large" />)}
+              (text === "Favorite Channels" && <MyVideo style={itemStyle} />) ||
+              (text === "Messages" && <MessageIcon style={itemStyle} />) ||
+              (text === "Create a new channel" && (
+                <MyVideo style={itemStyle} />
+              ))}
           </ListItemIcon>
           <ListItemText
             primary={<Typography variant="h6">{text}</Typography>}

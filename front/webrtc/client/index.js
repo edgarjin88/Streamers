@@ -63,12 +63,13 @@ class ConnectionClient {
         sdpSemantics: "unified-plan",
       });
 
-      localPeerConnection.close = function () {
+      localPeerConnection.close = function (videoId) {
         StoreExported.dispatch({
           type: STOP_STREAMING_REQUEST,
         });
+        // redux 필요하네 여기서도.
         console.log("delete  session fired");
-        fetch(`${URL}/api/connections/${typePassed}/${id}`, {
+        fetch(`${URL}/api/connections/${typePassed}/${id}/${videoId}`, {
           method: "delete",
         }).catch(() => {});
         return RTCPeerConnection.prototype.close.apply(this, arguments);
@@ -104,7 +105,7 @@ class ConnectionClient {
         return localPeerConnection;
       } catch (error) {
         console.log("error occurred. session will be deleted :", error);
-        localPeerConnection.close();
+        localPeerConnection.close(currentVideoId);
         throw error;
       }
     };

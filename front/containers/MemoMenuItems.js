@@ -1,5 +1,6 @@
 import React, { memo, useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import Router from "next/router";
 
 import IconButton from "@material-ui/core/IconButton";
 import Badge from "@material-ui/core/Badge";
@@ -21,26 +22,6 @@ import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import { URL } from "../config/config";
 import styled from "styled-components";
 
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import TrendingUpIcon from "@material-ui/icons/TrendingUp";
-import HistoryIcon from "@material-ui/icons/History";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import MyVideo from "@material-ui/icons/OndemandVideo";
-import MessageIcon from "@material-ui/icons/Forum";
-import SettingsIcon from "@material-ui/icons/Settings";
-import PolicyIcon from "@material-ui/icons/Policy";
-import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import CreateIcon from "@material-ui/icons/Create";
-import SignIn from "@material-ui/icons/ExitToApp";
-import { useTheme } from "@material-ui/core/styles";
 import { OPEN_MODAL } from "../reducers/menu";
 
 export const MemoMenuItems = memo(function MemoMenuItems() {
@@ -50,8 +31,8 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
-  const { userNotification } = useSelector(({ user }) => {
-    return { userNotification: user.me && user.me.notification };
+  const { userNotification, me } = useSelector(({ user }) => {
+    return { userNotification: user.me && user.me.notification, me: user.me };
   }, shallowEqual);
 
   const dispatch = useDispatch();
@@ -76,6 +57,17 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
     setMobileMoreAnchorEl(null);
     setNotificationAnchorEl(null);
   };
+
+  const clickProfile = () => {
+    Router.push(`/profile/[id]`, `/profile/${me.id}`);
+    handleMenuClose();
+  };
+
+  const clickMyStreaming = () => {
+    Router.push(`/mychannels`);
+    handleMenuClose();
+  };
+
   const menuId = "test";
 
   const handleMobileMenuOpen = (event) => {
@@ -96,10 +88,10 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={clickProfile}>
         <h3>Profile</h3>
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={clickMyStreaming}>
         <h3>My Streaming Channels</h3>
       </MenuItem>
       <MenuItem onClick={createChannel}>
@@ -160,6 +152,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
       height: 3.4rem;
     }
   `;
+
   const deleteSingleNotification = (notificationId) => (e) => {
     console.log("this should be event :", e);
     console.log("this should be notificationId :", notificationId);
@@ -242,7 +235,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
     >
       <MenuItem>
         <IconButton color="inherit">
-          <Badge badgeContent={4} color="secondary">
+          <Badge badgeContent={0} color="secondary">
             <MailIcon fontSize="large" />
           </Badge>
         </IconButton>
@@ -273,7 +266,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
     <>
       <div className={classes.sectionDesktop}>
         <IconButton color="inherit">
-          <Badge badgeContent={4} color="secondary">
+          <Badge badgeContent={0} color="secondary">
             <MailIcon fontSize="large" />
           </Badge>
         </IconButton>

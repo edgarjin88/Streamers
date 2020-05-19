@@ -5,10 +5,7 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
-import {
-  LOAD_USER_VIDEOS_REQUEST,
-  LOAD_POPULAR_VIDEOS_REQUEST,
-} from "../reducers/video";
+import { LOAD_POPULAR_VIDEOS_REQUEST } from "../reducers/video";
 const PopularVideos = () => {
   return (
     <div className="container">

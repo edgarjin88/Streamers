@@ -8,9 +8,8 @@ import RelatedVideos from "../components/RelatedVideos";
 import { LOAD_USER_VIDEOS_REQUEST } from "../reducers/video";
 import Router from "next/router";
 const Mychannels = () => {
-  const { userVideos, me } = useSelector((state) => {
+  const { me } = useSelector((state) => {
     return {
-      userVideos: state.video.userVideos,
       me: state.user && state.user.me,
     };
   }, shallowEqual);

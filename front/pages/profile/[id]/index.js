@@ -22,7 +22,6 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const {
-    userVideos,
     nickname,
     changePasswordSuccess,
     editNicknameSuccess,
@@ -32,7 +31,6 @@ const Profile = () => {
   } = useSelector((state) => {
     return {
       profilePhoto: state.user.userInfo.profilePhoto,
-      userVideos: state.video.userVideos,
       nickname: state.user.userInfo.nickname,
       editNicknameSuccess: state.user.editNicknameSuccess,
       changePasswordSuccess: state.user.changePasswordSuccess,
@@ -52,7 +50,7 @@ const Profile = () => {
       });
     }, 1000);
   }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
-  console.log("userVideos value: ", userVideos);
+  // console.log("userVideos value: ", userVideos);
   return (
     <div className="container">
       <ProfileStyle />
@@ -63,7 +61,6 @@ const Profile = () => {
 
         <RelatedVideos
           profilePhoto={profilePhoto}
-          videoData={userVideos}
           headers={`${nickname}'s other streamings`}
         />
       </main>
@@ -88,10 +85,6 @@ const Profile = () => {
 
 Profile.getInitialProps = async (context) => {
   const { id } = context.query;
-  // await context.store.dispatch({
-  //   type: LOAD_VIDEO_REQUEST,
-  //   data: id,
-  // });
 
   await context.store.dispatch({
     type: LOAD_FOLLOWERS_REQUEST,

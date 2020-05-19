@@ -8,13 +8,9 @@ require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.confirmPasswordReset = async (req, res, next) => {
-  console.log("confirm fired :", req.body);
   try {
     const { resetPasswordLink, password } = req.body;
-    console.log("password :", password);
-    console.log("link :", resetPasswordLink);
     const hashedPassword = await bcrypt.hash(password, 12);
-    console.log("password :", hashedPassword);
     const exUser = await db.User.findOne({
       where: { resetPasswordLink: resetPasswordLink },
     });
@@ -54,9 +50,7 @@ exports.passwordReset = async (req, res) => {
     { expiresIn: "10m" } // because it is only for email verification.
   );
 
-  // console.log("test :", email, password, name);
   let emailData = {
-    // from: process.env.EMAIL_FROM,
     from: "no-reply@streamers.com",
     to: userId,
     subject: "Password reset email for your Streamers account.",
@@ -69,10 +63,8 @@ exports.passwordReset = async (req, res) => {
       `,
   };
   try {
-    console.log("updated token :", token);
     await exUser.update({ resetPasswordLink: token });
 
-    console.log("updated user :", exUser);
     sgMail.send(emailData).then((sent) => {
       return res
         .status(200)
@@ -124,31 +116,26 @@ exports.signup = async (req, res) => {
   sgMail
     .send(emailData)
     .then((sent) => {
-      // console.log('SIGNUP EMAIL SENT', sent)
       return res.send(
         `Activation email has been sent to ${userId}. Follow the instruction to activate your account`
       );
     })
     .catch((err) => {
-      // console.log('SIGNUP EMAIL SENT ERROR', err)
       return res.send(err.message);
     });
 };
 
 exports.accountActivation = (req, res) => {
   const { token } = req.body;
-  console.log("activation fired :", token);
   if (token) {
     jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, async function (
       err,
       decoded
     ) {
       if (err) {
-        console.log("JWT veirfy in account activation error :", err);
         return res.status(401).send("Token expired. Please signup again");
       }
 
-      console.log("decoded :", decoded);
       const { nickname, userId, password } = jwt.decode(token);
 
       const exUser = await db.User.findOne({

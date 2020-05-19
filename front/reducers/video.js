@@ -132,6 +132,9 @@ export const STOP_STREAMING_REQUEST = "STOP_STREAMING_REQUEST";
 export const STOP_STREAMING_FAILURE = "STOP_STREAMING_FAILURE";
 export const STOP_STREAMING_SUCCESS = "STOP_STREAMING_SUCCESS";
 
+export const UPDATE_STREAMING_ON = "UPDATE_STREAMING_ON";
+export const UPDATE_STREAMING_OFF = "UPDATE_STREAMING_OFF";
+
 export const initialState = {
   currentCommentId: null,
   mainVideos: [],
@@ -173,6 +176,24 @@ export default (state = initialState, action) => {
   return produce(state, (draft) => {
     //draft is mutable state now.
     switch (action.type) {
+      case UPDATE_STREAMING_OFF: {
+        // debugger;
+        const index = draft.mainVideos.findIndex((eachVideo) => {
+          return eachVideo.id === parseInt(action.data, 10);
+        });
+
+        draft.mainVideos[index].streaming = "OFF";
+        break;
+      }
+      case UPDATE_STREAMING_ON: {
+        // debugger;
+        const index = draft.mainVideos.findIndex((eachVideo) => {
+          return eachVideo.id === parseInt(action.data, 10);
+        });
+
+        draft.mainVideos[index].streaming = "ON";
+        break;
+      }
       case STOP_STREAMING_REQUEST: {
         draft.streamingOn = false;
         break;

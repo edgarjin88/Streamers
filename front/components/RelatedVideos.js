@@ -61,113 +61,114 @@ const RelatedVideo = ({
   const targetUserId = router.query.id;
   console.log("targetUserId :", targetUserId);
 
-  const { mainVideos, hasMoreVideos, isLoading } = useSelector((state) => {
-    return {
-      mainVideos: state.video.mainVideos,
-      hasMoreVideos: state.video.hasMoreVideos,
-      isLoading: state.video.isLoading,
-    };
-  }, shallowEqual);
-  const countRef = useRef([]);
+  const { mainVideos, hasMoreVideos, isLoading, searchValue } = useSelector(
+    (state) => {
+      return {
+        mainVideos: state.video.mainVideos,
+        hasMoreVideos: state.video.hasMoreVideos,
+        isLoading: state.video.isLoading,
+        searchValue: state.input.searchValue,
+      };
+    },
+    shallowEqual
+  );
+  let countRef = useRef([]);
   const videoLengthRef = useRef([]);
   const dispatch = useDispatch();
+  console.log("pathname :", pathName, "targetId :", targetUserId);
+  useEffect(() => {
+    countRef.current = [];
+  }, [pathName, targetUserId]);
 
-  let videoList = videoData && videoData.length > 0 ? videoData : mainVideos;
-  console.log("videoData :", videoData);
-  const onScroll = useCallback(() => {
-    if (
-      window.scrollY + document.documentElement.clientHeight >
-      document.documentElement.scrollHeight - 350
-    ) {
-      if (hasMoreVideos) {
-        const lastId =
-          mainVideos &&
-          mainVideos[mainVideos.length - 1] &&
-          mainVideos[mainVideos.length - 1].id;
+  //일단 onscroll이 문제인지 먼저 확실히 파악하자.
 
-        if (!countRef.current.includes(lastId)) {
-          if (pathName === "/mychannels") {
-            dispatch({
-              type: LOAD_USER_VIDEOS_REQUEST,
-              lastId,
-            });
-            return countRef.current.push(lastId);
+  const onScroll = useCallback(
+    (e) => {
+      if (
+        window.scrollY + document.documentElement.clientHeight >
+          document.documentElement.scrollHeight - 350 &&
+        e.deltaY > 0
+      ) {
+        if (hasMoreVideos) {
+          const lastId =
+            mainVideos &&
+            mainVideos[mainVideos.length - 1] &&
+            mainVideos[mainVideos.length - 1].id;
+
+          if (!countRef.current.includes(lastId)) {
+            if (pathName === "/" || pathName === "/index") {
+              dispatch({
+                type: LOAD_MAIN_VIDEOS_REQUEST,
+                lastId, //
+              });
+              countRef.current.push(lastId);
+            }
+            if (pathName === "/mychannels") {
+              dispatch({
+                type: LOAD_USER_VIDEOS_REQUEST,
+                lastId,
+              });
+              countRef.current.push(lastId);
+            }
+
+            if (pathName === "/profile/[id]") {
+              dispatch({
+                type: LOAD_USER_VIDEOS_REQUEST,
+                data: targetUserId,
+                lastId, //
+              });
+              countRef.current.push(lastId);
+            }
+            if (pathName === "/favorite") {
+              dispatch({
+                type: LOAD_FAVORITE_VIDEOS_REQUEST,
+                data: targetUserId,
+                lastId, //
+              });
+              countRef.current.push(lastId);
+            }
+            if (pathName === "/video/[id]") {
+              // videoList = mainVideos;
+              dispatch({
+                type: LOAD_MAIN_VIDEOS_REQUEST,
+                lastId, //
+              });
+              countRef.current.push(lastId);
+            }
+
+            if (pathName === "/hashtag/[tag]") {
+              dispatch({
+                type: LOAD_HASHTAG_VIDEOS_REQUEST,
+                data: searchValue,
+                lastId,
+              });
+              countRef.current.push(lastId);
+            }
           }
 
-          if (pathName === "/profile/[id]") {
-            dispatch({
-              type: LOAD_USER_VIDEOS_REQUEST,
-              data: targetUserId,
-              lastId, //
-            });
-            return countRef.current.push(lastId);
-          }
-          if (pathName === "/favorite") {
-            dispatch({
-              type: LOAD_FAVORITE_VIDEOS_REQUEST,
-              data: targetUserId,
-              lastId, //
-            });
-            return countRef.current.push(lastId);
-          }
-          if (pathName === "/video/[id]") {
-            // videoList = mainVideos;
-            dispatch({
-              type: LOAD_MAIN_VIDEOS_REQUEST,
-              lastId, //
-            });
-            countRef.current.push(lastId);
-          }
-        }
-
-        if (
-          videoLengthRef.current[videoLengthRef.current.length - 1] !==
-          mainVideos.length
-        ) {
-          if (pathName === "/popularchannels") {
-            dispatch({
-              type: LOAD_POPULAR_VIDEOS_REQUEST,
-              lastId: mainVideos.length,
-            });
-            videoLengthRef.current.push(mainVideos.length);
-          }
-
-          if (pathName === "/hashtag/[tag]") {
-            // videoList = mainVideos;
-            dispatch({
-              type: LOAD_HASHTAG_VIDEOS_REQUEST,
-              lastId: mainVideos.length,
-            });
-            countRef.current.push(lastId);
-
-            videoLengthRef.current.push(mainVideos.length);
-          }
-
-          if (pathName === "/" || pathName === "/index") {
-            dispatch({
-              type: LOAD_MAIN_VIDEOS_REQUEST,
-              lastId, //
-            });
-            countRef.current.push(lastId);
-            videoLengthRef.current.push(mainVideos.length);
+          if (
+            videoLengthRef.current[videoLengthRef.current.length - 1] !==
+            mainVideos.length
+          ) {
+            if (pathName === "/popularchannels") {
+              dispatch({
+                type: LOAD_POPULAR_VIDEOS_REQUEST,
+                lastId: mainVideos.length,
+              });
+              videoLengthRef.current.push(mainVideos.length);
+            }
           }
         }
       }
-    }
-  }, [
-    hasMoreVideos,
-    mainVideos.length,
-    pathName,
-    countRef.current.length,
-    videoLengthRef.current.length,
-    targetUserId,
-    videoData,
-  ]);
+    },
+    [hasMoreVideos, mainVideos.length, pathName, targetUserId]
+  );
 
   useEffect(() => {
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("wheel", onScroll);
+    // wheel event used to prevent scroll up event before unmount. Even though clean up code fires, scroll event still fire before unmount.
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onScroll);
     };
   }, [mainVideos.length]);
 
@@ -175,6 +176,7 @@ const RelatedVideo = ({
     return (
       <ul>
         {videoInfoList.map((videoInfo) => {
+          const { streaming } = videoInfo;
           return (
             <li key={videoInfo && videoInfo.createdAt + videoInfo.id}>
               <Link
@@ -199,7 +201,11 @@ const RelatedVideo = ({
                       </h4>
                       <strong>
                         Currently streaming{" "}
-                        <span style={{ color: "red" }}>OFF</span>
+                        {streaming === "ON" ? (
+                          <span style={{ color: "green" }}>ON</span>
+                        ) : (
+                          <span style={{ color: "red" }}>OFF</span>
+                        )}
                       </strong>
                     </div>
 
@@ -230,49 +236,10 @@ const RelatedVideo = ({
         {profilePhoto && <img src={`${URL}/${profilePhoto}`} />}
         <span>{headers} </span>
       </StyledHeader>
-      {renderVideoList(videoList)}
+      {renderVideoList(mainVideos)}
       {isLoading && showLoading && <Loading />}
     </aside>
   );
 };
 
 export default RelatedVideo;
-
-// const a = [
-//   {
-//     id: 2,
-//     description: "chasldkfj\n",
-//     title: "channel 2",
-//     videoImageURL: null,
-//     viewCount: 210,
-//     streaming: "OFF",
-//     createdAt: "2020-05-04T12:25:05.000Z",
-//     updatedAt: "2020-05-18T07:20:02.000Z",
-//     UserId: 1,
-//     RetweetId: null,
-//     Like: {
-//       createdAt: "2020-05-16T17:24:36.000Z",
-//       updatedAt: "2020-05-16T17:24:36.000Z",
-//       VideoId: 2,
-//       UserId: 1,
-//     },
-//   },
-//   {
-//     id: 3,
-//     description: "#test  Let's go #beach",
-//     title: "Test3",
-//     videoImageURL: null,
-//     viewCount: 341,
-//     streaming: "OFF",
-//     createdAt: "2020-05-13T15:21:02.000Z",
-//     updatedAt: "2020-05-18T07:50:57.000Z",
-//     UserId: 4,
-//     RetweetId: null,
-//     Like: {
-//       createdAt: "2020-05-16T17:40:44.000Z",
-//       updatedAt: "2020-05-16T17:40:44.000Z",
-//       VideoId: 3,
-//       UserId: 1,
-//     },
-//   },
-// ];

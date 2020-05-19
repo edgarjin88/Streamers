@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import ConnectionClient from "../client/index";
 import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -33,7 +34,7 @@ const WebRTCController = ({ type, options, currentVideoId }) => {
 
   const onStop = () => {
     if (window.peerConnection) {
-      window.peerConnection.close();
+      window.peerConnection.close(currentVideoId);
     }
   };
 
@@ -58,6 +59,14 @@ const WebRTCController = ({ type, options, currentVideoId }) => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      console.log("cleanup function for webrtc fired");
+      if (streamingOn) {
+        handleStop();
+      }
+    };
+  }, [streamingOn]);
   return (
     <div>
       {!streamingOn ? (

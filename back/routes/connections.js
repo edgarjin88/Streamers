@@ -15,6 +15,8 @@ const broadcasterConnectionManager = WebRtcConnectionManager.create(
   broadCasterServer
 );
 
+const db = require("../models");
+
 router.get("/", async (req, res, next) => {
   res.json({ test: "test" });
 });
@@ -42,7 +44,12 @@ router.post(`/:type/:room`, async (req, res) => {
 
   try {
     const connection = await connectionManager.createConnection(room);
-
+    if (type === "broadcaster") {
+      const io = req.app.get("io");
+      console.log("room info here :", room);
+      await db.Video.update({ streaming: "ON" }, { where: { id: room } });
+      io.sockets.emit("streamingOn", { id: room });
+    }
     res.send(connection);
   } catch (e) {
     console.error(`error creating connection for type: ${type} :`);
@@ -50,8 +57,9 @@ router.post(`/:type/:room`, async (req, res) => {
   }
 });
 
-router.delete(`/:type/:id`, (req, res) => {
-  const { type, id } = req.params;
+router.delete(`/:type/:id/:room`, async (req, res) => {
+  const { type, id, room } = req.params;
+  console.log("req pramas :", req.params);
   const connectionManager =
     type === "broadcaster"
       ? broadcasterConnectionManager
@@ -63,6 +71,14 @@ router.delete(`/:type/:id`, (req, res) => {
       return;
     }
     connection.close();
+
+    if (type === "broadcaster") {
+      const io = req.app.get("io");
+      console.log("delete room info here :", room);
+      await db.Video.update({ streaming: "OFF" }, { where: { id: room } });
+      io.sockets.emit("streamingOff", { id: room });
+    }
+
     res.send(connection);
   } catch (e) {
     console.log(`error deleting connection for type: ${type} :`);

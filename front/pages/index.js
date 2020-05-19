@@ -7,10 +7,6 @@ import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
 const Index = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch({ type: LOAD_MAIN_VIDEOS_REQUEST });
-  }, []);
   console.log("fired here?");
   return (
     <div className="container">
