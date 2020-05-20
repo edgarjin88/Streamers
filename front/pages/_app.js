@@ -39,7 +39,6 @@ Front.getInitialProps = async (context) => {
   }
 
   if (!state.user.me) {
-    console.log("getinitialprops fired");
     ctx.store.dispatch({
       type: LOAD_USER_REQUEST,
     });

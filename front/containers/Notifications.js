@@ -72,8 +72,6 @@ const RenderNotification = () => {
   const isNotificationOpen = Boolean(notificationAnchorEl);
 
   const deleteSingleNotification = (notificationId) => (e) => {
-    console.log("this should be event :", e);
-    console.log("this should be notificationId :", notificationId);
     dispatch({
       type: DELETE_SINGLE_NOTIFICATION_REQUEST,
       data: notificationId,
@@ -102,7 +100,6 @@ const RenderNotification = () => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  console.log("rendered 1");
   return (
     notificationList.length > 0 && (
       <Menu
@@ -130,7 +127,7 @@ const RenderNotification = () => {
                       src={
                         el.userProfile
                           ? `${URL}/${el.userProfile}`
-                          : `/images/profiles/how-to-anything.png`
+                          : `../static/images/profiles/how-to-anything.png`
                       }
                     />
                   </a>

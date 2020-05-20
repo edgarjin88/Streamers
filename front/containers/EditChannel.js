@@ -127,7 +127,6 @@ export default function SimpleModal() {
 
   useEffect(() => {
     if (initEditVideo) {
-      console.log("init video:", videoDescription);
       setDescription(videoDescription);
       setTitle(videoTitle);
     }
@@ -169,7 +168,7 @@ export default function SimpleModal() {
                 ? `${URL}/${uploadedVideoImage}`
                 : src
                 ? `${URL}/${src}`
-                : "/images/profiles/noimage.png"
+                : "../static/images/profiles/noimage.png"
             }
             alt=""
           />

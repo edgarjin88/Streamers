@@ -1,5 +1,4 @@
-import React, { memo, useState, useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import React, { memo } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";

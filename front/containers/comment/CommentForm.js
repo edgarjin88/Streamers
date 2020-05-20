@@ -25,7 +25,6 @@ const CommentForm = () => {
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
-    console.log("id :", id);
     if (e.key === "Enter") {
       dispatch({
         type: ADD_COMMENT_REQUEST,
@@ -46,7 +45,7 @@ const CommentForm = () => {
         src={
           myProfilePhoto
             ? `${URL}/${myProfilePhoto}`
-            : "/images/profiles/how-to-anything.png"
+            : "../static/images/profiles/how-to-anything.png"
         }
         alt="User Profile Photo"
       />

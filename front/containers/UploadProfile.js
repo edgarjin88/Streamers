@@ -50,13 +50,6 @@ const UploadProfile = () => {
       >
         Change Profile Photo
       </Button>
-      {/* <Button variant="contained" color="secondary" startIcon={<DeleteIcon />}>
-        Cancel
-      </Button>
-
-      <Button variant="contained" color="primary" startIcon={<SaveIcon />}>
-        Save
-      </Button> */}
     </div>
   );
 };

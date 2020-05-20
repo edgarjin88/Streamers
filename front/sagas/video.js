@@ -499,7 +499,6 @@ function* watchRemoveVideo() {
 }
 
 function editVideoAPI(videoId, videoData) {
-  console.log("video Id here :", videoId);
   return axios.patch(`/video/${videoId}`, videoData, {
     withCredentials: true,
     httpsAgent,
@@ -507,7 +506,6 @@ function editVideoAPI(videoId, videoData) {
 }
 
 function* editVideo(action) {
-  // console.log("action here1 :", action);
   try {
     const result = yield call(editVideoAPI, action.videoId, action.data);
     yield put({
@@ -555,8 +553,6 @@ function* watchLoadVideo() {
 // /////////////
 
 function uploadVideoImagesAPI(formData) {
-  console.log("uploadVideoImagesAPI fired");
-
   return axios.post("/video/image", formData, {
     withCredentials: true,
     httpsAgent,
@@ -564,8 +560,6 @@ function uploadVideoImagesAPI(formData) {
 }
 
 function* uploadVideoImages(action) {
-  console.log("uploadVideoImages fired");
-
   try {
     const result = yield call(uploadVideoImagesAPI, action.data);
     yield put({
@@ -599,7 +593,6 @@ function likeCommentAPI(commentId) {
 function* likeComment(action) {
   try {
     const result = yield call(likeCommentAPI, action.data);
-    console.log("whole action id :", action);
     yield put({
       type: LIKE_COMMENT_SUCCESS,
       data: {
@@ -619,7 +612,6 @@ function* likeComment(action) {
 
 function* watchLikeComment() {
   yield takeLatest(LIKE_COMMENT_REQUEST, likeComment);
-  console.log("undefined ? :", LIKE_COMMENT_REQUEST);
 }
 
 //unlike below

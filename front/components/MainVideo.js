@@ -38,7 +38,6 @@ const MainVideo = () => {
   }, shallowEqual);
 
   useEffect(() => {
-    console.log("video component loaded");
     if (me) {
       socket.emit(
         "join",
@@ -51,7 +50,6 @@ const MainVideo = () => {
         (error) => {
           if (error) {
             alert(error);
-            console.log("user name in use");
             location.href = "/";
           }
         }
@@ -59,7 +57,6 @@ const MainVideo = () => {
     }
     return () => {
       if (me) {
-        console.log("leave room fired");
         socket.emit("leaveRoom", {
           username: nickname,
           profilePhoto: me.profilePhoto,
@@ -78,7 +75,7 @@ const MainVideo = () => {
         {!streamingOn && (
           <img
             className={"main-content"}
-            src={src ? `${URL}/${src}` : "/images/videos/noimage.png"}
+            src={src ? `${URL}/${src}` : "../static/images/videos/noimage.png"}
             alt="How to film your course"
           />
         )}

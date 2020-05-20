@@ -2,7 +2,6 @@ import React from "react";
 import Link from "next/link";
 import styled from "styled-components";
 
-import { styledButton1 } from "./CustomButtons";
 const VideoDescription = ({ description }) => {
   const StyledSpan = styled.span`
     font-size: 1.4rem;

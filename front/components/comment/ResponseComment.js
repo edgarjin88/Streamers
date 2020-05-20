@@ -42,7 +42,7 @@ const ResponseComment = ({ commentId, Recomment, videoUserId }) => {
                   eachRecomment.Recommenter &&
                   eachRecomment.Recommenter.profilePhoto
                     ? `${URL}/${eachRecomment.Recommenter.profilePhoto}`
-                    : "/images/profiles/how-to-anything.png"
+                    : "../static/images/profiles/how-to-anything.png"
                 }
                 alt="Profile Photo"
               />

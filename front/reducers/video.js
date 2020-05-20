@@ -256,21 +256,12 @@ export default (state = initialState, action) => {
           const refIndex = draft.currentVideoComments.findIndex(
             (v) => v.id === action.data.refCommentId
           );
-          console.log("action.data.refCommentId :", action.data.refCommentId);
-          console.log("commentId :", action.data.id);
-          console.log("refIndex :", refIndex);
-          console.log(
-            "draft.currentVideoComments.refIndex.Recomment1 :",
-            draft.currentVideoComments[refIndex].Recomment[1]
-          );
+
           const recommentIndex = draft.currentVideoComments[
             refIndex
           ].Recomment.findIndex((v) => {
-            console.log("inside v:", v);
             return v.id === action.data.id;
           });
-
-          console.log("recommentIndex :", recommentIndex);
 
           draft.currentVideoComments[refIndex].Recomment.splice(
             recommentIndex,
@@ -280,7 +271,6 @@ export default (state = initialState, action) => {
           break;
         }
 
-        console.log("remove action:", action);
         const index = draft.currentVideoComments.findIndex(
           (v) => v.id === action.data.id
         );

@@ -107,7 +107,7 @@ const VideoDetails = () => {
               src={
                 User && User.profilePhoto
                   ? `${URL}/${User.profilePhoto}`
-                  : "/images/profiles/how-to-anything.png"
+                  : "../static/images/profiles/how-to-anything.png"
               }
               alt={`${User && User.nickname}`}
             />

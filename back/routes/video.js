@@ -24,7 +24,6 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
           })
         )
       );
-      // console.log(result);
       await newVideo.addHashtags(result.map((r) => r[0]));
     }
 
@@ -66,8 +65,6 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
 router.post("/image", upload.array("image"), (req, res) => {
   res.json(
     req.files.map((v) => {
-      // console.log("each v :", v);
-      // console.log("each v[imageLink] :", v[imageLink]);
       return v[imageLink];
     })
   );
@@ -88,11 +85,9 @@ router.patch("/:id", isLoggedIn, async (req, res, next) => {
       where: { VideoId: exVideo.id },
     });
 
-    // console.log("image liset: ", images);
     await exVideo.removeImages(images);
 
     const hashtags = req.body.description.match(/#[^\s]+/g);
-    // console.log("form in body :", req.body);
     if (hashtags) {
       const result = await Promise.all(
         hashtags.map((tag) =>
@@ -444,8 +439,6 @@ router.post("/:id/like", isLoggedIn, async (req, res, next) => {
       const targetSocket = socketList[video.UserId];
 
       if (targetSocket) {
-        console.log("targetSocket2 :", targetSocket);
-
         io.to(targetSocket).emit("eventSentFromServer", {
           message: event.content,
           videoId: videoId,

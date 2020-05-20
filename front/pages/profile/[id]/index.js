@@ -50,7 +50,6 @@ const Profile = () => {
       });
     }, 1000);
   }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
-  // console.log("userVideos value: ", userVideos);
   return (
     <div className="container">
       <ProfileStyle />
@@ -90,7 +89,6 @@ Profile.getInitialProps = async (context) => {
     type: LOAD_FOLLOWERS_REQUEST,
     data: id,
   });
-  // console.log('this is store', context.store);
   await context.store.dispatch({
     type: LOAD_FOLLOWINGS_REQUEST,
     data: id,
@@ -104,8 +102,6 @@ Profile.getInitialProps = async (context) => {
     type: LOAD_USER_REQUEST,
     data: id,
   });
-
-  // return { id };
 };
 
 export default Profile;

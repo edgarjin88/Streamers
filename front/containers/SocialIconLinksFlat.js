@@ -1,24 +1,12 @@
-import React, { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Link from "next/link";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faTwitter,
-  faInstagram,
   faLinkedin,
   faGoogle,
   faFacebookF,
 } from "@fortawesome/free-brands-svg-icons";
 import styled from "styled-components";
-import {
-  GOOGLE_SIGN_IN_REQUEST,
-  KAKAO_SIGN_IN_REQUEST,
-  FACEBOOK_SIGN_IN_REQUEST,
-  LINKEDIN_SIGN_IN_REQUEST,
-  OAUTH_SIGN_IN_REQUEST,
-} from "../reducers/user";
 
+import { URL } from "../config/config";
 const StyledIconList = styled.li`
   list-style: none;
   margin: 0 5px;
@@ -75,8 +63,8 @@ const StyledIconList = styled.li`
 export const KakaoOAUTH = () => {
   return (
     <StyledIconList backgroundColor={"#ffe812"}>
-      <a href="http://localhost:3003/api/user/auth/kakao">
-        <img src="/images/icons/kakaotalk.svg" />
+      <a href={`${URL}/api/user/auth/kakao`}>
+        <img src="../static/images/icons/kakaotalk.svg" />
       </a>
     </StyledIconList>
   );
@@ -85,7 +73,7 @@ export const FacebookOAUTH = () => {
   return (
     <>
       <StyledIconList backgroundColor={"#3b5999"}>
-        <a href="http://localhost:3003/api/user/auth/facebook">
+        <a href={`${URL}/api/user/auth/facebook`}>
           <FontAwesomeIcon icon={faFacebookF} size="sm" />
         </a>
       </StyledIconList>
@@ -96,7 +84,7 @@ export const GoogleOAUTH = () => {
   return (
     <>
       <StyledIconList backgroundColor={"#dd4b39"}>
-        <a href="http://localhost:3003/api/user/auth/google">
+        <a href={`${URL}/api/user/auth/google`}>
           {/* <a onClick={handleClick} href="#"> */}
           <span>
             <FontAwesomeIcon icon={faGoogle} size="sm" />
@@ -110,35 +98,9 @@ export const LinkedInOAUTH = () => {
   return (
     <>
       <StyledIconList backgroundColor={"#0077b5"}>
-        <a href="http://localhost:3003/api/user/auth/linkedin">
+        <a href={`${URL}/api/user/auth/linkedin`}>
           <span>
             <FontAwesomeIcon icon={faLinkedin} size="sm" />
-          </span>
-        </a>
-      </StyledIconList>
-    </>
-  );
-};
-
-export const TwitterOAUTH = () => {
-  return (
-    <StyledIconList backgroundColor={"#55acee"}>
-      <a href="#">
-        <span>
-          <FontAwesomeIcon icon={faTwitter} size="sm" />
-        </span>
-      </a>
-    </StyledIconList>
-  );
-};
-
-export const InstagramOAUTH = () => {
-  return (
-    <>
-      <StyledIconList backgroundColor={"#e4405f"}>
-        <a href="#">
-          <span>
-            <FontAwesomeIcon icon={faInstagram} size="sm" />
           </span>
         </a>
       </StyledIconList>

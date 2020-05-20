@@ -39,9 +39,7 @@ const WrapperComponent = () => {
 
   //socketLogic
   useEffect(() => {
-    Notification.requestPermission().then(function (result) {
-      console.log(result);
-    });
+    Notification.requestPermission().then(function (result) {});
     if (me) {
       socket.emit("loginInfo", me.id);
     }
@@ -54,21 +52,18 @@ const WrapperComponent = () => {
     });
 
     socket.on("message", (message) => {
-      console.log("message received here:", message);
       dispatch({
         type: UPDATE_CHAT_MESSAGE_LIST,
         data: message,
       });
     });
     socket.on("streamingOn", (message) => {
-      console.log("streamingOn received here:", message);
       dispatch({
         type: UPDATE_STREAMING_ON,
         data: message.id,
       });
     });
     socket.on("streamingOff", (message) => {
-      console.log("streamingOff received here:", message);
       dispatch({
         type: UPDATE_STREAMING_OFF,
         data: message.id,

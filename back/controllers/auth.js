@@ -154,7 +154,6 @@ exports.accountActivation = (req, res) => {
         password: hashedPassword,
       });
       delete newUser.password;
-      console.log("new user without password", newUser);
       return res.status(200).json(newUser);
     });
   } else {
@@ -164,10 +163,8 @@ exports.accountActivation = (req, res) => {
 
 exports.passwordChange = async (req, res, next) => {
   try {
-    console.log("passowr update started :", req.body.password.password);
     const hashedPassword = await bcrypt.hash(req.body.password.password, 12);
 
-    console.log("user id:", req.user.id);
     const me = await db.User.findOne({
       where: {
         id: req.user.id,

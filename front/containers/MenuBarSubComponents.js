@@ -46,7 +46,7 @@ export const MemoMenuIcon = memo(function MemoMenuIcon() {
 
 ///MemoSearchInput
 ///MemoSearchInput
-///MemoSearchInput
+
 export const MemoSearchInput = memo(function MemoSearchInput() {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -56,9 +56,7 @@ export const MemoSearchInput = memo(function MemoSearchInput() {
   }, shallowEqual);
 
   const handleEnter = (e) => {
-    console.log("key chnage fired");
     if (e.key === "Enter") {
-      console.log("enter  fired");
       dispatch({ type: LOAD_HASHTAG_VIDEOS_REQUEST, data: searchValue });
     }
   };

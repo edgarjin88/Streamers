@@ -7,7 +7,7 @@ const addUser = ({ id, username, room, userId, profilePhoto }) => {
 
   // Validate the data
   if (!username || !room) {
-    console.log("username or room are required");
+    // console.log("username or room are required");
     return {
       error: "Username and room are required!",
     };
@@ -27,9 +27,7 @@ const addUser = ({ id, username, room, userId, profilePhoto }) => {
 
   // Store user
   const user = { id, username, room, userId, profilePhoto };
-  console.log("user added :", user);
   users.push(user);
-  console.log("user list!: ", users);
   return { user };
 };
 

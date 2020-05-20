@@ -38,10 +38,8 @@ class ConnectionManager {
     }
 
     this.createConnection = (room) => {
-      console.log("room info fired in createConnection:", room);
       const id = createId();
-      console.log("id craeted :", id);
-      // 여기까지는 이상 무.
+
       const connection = new Connection(id, room);
       // console.log("creating Connection :", e);
 
@@ -59,7 +57,7 @@ class ConnectionManager {
     };
 
     this.getConnection = (id) => {
-      console.log("getConnection fired connections:", connections);
+      // console.log("getConnection fired connections:", connections);
       return connections.get(id) || null;
     };
 

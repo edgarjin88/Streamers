@@ -21,7 +21,7 @@ const ChatMessageForm = () => {
       { message: message, userId: me.userId, profilePhoto: me.profilePhoto },
       (error) => {
         if (error) {
-          return console.log(error);
+          return console.error(error);
         }
       }
     );
@@ -46,7 +46,7 @@ const ChatMessageForm = () => {
       <div id="chat-form">
         <img
           onMouseDown={handleSubmit}
-          src="/images/icons/attachment-logo.svg"
+          src="../static/images/icons/attachment-logo.svg"
           alt="Add Attachment"
         />
         <input

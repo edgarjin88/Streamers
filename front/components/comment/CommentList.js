@@ -100,7 +100,7 @@ const CommentList = () => {
               src={
                 profilePhoto
                   ? `${URL}/${profilePhoto}`
-                  : "/images/profiles/how-to-anything.png"
+                  : "../static/images/profiles/how-to-anything.png"
               }
               alt="Profile Photo"
             />

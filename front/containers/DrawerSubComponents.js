@@ -37,15 +37,12 @@ export const MemoSystemItemList = memo(function MemoSystemItemList() {
 
   const handleClick = useCallback(
     (target) => (e) => {
-      console.log("clicking fired :", target);
-      console.log("event ? :", e);
       if (target === "Sign Out") {
         dispatch({
           type: SIGN_OUT_REQUEST,
         });
       }
       if (target === "Sign In") {
-        console.log("sign in clicked");
         Router.push("/signin");
       }
     },

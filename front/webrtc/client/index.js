@@ -11,8 +11,7 @@ const fetch = require("node-fetch");
 const DefaultRTCPeerConnection = require("wrtc").RTCPeerConnection;
 const { RTCSessionDescription } = require("wrtc");
 
-const TIME_TO_HOST_CANDIDATES = 3000; // NOTE(mroberts): Too long.
-
+const TIME_TO_HOST_CANDIDATES = 3000;
 class ConnectionClient {
   constructor(options = {}) {
     options = {
@@ -26,11 +25,6 @@ class ConnectionClient {
     };
 
     const { RTCPeerConnection, prefix, host } = options;
-
-    console.log(
-      "const { RTCPeerConnection, prefix, host } = options;",
-      options
-    );
 
     this.createConnection = async (func, typePassed, currentVideoId) => {
       // func, typePassed, roomId
@@ -53,10 +47,6 @@ class ConnectionClient {
       // roomId to be passed into Router
 
       const remotePeerConnection = await response1.json();
-      console.log(
-        "remote  peerconnection made on the serverside here: ",
-        remotePeerConnection
-      );
 
       const { id } = remotePeerConnection;
       const localPeerConnection = new RTCPeerConnection({
@@ -67,8 +57,7 @@ class ConnectionClient {
         StoreExported.dispatch({
           type: STOP_STREAMING_REQUEST,
         });
-        // redux 필요하네 여기서도.
-        console.log("delete  session fired");
+        // redux may not required here
         fetch(`${URL}/api/connections/${typePassed}/${id}/${videoId}`, {
           method: "delete",
         }).catch(() => {});
@@ -104,7 +93,6 @@ class ConnectionClient {
 
         return localPeerConnection;
       } catch (error) {
-        console.log("error occurred. session will be deleted :", error);
         localPeerConnection.close(currentVideoId);
         throw error;
       }

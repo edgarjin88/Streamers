@@ -38,71 +38,14 @@ import MUIRichTextEditor from "mui-rte";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import {
   EditorState,
-  // Editor,
   convertFromRaw,
   convertToRaw,
   ContentState,
 } from "draft-js";
-// EditorState immutable.
-// Editor  control thigns
-// convertToRaw : data type is RawDraftContentState
-// EditorState : hold all state of texteditor. Immutable object.
-// Editor editor itself.
-// editorState: EditorState.createEmpty() to push back empty state to editor
 
-// editorState back to up date
-// updateEditorState(editorState){
-//   this.ListeningStateChangedEvent({ editorState });
-// }
-// onChange={(this.updateEditorState.bind(this))}
-
-//  const [Ques, setQues] = useState({
-//    answer: "",
-//    question: ""
-//  });
-
-//  const handleChange = prop => event => {
-//    setQues({ ...Ques, [prop]: event.target.value });
-//    console.log(event.target.value);
-//  };
 export const RichTextEditor = () => {
-  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [editorState, setEditorState] = useState(null);
 
-  // export const RichTextEditor = () => {
-  //   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-
-  // import {
-  //   EditorState,
-  //   convertFromRaw,
-  //   convertToRaw,
-  //   ContentState
-  // } from "draft-js";
-
-  //   convertFromRaw,
-  //   convertToRaw, 이 두개를 사용 해야 하는 듯.
-
-  // getCurrentContent(): ContentState
-  // const handleChange = prop => event => {
-  //   const content = JSON.stringify(convertToRaw(event.getCurrentContent()));
-
-  //   // setQues({ ...Ques, [prop]: content });
-  //   console.log("this is content: ", content);
-  //   console.log("this is evetn: ", evetn);
-  //   console.log("this is props: ", props);
-  // };
-  // const handleChange = editorState => {
-  //   console.log("current content :", editorState.getCurrentContent());
-  //   setEditorState(editorState);
-  // };
-
-  // 질문 1. 꼭 스테이트를 쓸 필요 있나 이경우?
-  // onChange에서 스트링을 쏴 주고, 이것을 데이터베이스 에 저장. 그리고 필요할 때 이것을 value로 바꿔 주면 된다. 왜 굳이 스테이트?
-
-  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
-  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
-  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
-  //잠깐. 내가 굳이 왜 모든것을 스테이트에 넣으려고 했지? onSave 할때만 스트링어파이 해서 넣으면 되는데... 아 병신. 이렇게 하자.
   const defaultTheme = createMuiTheme();
   Object.assign(defaultTheme, {
     overrides: {
@@ -132,28 +75,14 @@ export const RichTextEditor = () => {
   );
   const dispatch = useDispatch();
 
-  // 문제는 버튼과 save 버튼이 함께 이거를 사용하면서, data가 event가 될수도 있다는 점이구나. 즉 두개의 펑션이 달라야 한다. 여기서는 데이터를 받고,
-  // button click때는 이벤트를 받으니까.
   const handleSaveDescription = (data) => {
-    // e.persist();
-    console.log("data from rich text :", data);
     dispatch({
       type: EDIT_DESCRIPTION_REQUEST,
       data: data,
     });
   };
 
-  // let text;
-
-  // const setTemp = data => {
-  //   console.log(" another data: ", convertToRaw(data.getCurrentContent()));
-  //   text = convertToRaw(data.getCurrentContent());
-  // };
-
   const handleSaveDescriptionState = (e) => {
-    // e.persist();
-    console.log("data from rich text :", description);
-    console.log("text :", text);
     dispatch({
       type: EDIT_DESCRIPTION_REQUEST,
       data: JSON.stringify(text),
@@ -168,10 +97,6 @@ export const RichTextEditor = () => {
 
   const handleChange = useCallback(
     (data) => {
-      // console.log(
-      //   "data from handlechange :",
-      //   convertToRaw(data.getCurrentContent())
-      // );
       dispatch({
         type: SET_DESCRIPTION,
         data: convertToRaw(data.getCurrentContent()),
@@ -180,20 +105,13 @@ export const RichTextEditor = () => {
     [description]
   );
   const test1 = (data) => {
-    // console.log("test :", data);
     setEditorState(JSON.stringify(convertToRaw(data.getCurrentContent())));
   };
-  // 현재로서 가장 좋은 방법은 onChange에 바인딩 되어있는 펑션을 불러와서 묶는 거다.
 
   return (
     <>
       <MuiThemeProvider theme={defaultTheme}>
         <MUIRichTextEditor
-          // className={classes.richText}
-          // onChange={test1}
-          // placeHolder="This is Placeholder"
-          // editorState={editorState}
-          // value={defaultData} only for initial
           readOnly={false}
           toolbar={true}
           inlineToolbar={true}
@@ -210,7 +128,6 @@ export const RichTextEditor = () => {
         variant="contained"
         color="primary"
         style={{ float: "right" }}
-        // className={classes.button}
         startIcon={<CloudUploadIcon />}
       >
         {!startedEditingDescription ? "Edit Description" : "Save"}
@@ -339,7 +256,6 @@ export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
         variant="contained"
         color="primary"
         style={{ float: "right" }}
-        // className={classes.button}
         startIcon={<CloudUploadIcon />}
       >
         {startedChangingPassword ? "Save" : "Change Password"}
@@ -351,9 +267,6 @@ export const MemoSubmitPasswordChange = memo(function MemoSubmitPasswordChange({
   );
 });
 
-//
-//
-//
 export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
   userId,
 }) {
@@ -377,7 +290,6 @@ export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
 
   const handleClick = (e) => {
     if (!password) {
-      console.log("password change confirm fired");
       dispatch({
         type: SET_PASSWORD_ERROR,
       });
@@ -497,7 +409,6 @@ export const MemoEmail = memo(function MemoEmail({
         autoFocus
         disabled={profileUserId}
       />
-      {/* {JSON.stringify} */}
       {
         <SignUpError
           show={untouchedEmail ? "untouched" : emailError ? true : false}

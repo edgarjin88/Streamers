@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { ADD_REPLY_TO_COMMENT_REQUEST } from "../../reducers/video";
 import { URL } from "../../config/config";
@@ -24,7 +24,6 @@ const ReplyCommentForm = ({ commentId }) => {
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
-    console.log("id :", id);
     if (e.key === "Enter") {
       dispatch({
         type: ADD_REPLY_TO_COMMENT_REQUEST,
@@ -46,7 +45,7 @@ const ReplyCommentForm = ({ commentId }) => {
         src={
           myProfilePhoto
             ? `${URL}/${myProfilePhoto}`
-            : "/images/profiles/how-to-anything.png"
+            : "../static/images/profiles/how-to-anything.png"
         }
         alt="User Profile Photo"
       />

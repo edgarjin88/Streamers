@@ -11,13 +11,10 @@ const linkedIn = require("./linkedIn");
 const user = {};
 module.exports = () => {
   passport.serializeUser((user, done) => {
-    console.log("serializeUser fired");
-
     return done(null, user.id);
   });
 
   passport.deserializeUser(async (id, done) => {
-    console.log("deserializeUser fired");
     if (user[id]) {
       try {
         return done(user[id]);
@@ -48,7 +45,6 @@ module.exports = () => {
         });
         return done(null, user);
       } catch (e) {
-        // console.error(e);
         return done(e);
       }
     }

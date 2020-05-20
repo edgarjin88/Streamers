@@ -5,23 +5,21 @@ const db = require("../models");
 const { User } = require("../models");
 
 module.exports = () => {
-  console.log("local fired");
   passport.use(
     new KakaoStrategy(
       {
         clientID: process.env.KAKAO_CLIENT_ID,
         clientSecret: process.env.KAKAO_CLIENT_SECERET,
-        callbackURL: "http://localhost:3003/api/user/auth/kakao/callback"
+        callbackURL: "http://localhost:3003/api/user/auth/kakao/callback",
       },
 
       async (accessToken, refreshToken, profile, done) => {
-        console.log("profile kakao:", profile);
         try {
           const existingUser = await User.findOne({
             where: {
               OAuthID: profile._json.id,
-              provider: "kakao"
-            }
+              provider: "kakao",
+            },
           });
 
           if (existingUser) {
@@ -32,11 +30,10 @@ module.exports = () => {
             userId: profile._json && profile._json.id,
             nickname: profile.displayName,
             OAuthID: profile._json && profile._json.id,
-            profilePhoto: profile._json && profile._json.profile_image,
-            thumbnail_image: profile._json && profile._json.thumbnail_image,
-            provider: "kakao"
+            // profilePhoto: profile._json && profile._json.profile_image,
+            // thumbnail_image: profile._json && profile._json.thumbnail_image,
+            provider: "kakao",
           });
-          console.log("new user from kakao: ", newUser);
           return done(null, newUser);
         } catch (error) {
           console.error("error fired :", error);

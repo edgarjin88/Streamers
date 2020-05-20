@@ -5,25 +5,23 @@ const db = require("../models");
 const { User } = require("../models");
 
 module.exports = () => {
-  console.log("local fired");
   passport.use(
     new LinkedInStrategy(
       {
         clientID: process.env.LINKEDIN_CLIENT_ID,
         clientSecret: process.env.LINKEDIN_CLIENT_SECERET,
-        callbackURL: "http://localhost:3003/api/user/auth/linkedin/callback"
+        callbackURL: "http://localhost:3003/api/user/auth/linkedin/callback",
         // scope: ["r_emailaddress", "r_basicprofile"],
         // state: true
       },
 
       async (accessToken, refreshToken, profile, done) => {
-        console.log("profile :", profile);
         try {
           const existingUser = await User.findOne({
             where: {
               OAuthID: profile.id,
-              provider: "linkedIn"
-            }
+              provider: "linkedIn",
+            },
           });
 
           if (existingUser) {
@@ -34,15 +32,14 @@ module.exports = () => {
             userId: profile.id,
             nickname: profile.displayName,
             OAuthID: profile.id,
-            profilePhoto:
-              (profile &&
-                profile.photos &&
-                profile.photos[3] &&
-                profile.photos[3].value) ||
-              null,
-            provider: "linkedIn"
+            // profilePhoto:
+            //   (profile &&
+            //     profile.photos &&
+            //     profile.photos[3] &&
+            //     profile.photos[3].value) ||
+            //   null,
+            provider: "linkedIn",
           });
-          console.log("new user from linkedIn: ", newUser);
           return done(null, newUser);
         } catch (error) {
           console.error("error fired :", error);

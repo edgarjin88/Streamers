@@ -139,7 +139,7 @@ export default function RecipeReviewCard() {
             ? process.env.NODE_ENV === "development"
               ? `http://localhost:3003/${profilePhoto}`
               : profilePhoto
-            : "/images/profiles/noimage.png"
+            : "../static/images/profiles/noimage.png"
         }
         title="Profile Image"
       />

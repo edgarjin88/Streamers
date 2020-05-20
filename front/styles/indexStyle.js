@@ -622,16 +622,6 @@ main {
 
 
 
-/* 
-   #left-side-bar{
-     grid-area : left-side-bar;
-     background-color: white;
-     color: red;
-     margin-top:48px;
-     position:fixed;
-     width: 256px; 
-     height: 100vh
-   } */
 
 }
 

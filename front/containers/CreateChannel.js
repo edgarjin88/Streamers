@@ -153,7 +153,7 @@ export default function SimpleModal() {
             src={
               uploadedVideoImage
                 ? `${URL}/${uploadedVideoImage}`
-                : "/images/profiles/noimage.png"
+                : "../static/images/profiles/noimage.png"
             }
             alt=""
           />

@@ -50,7 +50,6 @@ export const StyledChatMessageBox = styled.div`
     scrollbar-width: none;
   }
 
-  /*message-row는 안에 있는데, 컨텐츠는 밖으로 나간다. 이유는?  */
   & .message-row {
     display: grid;
     grid-template-columns: 70%;

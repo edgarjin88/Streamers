@@ -84,7 +84,6 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor({
     dispatch({ type: NULLIFY_EDIT_DESCRIPTION_SUCCESS });
   };
   const handleSaveDescription = (data) => {
-    console.log("data from rich texts :", typeof data);
     setEditorState(data);
   };
 
@@ -118,7 +117,6 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor({
       </MuiThemeProvider>
     );
   };
-  console.log("user desc :", typeof userDescription);
   return (
     <>
       {test()}
@@ -246,7 +244,6 @@ export const MemoConfirmPasswordReset = memo(function MemoConfirmPasswordReset({
 
   const handleClick = (e) => {
     if (!password) {
-      console.log("password change confirm fired");
       dispatch({
         type: SET_PASSWORD_ERROR,
       });

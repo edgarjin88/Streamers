@@ -30,10 +30,9 @@ module.exports = () => {
             userId: profile._json && profile._json.email,
             nickname: profile.displayName,
             OAuthID: profile.id,
-            profilePhoto: profile._json && profile.photos[0].value,
+            // profilePhoto: profile._json && profile.photos[0].value,
             provider: "facebook",
           });
-          console.log("new user from facebook: ", newUser);
           return done(null, newUser);
         } catch (error) {
           console.error("error fired :", error);

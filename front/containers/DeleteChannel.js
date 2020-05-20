@@ -77,7 +77,6 @@ export default function SimpleModal() {
     });
   }
   const onClickDelete = () => {
-    console.log("videoId :", videoId);
     dispatch({
       type: REMOVE_VIDEO_REQUEST,
       data: videoId,

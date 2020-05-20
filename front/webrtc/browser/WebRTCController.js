@@ -23,7 +23,6 @@ const WebRTCController = ({ type, options, currentVideoId }) => {
   let peerConnection = null;
 
   const onStart = async () => {
-    console.log("onstart fired");
     peerConnection = await connectionClient.createConnection(
       options,
       type,
@@ -61,7 +60,6 @@ const WebRTCController = ({ type, options, currentVideoId }) => {
 
   useEffect(() => {
     return () => {
-      console.log("cleanup function for webrtc fired");
       if (streamingOn) {
         handleStop();
       }

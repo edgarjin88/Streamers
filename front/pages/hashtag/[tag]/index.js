@@ -10,7 +10,6 @@ import { LOAD_HASHTAG_VIDEOS_REQUEST } from "../../../reducers/video";
 
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
-  console.log("tag  here :", tag);
 
   const { mainVideos, hasMoreVideo } = useSelector((state) => state.video);
 

@@ -30,7 +30,7 @@ router.get(`/:type`, (req, res) => {
   try {
     res.send(connectionManager.getConnections());
   } catch (e) {
-    console.log(`Error while getting connetion list for type :${type} :`);
+    console.log("error connecting :", e);
   }
 });
 
@@ -46,7 +46,6 @@ router.post(`/:type/:room`, async (req, res) => {
     const connection = await connectionManager.createConnection(room);
     if (type === "broadcaster") {
       const io = req.app.get("io");
-      console.log("room info here :", room);
       await db.Video.update({ streaming: "ON" }, { where: { id: room } });
       io.sockets.emit("streamingOn", { id: room });
     }
@@ -59,7 +58,6 @@ router.post(`/:type/:room`, async (req, res) => {
 
 router.delete(`/:type/:id/:room`, async (req, res) => {
   const { type, id, room } = req.params;
-  console.log("req pramas :", req.params);
   const connectionManager =
     type === "broadcaster"
       ? broadcasterConnectionManager
@@ -74,7 +72,6 @@ router.delete(`/:type/:id/:room`, async (req, res) => {
 
     if (type === "broadcaster") {
       const io = req.app.get("io");
-      console.log("delete room info here :", room);
       await db.Video.update({ streaming: "OFF" }, { where: { id: room } });
       io.sockets.emit("streamingOff", { id: room });
     }

@@ -16,7 +16,6 @@ const router = express.Router();
 
 const { socketList } = require("../socket/socket");
 
-console.log("socket list imported :", socketList);
 const {
   accountActivation,
   signup,
@@ -30,7 +29,6 @@ router.get("/", isLoggedIn, (req, res) => {
 
   const user = Object.assign({}, req.user.toJSON());
 
-  console.log("user info: "), user;
   delete user.password;
   return res.json(user);
 });
@@ -348,8 +346,6 @@ router.get("/:id/videos", async (req, res, next) => {
     let where = {
       UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,
     }; //two different "wheres"
-    console.log("last id: ", parseInt(req.query.lastId, 10));
-    console.log("paramsaaa id: ", parseInt(req.params.id, 10));
     if (parseInt(req.query.lastId, 10)) {
       where.id = { [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10) }; // less than last id.
     }
@@ -374,7 +370,6 @@ router.get("/:id/videos", async (req, res, next) => {
       order: [["createdAt", "DESC"]], // DESC, ASC
       limit: parseInt(req.query.limit, 10),
     });
-    console.log("full videos :", videos.length);
     res.json(videos);
   } catch (e) {
     console.error(e);
@@ -531,7 +526,6 @@ router.delete("/deletenotifications", isLoggedIn, async (req, res, next) => {
         TargetUserId: req.user.id,
       },
     });
-    console.log("allNotifications :", allNotifications);
     res.send(allNotifications);
   } catch (e) {
     console.error(e);

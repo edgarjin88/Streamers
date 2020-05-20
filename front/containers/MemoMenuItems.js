@@ -154,8 +154,6 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   `;
 
   const deleteSingleNotification = (notificationId) => (e) => {
-    console.log("this should be event :", e);
-    console.log("this should be notificationId :", notificationId);
     dispatch({
       type: DELETE_SINGLE_NOTIFICATION_REQUEST,
       data: notificationId,
@@ -180,8 +178,6 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
         const name = el.content.slice(0, wordIndex);
         const message = el.content.slice(wordIndex);
         const { UserId, userProfile, targetVideoId } = el;
-        console.log("targetVideoId :", targetVideoId);
-        console.log("UserId :", UserId);
         return (
           <StyledMenuItem key={i}>
             <div className="notificationItem">
@@ -192,7 +188,7 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
                     src={
                       el.userProfile
                         ? `${URL}/${userProfile}`
-                        : `/images/profiles/how-to-anything.png`
+                        : `../static/images/profiles/how-to-anything.png`
                     }
                   />
                 </a>

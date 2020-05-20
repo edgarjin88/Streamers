@@ -35,8 +35,6 @@ class WebRtcConnection extends Connection {
       sdpSemantics: "unified-plan",
     });
 
-    console.log("error room :", room);
-
     // peerConnection.room = room
 
     beforeOffer(peerConnection, room);
@@ -81,7 +79,6 @@ class WebRtcConnection extends Connection {
       "iceconnectionstatechange",
       onIceConnectionStateChange
     );
-    //state별로 대응
 
     this.doOffer = async () => {
       const offer = await peerConnection.createOffer();
@@ -91,9 +88,6 @@ class WebRtcConnection extends Connection {
       try {
         await waitUntilIceGatheringStateComplete(peerConnection, options);
       } catch (error) {
-        console.log(
-          "error occurred while waitUntilIceGatheringStateComplete :"
-        );
         this.close();
         throw error;
       }

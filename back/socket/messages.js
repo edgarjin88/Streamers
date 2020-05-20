@@ -1,5 +1,4 @@
 const generateMessage = (username, userId, profilePhoto, text) => {
-  console.log("generateor fired: ", userId);
   return {
     username,
     userId,

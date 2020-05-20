@@ -24,14 +24,11 @@ const WebRTCVideo = () => {
 
   const typeFunction = async (peerConnection) => {
     if (type === "broadcaster") {
-      console.log("before answer fired");
-      console.log("window : ", window);
       const localStream = await window.navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
       });
 
-      console.log("local stream here :", localStream);
       localStream
         .getTracks()
         .forEach((track) => peerConnection.addTrack(track, localStream));

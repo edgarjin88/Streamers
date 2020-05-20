@@ -7,7 +7,6 @@ import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import { LOAD_MAIN_VIDEOS_REQUEST } from "../reducers/video";
 const Index = () => {
-  console.log("fired here?");
   return (
     <div className="container">
       <IndexGlobalStyle />

@@ -41,7 +41,6 @@ export default function SignInSide() {
   );
   const handleClick = (e) => {
     e.preventDefault();
-    console.log("data  !!!!!!!!!:", userId, password, nickname);
     dispatch({
       type: ACTIVATION_REQUEST,
       data: {

@@ -30,16 +30,12 @@ const webSocket = (server, app, sessionMiddleware) => {
 
     socket.on("loginInfo", (userId) => {
       socketList[userId] = socket.id;
-      console.log("login info received :", userId);
-      console.log("socketinfo :", socketList);
     });
 
     socket.on("join", (options, callback) => {
       const { error, user } = addUser({ id: socket.id, ...options });
-      // addUser의 결과가 erro, user라고
 
       if (error) {
-        console.log("join error: ", error);
         return callback(error);
       }
 
@@ -77,8 +73,6 @@ const webSocket = (server, app, sessionMiddleware) => {
     socket.on("sendMessage", (message, callback) => {
       const user = getUser(socket.id);
 
-      console.log("user: ", user);
-      console.log("userList: ", userList);
       if (user && user.room !== undefined) {
         io.to(user.room).emit(
           "message",
@@ -90,22 +84,17 @@ const webSocket = (server, app, sessionMiddleware) => {
           )
         );
         callback();
-        console.log("message sent :", message);
       }
     });
 
     socket.on("leaveRoom", (data) => {
-      console.log("socket data :", data);
       socket.leave(data.room);
       const user = removeUser(socket.id);
-      console.log("user removed fired :", user);
       generateMessage("Admin", `${data.username} has left!`);
     });
 
     socket.on("disconnect", () => {
-      console.log("disconnection fired");
       const user = removeUser(socket.id);
-      console.log("user removed fired :", user);
 
       if (user) {
         io.to(user.room).emit(

@@ -4,8 +4,6 @@ const { broadcaster } = require("./broadcasterServer");
 
 function beforeOffer(peerConnection, room) {
   const eventName = `a${room.toString()}`;
-  console.log("fired before offer :", room);
-  console.log("fired before offer eventName :", eventName);
   const audioTransceiver = peerConnection.addTransceiver("audio");
   const videoTransceiver = peerConnection.addTransceiver("video");
 

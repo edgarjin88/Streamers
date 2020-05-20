@@ -59,7 +59,6 @@ const RelatedVideo = ({
   const router = useRouter();
   const pathName = router.pathname;
   const targetUserId = router.query.id;
-  console.log("targetUserId :", targetUserId);
 
   const { mainVideos, hasMoreVideos, isLoading, searchValue } = useSelector(
     (state) => {
@@ -75,7 +74,6 @@ const RelatedVideo = ({
   let countRef = useRef([]);
   const videoLengthRef = useRef([]);
   const dispatch = useDispatch();
-  console.log("pathname :", pathName, "targetId :", targetUserId);
   useEffect(() => {
     countRef.current = [];
   }, [pathName, targetUserId]);
@@ -189,7 +187,7 @@ const RelatedVideo = ({
                       src={
                         videoInfo && videoInfo.Images && videoInfo.Images[0]
                           ? `${URL}/${videoInfo.Images[0].src}`
-                          : "/images/videos/noimage.png"
+                          : "../static/images/videos/noimage.png"
                       }
                     />
                     {`Created on ${moment(videoInfo.createdAt).format(

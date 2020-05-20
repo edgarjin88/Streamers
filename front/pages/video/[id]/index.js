@@ -28,7 +28,6 @@ const VideoPage = () => {
 
 VideoPage.getInitialProps = async (context) => {
   const { id } = context.query;
-  console.log("server side LOAD_VIDEO_REQUEST fired");
   await context.store.dispatch({
     type: LOAD_VIDEO_REQUEST,
     data: id,

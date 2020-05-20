@@ -180,7 +180,6 @@ function* loadUser(action) {
       me: !action.data,
       data: result.data,
     });
-    // console.log('load user success', result.data);
   } catch (e) {
     console.error(e);
     yield put({
@@ -426,11 +425,6 @@ function* watchPasswordReset() {
   yield takeEvery(PASSWORD_RESET_REQUEST, passwordResetRequest);
 }
 
-//wath login 부분 바꾸고,
-//카카오랑 기타등등 다 추가하기.
-//링크 부분만 스트링 인터폴레이션 가능한지 생각해 보기.
-// 결국 익스프레스 설치 해야 한다.
-
 function OauthSignInAPI(loginData) {
   return axios.get(`/user/auth/${loginData}`, {
     withCredentials: true,
@@ -470,7 +464,6 @@ function changePasswordAPI(password) {
 }
 
 function* changePassword(action) {
-  console.log("change password fired :", action);
   try {
     const result = yield call(changePasswordAPI, action.data);
     yield put({
@@ -499,7 +492,6 @@ function confirmResetPasswordAPI(data) {
 }
 
 function* confirmResetPassword(action) {
-  console.log("change password fired :", action);
   try {
     const result = yield call(confirmResetPasswordAPI, action.data);
     yield put({
