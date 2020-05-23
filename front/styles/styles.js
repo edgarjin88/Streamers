@@ -91,8 +91,8 @@ main {
 
 #main-video > .main-content {
   width: 100%;
-  /* how to calculate based on current width, not vh */
-  max-height: calc(100vh / 2);
+  /* height: calc(100vh / 2); */
+  height: calc(100vh / 2);
   object-fit: cover;
 }
   
@@ -461,6 +461,8 @@ main {
 }
 
 @media (min-width: 768px) {
+
+  
   #related-videos > ul {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -469,6 +471,7 @@ main {
     height: 17.5vw;
     min-height: 131px;
     max-height: inherit;
+
   }
 }
 
@@ -488,6 +491,9 @@ main {
       "video-comments related-videos" 1fr
       / 1fr 256px;
   }
+
+
+  
 
   #relatead-videos {
     padding-left: 8px;

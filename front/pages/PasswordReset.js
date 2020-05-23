@@ -11,7 +11,6 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import Toaster from "../components/Toaster";
 import { useStyles } from "../styles/SigniningStyle";
-// to be moved to styling folder later.
 
 import Copyright from "../components/Copyright";
 

@@ -9,7 +9,6 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Typography from "@material-ui/core/Typography";
 import { useStyles } from "../styles/SigniningStyle";
@@ -32,7 +31,7 @@ export default function SignInSide() {
 
   const classes = useStyles();
   /////////Logic //////////
-  const { me, signInErrorReason } = useSelector((state) => state.user);
+  const { me } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   //No shallow comparison required here.
   useEffect(() => {

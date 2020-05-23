@@ -2,6 +2,7 @@ const sgMail = require("@sendgrid/mail");
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
 
 require("dotenv").config();
 
@@ -182,4 +183,62 @@ exports.passwordChange = async (req, res, next) => {
     res.status(400).send("Unable to change password. Please try again later.");
     // next(e);
   }
+};
+
+exports.logOut = async (req, res, next) => {
+  req.logout();
+  req.session.destroy();
+  res.send("LOGOUT Success");
+};
+
+exports.logIn = async (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    if (info) {
+      return res.status(401).send(info.reason);
+    }
+    return req.login(user, async (loginErr) => {
+      try {
+        if (loginErr) {
+          return next(loginErr);
+        }
+        const fullUser = await db.User.findOne({
+          where: {
+            id: user.id,
+          },
+          include: [
+            {
+              model: db.Video,
+              as: "Videos",
+              attributes: ["id"],
+            },
+            {
+              model: db.User,
+              as: "Followings",
+              attributes: ["id"],
+            },
+            {
+              model: db.User,
+              as: "Followers",
+              attributes: ["id"],
+            },
+          ],
+          attributes: [
+            "id",
+            "nickname",
+            "userId",
+            "profilePhoto",
+            "notification",
+          ],
+        });
+
+        return res.json(fullUser);
+      } catch (e) {
+        next(e);
+      }
+    });
+  })(req, res, next);
 };

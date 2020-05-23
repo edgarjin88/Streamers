@@ -102,4 +102,8 @@ app.use("/api/videos", videosAPIRouter);
 app.use("/api/hashtag", hashtagAPIRouter);
 app.use("/api/connections", webRTCRouter);
 
+app.use((err, req, res, next) => {
+  console.log("error on serverside :", err);
+});
+
 server.listen(PORT, () => console.log(`Active on ${process.env.PORT}`));

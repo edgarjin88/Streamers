@@ -1,12 +1,13 @@
 import React, { memo, useState, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
 
 import MenuIcon from "@material-ui/icons/Menu";
 
-import { useStyles } from "../styles/HideBarStyle";
+// import { useStyles } from "../styles/HideBarStyle";
 //actions
 
 import { OPEN_DRAWER, CLOSE_DRAWER } from "../reducers/menu";
@@ -47,8 +48,28 @@ export const MemoMenuIcon = memo(function MemoMenuIcon() {
 ///MemoSearchInput
 ///MemoSearchInput
 
+const useStyles = makeStyles((theme) => ({
+  inputRoot: {
+    color: "inherit",
+    backgroundColor: "inherit",
+  },
+  inputInput: {
+    display: "flex",
+    padding: theme.spacing(1, 1, 1, 7),
+
+    transition: theme.transitions.create("width"),
+    width: "80%",
+    [theme.breakpoints.up("sm")]: {
+      width: 120,
+      "&:focus": {
+        width: 200,
+      },
+    },
+  },
+}));
 export const MemoSearchInput = memo(function MemoSearchInput() {
   const classes = useStyles();
+
   const dispatch = useDispatch();
 
   const { searchValue } = useSelector(({ input }) => {

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon",
     "build": "next build",
-    "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production node server.js"
+    "prestart": "next build",
+    "start": "next start"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

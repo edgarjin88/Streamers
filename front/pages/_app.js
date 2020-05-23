@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import withRedux from "next-redux-wrapper";
 import withReduxSaga from "next-redux-saga";
 import { applyMiddleware, compose, createStore } from "redux";
@@ -16,6 +16,16 @@ import { LOAD_USER_REQUEST } from "../reducers/user";
 import WrapperComponent from "../containers/WrapperComponent";
 
 const Front = ({ Component, pageProps, store }) => {
+  useEffect(() => {
+    const jssStyles = document.querySelector("#jss-server-side");
+    if (jssStyles && jssStyles.parentNode) {
+      jssStyles.parentNode.removeChild(jssStyles);
+    }
+    // const styled = document.querySelector("[data-styled]");
+    // if (styled && styled.parentNode) {
+    //   styled.parentNode.removeChild(styled);
+    // }
+  }, []);
   return (
     <Provider store={store}>
       <Component {...pageProps} />
@@ -29,7 +39,6 @@ export let StoreExported = {};
 
 Front.getInitialProps = async (context) => {
   const { ctx, Component } = context;
-  // console.log("ctx on getInitialProps :", ctx);
   let pageProps = {};
   const state = ctx.store.getState(); //
   const cookie = ctx.isServer ? ctx.req.headers.cookie : ""; //cookies는 여기

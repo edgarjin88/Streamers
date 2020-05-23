@@ -1,39 +1,47 @@
 import React from "react";
-import Helmet from "react-helmet";
-import Document, { Main, NextScript } from "next/document";
-import { ServerStyleSheet } from "styled-components";
+import Document, { Html, Head, Main, NextScript } from "next/document";
+
+import { ServerStyleSheet as StyledComponentSheets } from "styled-components";
 import { ServerStyleSheets as MaterialUiServerStyleSheets } from "@material-ui/core/styles";
 
 class MyDocument extends Document {
-  static async getInitialProps(context) {
-    const sheet = new ServerStyleSheet();
-    const materialUI = new MaterialUiServerStyleSheets();
+  static async getInitialProps(ctx) {
+    const styledComponentSheet = new StyledComponentSheets();
+    const materialUiSheets = new MaterialUiServerStyleSheets();
+    const originalRenderPage = ctx.renderPage;
     try {
-      const page = await context.renderPage((App) => (props) => {
-        return sheet.collectStyles(materialUI.collect(<App {...props} />));
-      });
-
-      const styleTags = await sheet.getStyleElement();
-      return { ...page, helmet: Helmet.renderStatic(), styleTags };
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: (App) => (props) =>
+            styledComponentSheet.collectStyles(
+              materialUiSheets.collect(<App {...props} />)
+            ),
+        });
+      console.log("ctx.renderPage :", ctx.renderPage);
+      const initialProps = await Document.getInitialProps(ctx);
+      return {
+        ...initialProps,
+        // helmet: Helmet.renderStatic(),
+        styles: (
+          <React.Fragment key="styles">
+            {initialProps.styles}
+            {materialUiSheets.getStyleElement()}
+            {styledComponentSheet.getStyleElement()}
+          </React.Fragment>
+        ),
+      };
     } finally {
-      sheet.seal();
-      // to check memoryleackage
+      styledComponentSheet.seal();
     }
   }
 
   render() {
-    const { htmlAttributes, bodyAttributes, ...helmet } = this.props.helmet;
-
-    const htmlAttrs = htmlAttributes.toComponent(); //
-    const bodyAttrs = bodyAttributes.toComponent();
-
+    console.log("props :", this.props);
     return (
-      <html {...htmlAttrs}>
-        <head>
-          {this.props.styleTags}
-          {Object.values(helmet).map((el) => el.toComponent())}
-        </head>
-        <body {...bodyAttrs}>
+      <Html>
+        <Head>{this.props.styles}</Head>
+
+        <body>
           <Main />
           {process.env.NODE_ENV === "production" && (
             <script
@@ -43,7 +51,7 @@ class MyDocument extends Document {
           )}
           <NextScript />
         </body>
-      </html>
+      </Html>
     );
   }
 }

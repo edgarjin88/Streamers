@@ -37,7 +37,9 @@ const WebRTCVideo = () => {
 
       const { close } = peerConnection;
       peerConnection.close = function () {
-        videoRef.current.srcObject = null;
+        if (videoRef.current) {
+          videoRef.current.srcObject = null;
+        }
 
         localStream.getTracks().forEach((track) => track.stop());
 
@@ -47,7 +49,9 @@ const WebRTCVideo = () => {
       const remoteStream = new MediaStream(
         peerConnection.getReceivers().map((receiver) => receiver.track)
       );
-      videoRef.current.srcObject = remoteStream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = remoteStream;
+      }
 
       const { close } = peerConnection;
       peerConnection.close = function () {

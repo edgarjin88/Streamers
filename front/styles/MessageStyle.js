@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyledChatForm = styled.div`
   z-index: 10;
-  background-color: white;
+  background-color: #fafafa;
   & > *,
   & > * > * {
     z-index: 10;
@@ -48,6 +48,9 @@ export const StyledChatMessageBox = styled.div`
     padding: 0 1rem;
     overflow-y: scroll;
     scrollbar-width: none;
+  }
+  .chatMessageList::-webkit-scrollbar {
+    display: none;
   }
 
   & .message-row {

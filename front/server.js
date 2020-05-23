@@ -15,19 +15,19 @@ app
     server.use(
       cors({
         origin: "*",
-        credentials: true
+        credentials: true,
       })
     );
     server.get("*", (req, res) => {
       return handle(req, res);
     });
-
-    server.use(handle).listen(3000, err => {
+    console.log("currentmode : ", process.env.NODE_ENV);
+    server.use(handle).listen(3000, (err) => {
       if (err) throw err;
       console.log("> Ready on http://localhost:3000");
     });
   })
-  .catch(ex => {
+  .catch((ex) => {
     console.error(ex.stack);
     process.exit(1);
   });

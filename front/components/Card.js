@@ -136,9 +136,7 @@ export default function RecipeReviewCard() {
         className={classes.media}
         image={
           profilePhoto
-            ? process.env.NODE_ENV === "development"
-              ? `http://localhost:3003/${profilePhoto}`
-              : profilePhoto
+            ? `${URL}/${profilePhoto}`
             : "../static/images/profiles/noimage.png"
         }
         title="Profile Image"
