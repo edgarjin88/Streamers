@@ -22,20 +22,18 @@ exports.deleteNotification = async (req, res, next) => {
   }
 };
 exports.deleteSingleNotification = async (req, res, next) => {
-  async (req, res, next) => {
-    try {
-      const notification = await db.Event.findOne({
-        where: { id: req.params.id },
-      });
-      if (!notification) {
-        return res.status(404).send("notification does not exist.");
-      }
-      await db.Event.destroy({ where: { id: req.params.id } });
-
-      res.send(req.params.id);
-    } catch (e) {
-      console.error(e);
-      next(e);
+  try {
+    const notification = await db.Event.findOne({
+      where: { id: req.params.id },
+    });
+    if (!notification) {
+      return res.status(404).send("notification does not exist.");
     }
-  };
+    await db.Event.destroy({ where: { id: req.params.id } });
+
+    res.send(req.params.id);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 };
