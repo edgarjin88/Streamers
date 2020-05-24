@@ -1,6 +1,5 @@
 import produce from "immer";
 import { validateEmail } from "../helpers/loginHelpers";
-import { SIGN_UP_SUCCESS } from "./user";
 
 export const initialState = {
   email: "",
@@ -22,7 +21,7 @@ export const initialState = {
   startedChangingPassword: true,
   changePasswordErrorReason: "",
   resetPasswordLink: "",
-  description: ""
+  description: "",
 };
 
 export const SET_DESCRIPTION = "SET_DESCRIPTION";
@@ -46,7 +45,7 @@ export const SET_RESET_PASSWORD_LINK = "SET_RESET_PASSWORD_LINK";
 // export const CLOSE_BACKDROP = "CLOSE_BACKDROP";
 
 export default (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     switch (action.type) {
       case SET_DESCRIPTION:
         {

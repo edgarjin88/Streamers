@@ -17,7 +17,6 @@ class MyDocument extends Document {
               materialUiSheets.collect(<App {...props} />)
             ),
         });
-      console.log("ctx.renderPage :", ctx.renderPage);
       const initialProps = await Document.getInitialProps(ctx);
       return {
         ...initialProps,
@@ -36,7 +35,8 @@ class MyDocument extends Document {
   }
 
   render() {
-    console.log("props :", this.props);
+    console.log("currentmode : ", process.env.NODE_ENV);
+
     return (
       <Html>
         <Head>{this.props.styles}</Head>

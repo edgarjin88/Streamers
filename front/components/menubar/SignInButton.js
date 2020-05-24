@@ -1,8 +1,9 @@
 import React, { memo } from "react";
 import Link from "next/link";
+import styled from "styled-components";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
 
 export const StyledIcon = styled.div`
   display: flex;

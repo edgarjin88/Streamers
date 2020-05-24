@@ -1,6 +1,7 @@
-import React, { memo, useState, useCallback } from "react";
+import React, { memo, useState } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import Router from "next/router";
+import Link from "next/link";
 
 import IconButton from "@material-ui/core/IconButton";
 import Badge from "@material-ui/core/Badge";
@@ -11,17 +12,15 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
+import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
+import styled from "styled-components";
+
 import { useStyles } from "../styles/HideBarStyle";
 import {
   DELETE_NOTIFICATION_REQUEST,
   DELETE_SINGLE_NOTIFICATION_REQUEST,
 } from "../reducers/user";
-
-import Link from "next/link";
-import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import { URL } from "../config/config";
-import styled from "styled-components";
-
 import { OPEN_MODAL } from "../reducers/menu";
 
 export const MemoMenuItems = memo(function MemoMenuItems() {

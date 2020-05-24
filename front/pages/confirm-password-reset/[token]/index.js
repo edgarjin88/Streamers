@@ -2,25 +2,24 @@ import React, { useEffect } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
+
+import jwt from "jsonwebtoken";
+
+import styled from "styled-components";
 import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-
 import Typography from "@material-ui/core/Typography";
 import Toaster from "../../../components/Toaster";
+
 import { useStyles } from "../../../styles/SigniningStyle";
-// to be moved to styling folder later.
-
 import Copyright from "../../../components/Copyright";
-
-import jwt from "jsonwebtoken";
 import LinearDeterminate from "../../../components/Progressbar";
 
 import {
-  MemoEmail,
   MemoPassword,
   MemoPasswordCheck,
   MemoConfirmPasswordReset,

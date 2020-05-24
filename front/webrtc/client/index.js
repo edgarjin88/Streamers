@@ -6,8 +6,8 @@ import {
   STOP_STREAMING_REQUEST,
 } from "../../reducers/video";
 import { StoreExported } from "../../pages/_app";
+import axios from "axios";
 
-const fetch = require("node-fetch");
 const DefaultRTCPeerConnection = require("wrtc").RTCPeerConnection;
 const { RTCSessionDescription } = require("wrtc");
 
@@ -38,29 +38,31 @@ class ConnectionClient {
 
       const { beforeAnswer, stereo, type } = options;
 
-      const response1 = await fetch(
+      const response1 = await axios.post(
         `${URL}/api/connections/${type}/${currentVideoId}`,
-        {
-          method: "POST",
-        }
+        {},
+        { withCredentials: true }
       );
       // roomId to be passed into Router
 
-      const remotePeerConnection = await response1.json();
+      const remotePeerConnection = await response1.data;
 
+      console.log("remotePeerConnection :", remotePeerConnection);
       const { id } = remotePeerConnection;
       const localPeerConnection = new RTCPeerConnection({
         sdpSemantics: "unified-plan",
       });
 
-      localPeerConnection.close = function (videoId) {
+      localPeerConnection.close = async function (videoId) {
         StoreExported.dispatch({
           type: STOP_STREAMING_REQUEST,
         });
-        // redux may not required here
-        fetch(`${URL}/api/connections/${typePassed}/${id}/${videoId}`, {
-          method: "delete",
-        }).catch(() => {});
+
+        await axios.delete(
+          `${URL}/api/connections/${typePassed}/${id}/${videoId}`,
+          { withCredentials: true }
+        );
+
         return RTCPeerConnection.prototype.close.apply(this, arguments);
       };
 
@@ -80,17 +82,15 @@ class ConnectionClient {
         });
         await localPeerConnection.setLocalDescription(updatedAnswer);
 
-        await fetch(
+        await axios.post(
           `${URL}/api/connections/${typePassed}/${id}/remote-description`,
           {
-            method: "POST",
             body: JSON.stringify(localPeerConnection.localDescription),
-            headers: {
-              "Content-Type": "application/json",
-            },
+          },
+          {
+            withCredentials: true,
           }
         );
-
         return localPeerConnection;
       } catch (error) {
         localPeerConnection.close(currentVideoId);

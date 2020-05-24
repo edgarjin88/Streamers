@@ -2,14 +2,9 @@
 
 import React, { useRef } from "react";
 import { useSelector, shallowEqual } from "react-redux";
-
-import { useRouter } from "next/router";
 import WebRTCController from "../webrtc/browser/WebRTCController";
 import styled from "styled-components";
 const WebRTCVideo = () => {
-  const router = useRouter();
-  const queryId = router.query.id;
-
   const videoRef = useRef();
 
   const { myId, videoOwnerId, me } = useSelector((state) => {
@@ -24,27 +19,32 @@ const WebRTCVideo = () => {
 
   const typeFunction = async (peerConnection) => {
     if (type === "broadcaster") {
-      const localStream = await window.navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
+      try {
+        const localStream = await window.navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true,
+        });
 
-      localStream
-        .getTracks()
-        .forEach((track) => peerConnection.addTrack(track, localStream));
+        localStream
+          .getTracks()
+          .forEach((track) => peerConnection.addTrack(track, localStream));
 
-      videoRef.current.srcObject = localStream;
+        videoRef.current.srcObject = localStream;
 
-      const { close } = peerConnection;
-      peerConnection.close = function () {
-        if (videoRef.current) {
-          videoRef.current.srcObject = null;
-        }
+        const { close } = peerConnection;
+        peerConnection.close = function () {
+          if (videoRef.current) {
+            videoRef.current.srcObject = null;
+          }
 
-        localStream.getTracks().forEach((track) => track.stop());
+          localStream.getTracks().forEach((track) => track.stop());
 
-        return close.apply(this, arguments);
-      };
+          return close.apply(this, arguments);
+        };
+      } catch (e) {
+        alert("You need a camera to start broadcasting");
+        console.error("error while accessing media device :", e);
+      }
     } else {
       const remoteStream = new MediaStream(
         peerConnection.getReceivers().map((receiver) => receiver.track)
@@ -57,7 +57,6 @@ const WebRTCVideo = () => {
       peerConnection.close = function () {
         videoRef.current.srcObject = null;
         return close.apply(this, arguments);
-        // 굉장히 중요.
       };
     }
   };

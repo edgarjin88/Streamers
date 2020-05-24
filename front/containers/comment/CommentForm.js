@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { ADD_COMMENT_REQUEST } from "../../reducers/video";
 import { URL } from "../../config/config";

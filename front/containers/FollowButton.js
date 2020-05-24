@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import SubscriptionsIcon from "@material-ui/icons/Subscriptions";
 import StopScreenShareIcon from "@material-ui/icons/StopScreenShare";

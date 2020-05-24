@@ -1,20 +1,16 @@
-import React, { useEffect } from "react";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Router from "next/router";
-import Button from "@material-ui/core/Button";
 
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     "& > * + *": {
-      marginTop: theme.spacing(2)
+      marginTop: theme.spacing(2),
       // marginBottom: theme.spacing(2)
-    }
-  }
+    },
+  },
 }));
 
 const LinearDeterminate = () => {
@@ -23,7 +19,7 @@ const LinearDeterminate = () => {
 
   React.useEffect(() => {
     function progress() {
-      setCompleted(oldCompleted => {
+      setCompleted((oldCompleted) => {
         if (oldCompleted === 100) {
           return 100;
         }

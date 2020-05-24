@@ -1,5 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { useRouter } from "next/router";
+import Link from "next/link";
+
+import moment from "moment";
+import styled from "styled-components";
+
 import {
   LOAD_MAIN_VIDEOS_REQUEST,
   LOAD_HASHTAG_VIDEOS_REQUEST,
@@ -7,14 +13,7 @@ import {
   LOAD_USER_VIDEOS_REQUEST,
   LOAD_FAVORITE_VIDEOS_REQUEST,
 } from "../reducers/video";
-import { useRouter } from "next/router";
-
-import Link from "next/link";
-
 import { URL } from "../config/config";
-import moment from "moment";
-
-import styled from "styled-components";
 import Loading from "../components/Loading";
 
 moment.locale("en");
@@ -77,8 +76,6 @@ const RelatedVideo = ({
   useEffect(() => {
     countRef.current = [];
   }, [pathName, targetUserId]);
-
-  //일단 onscroll이 문제인지 먼저 확실히 파악하자.
 
   const onScroll = useCallback(
     (e) => {

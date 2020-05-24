@@ -5,9 +5,8 @@ import SaveIcon from "@material-ui/icons/Save";
 import EditIcon from "@material-ui/icons/Edit";
 
 import { UPLOAD_PROFILE_REQUEST } from "../reducers/user";
-import React, { useCallback, useState, useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
-import Modal from "@material-ui/core/Modal";
 
 const UploadProfile = () => {
   const imageInput = useRef(); //
@@ -28,13 +27,7 @@ const UploadProfile = () => {
   }, [imageInput.current]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        margin: "16px 15px",
-        justifyContent: "flex-end",
-      }}
-    >
+    <div>
       <input
         type="file"
         multiple
@@ -44,8 +37,13 @@ const UploadProfile = () => {
       />
       <Button
         onClick={onClickImageUpload}
+        style={{
+          float: "right",
+          marginRight: "2rem",
+          backgroundColor: "orange",
+          color: "white",
+        }}
         variant="contained"
-        color="default"
         startIcon={<EditIcon />}
       >
         Change Profile Photo

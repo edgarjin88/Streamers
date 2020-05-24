@@ -1,20 +1,9 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import React, { useState } from "react";
+import { useSelector, shallowEqual } from "react-redux";
 
-import Button from "@material-ui/core/Button";
-import {
-  ADD_COMMENT_REQUEST,
-  LIKE_COMMENT_REQUEST,
-  SET_CURRENT_COMMENT_ID,
-} from "../../reducers/video";
-import { URL } from "../../config/config";
 import moment from "moment";
 
-import styled from "styled-components";
-
 import CommentForm from "../../containers/comment/CommentForm.js";
-import CommentEditBox from "../../containers/comment/CommentEditBox";
-import ResponseComment from "./ResponseComment";
 import CommentList from "./CommentList";
 
 moment.locale("en");
@@ -23,18 +12,9 @@ const VideoComments = () => {
   const [truefalse, setTruefalse] = useState({
     showComment: true,
     showResponse: false,
-
-    liked: false,
-    disliked: false,
   });
 
-  const {
-    showComment,
-    showResponse,
-
-    liked,
-    disliked,
-  } = truefalse;
+  const { showComment, showResponse } = truefalse;
 
   const handleBoolean = (e) => {
     setTruefalse({
@@ -43,9 +23,8 @@ const VideoComments = () => {
     });
   };
 
-  const { id, currentVideoComments } = useSelector(({ video }) => {
+  const { currentVideoComments } = useSelector(({ video }) => {
     return {
-      id: video.currentVideo.id,
       currentVideoComments: video.currentVideoComments,
     };
   }, shallowEqual);
@@ -53,17 +32,6 @@ const VideoComments = () => {
   const { me } = useSelector(({ user }) => {
     return user;
   }, shallowEqual);
-
-  const dispatch = useDispatch();
-
-  const handleResponse = () => {
-    setTruefalse(() => {
-      return { ...truefalse, showResponse: !showResponse };
-    });
-    dispatch({
-      type: SET_CURRENT_COMMENT_ID,
-    });
-  };
 
   const renderCommentHeader = () => {
     return (
@@ -96,12 +64,7 @@ const VideoComments = () => {
 
       <div id="comment-list-container">
         {me && <CommentForm />}
-        {showComment && (
-          <CommentList
-            showResponse={showResponse}
-            handleResponse={handleResponse}
-          />
-        )}
+        {showComment && <CommentList />}
       </div>
     </section>
   );

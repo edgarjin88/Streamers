@@ -1,4 +1,3 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 
 import styled from "styled-components";

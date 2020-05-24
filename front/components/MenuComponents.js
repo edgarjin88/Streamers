@@ -1,13 +1,16 @@
-import React, { memo, useState, useCallback } from "react";
-import Typography from "@material-ui/core/Typography";
-import { useStyles } from "../styles/HideBarStyle";
+import React, { memo, useCallback } from "react";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
+
+import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
 import VideocamIcon from "@material-ui/icons/Videocam";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
+
 import { CLOSE_DRAWER } from "../reducers/menu";
+import { useStyles } from "../styles/HideBarStyle";
+
 export const LogoAndName = memo(function LogoAndName() {
   const classes = useStyles();
   const dispatch = useDispatch();

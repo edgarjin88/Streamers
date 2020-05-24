@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import React from "react";
 
 import { IndexGlobalStyle } from "../styles/indexStyle";
 

@@ -1,10 +1,5 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import {
-  EDIT_NICKNAME_REQUEST,
-  START_EDIT_NICKNAME,
-  LOAD_USER_REQUEST,
-} from "../reducers/user";
+import React, { useState } from "react";
+import { useSelector, shallowEqual } from "react-redux";
 
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -16,12 +11,10 @@ import CardActions from "@material-ui/core/CardActions";
 import Collapse from "@material-ui/core/Collapse";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import { red } from "@material-ui/core/colors";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { URL } from "../config/config";
+import { red } from "@material-ui/core/colors";
 
+import { URL } from "../config/config";
 import {
   MemoEmail,
   MemoEditNickname,
@@ -29,18 +22,17 @@ import {
   MemoSubmitPasswordChange,
   MemoRichTextEditor,
 } from "../containers/InputComponents";
-import UploadProfile from "../containers/UploadProfile";
 
 import moment from "moment";
-import { useRouter } from "next/router";
 // import FollowButton from "../containers/FollowButton";
 moment.locale("en");
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "95rem",
-    marginTop: "30px",
-    fontSize: "14px",
+    marginTop: "3rem",
+    fontSize: "1.4rem",
+    marginBottom: "4rem",
   },
   button: {
     margin: "5px",
@@ -48,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
   media: {
     height: 0,
-    margin: "0 1.7refm",
+    margin: "0 1.7rem",
     paddingTop: "56.25%", // 16:9
   },
   expand: {
@@ -67,13 +59,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function RecipeReviewCard() {
+const UserCard = ({ profileOwner }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const queryId = router.query.id;
   const [expanded, setExpanded] = useState(false);
-  const [user, setUser] = useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -87,6 +75,7 @@ export default function RecipeReviewCard() {
     id,
     createdAt,
     Followers,
+    myNickname,
   } = useSelector(({ user }) => {
     return {
       startedEditingNickname: user.startedEditingNickname,
@@ -97,19 +86,10 @@ export default function RecipeReviewCard() {
       id: user.userInfo.id,
       createdAt: user.userInfo.createdAt,
       Followers: user.userInfo.Followers,
+      myNickname: user.me && user.me.nickname,
     };
-  });
+  }, shallowEqual);
 
-  useEffect(() => {
-    dispatch({
-      type: LOAD_USER_REQUEST,
-      data: router.query.id,
-    });
-  }, [id]);
-
-  const { me } = useSelector(({ user }) => user);
-
-  const profileOwner = me && me.id === id && id === parseInt(queryId, 10);
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -123,7 +103,7 @@ export default function RecipeReviewCard() {
           </Avatar>
         }
         action={<IconButton aria-label="settings"></IconButton>}
-        title={nickname}
+        title={profileOwner ? myNickname : nickname}
         subheader={
           <div>
             Joined on {moment(createdAt).format("DD.MM.YYYY")} <br />
@@ -156,7 +136,7 @@ export default function RecipeReviewCard() {
         <MemoRichTextEditor profileOwner={profileOwner} />
       </CardContent>
       <CardActions disableSpacing>
-        {/* <hr /> */}
+        <hr />
         {profileOwner && (
           <>
             <IconButton
@@ -169,6 +149,7 @@ export default function RecipeReviewCard() {
                 fontSize: "5rem",
                 color: "#fff",
                 backgroundColor: "#fda026",
+                marginBottom: "2rem",
               }}
               aria-expanded={expanded}
               aria-label="User Details"
@@ -202,7 +183,9 @@ export default function RecipeReviewCard() {
           <MemoSubmitPasswordChange />
         </CardContent>
       </Collapse>
-      {profileOwner && <UploadProfile />}
+      {/* {profileOwner && <UploadProfile />} */}
     </Card>
   );
-}
+};
+
+export default UserCard;

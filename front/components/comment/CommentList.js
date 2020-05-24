@@ -1,19 +1,16 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
-import Button from "@material-ui/core/Button";
-import {
-  ADD_COMMENT_REQUEST,
-  LIKE_COMMENT_REQUEST,
-  SET_CURRENT_COMMENT_ID,
-} from "../../reducers/video";
-import { URL } from "../../config/config";
 import moment from "moment";
 
+import Button from "@material-ui/core/Button";
+
+import { URL } from "../../config/config";
 import CommentEditBox from "../../containers/comment/CommentEditBox";
 import ResponseComment from "./ResponseComment";
 import ReplyCommentForm from "../../containers/comment/ReplyCommentForm";
 import Link from "next/link";
+
 moment.locale("en");
 
 const CommentList = () => {

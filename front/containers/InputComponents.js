@@ -12,6 +12,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import SaveIcon from "@material-ui/icons/Save";
 
+import UploadProfile from "../containers/UploadProfile";
+
 import {
   SET_NICKNAME,
   SET_EMAIL,
@@ -19,11 +21,7 @@ import {
   SET_PASSWORD,
   SET_PASSWORD_ERROR,
   SET_PASSWORD_CHECK,
-  SET_PASSWORD_CHECK_ERROR,
   SET_TERM,
-  SET_TERM_ERROR,
-  SET_NICKNAME_ERROR,
-  SET_DESCRIPTION,
 } from "../reducers/input";
 import {
   SIGN_UP_REQUEST,
@@ -139,16 +137,18 @@ export const MemoRichTextEditor = memo(function MemoRichTextEditor({
       )}
 
       {startedEditingDescription && (
-        <Button
-          onClick={handleCancel}
-          variant="contained"
-          color="secondary"
-          // className={classes.button}
-          startIcon={<DeleteIcon />}
-          style={{ float: "right", marginRight: "20px" }}
-        >
-          Cancel
-        </Button>
+        <>
+          <Button
+            onClick={handleCancel}
+            variant="contained"
+            color="secondary"
+            startIcon={<DeleteIcon />}
+            style={{ float: "right", marginRight: "2rem" }}
+          >
+            Cancel
+          </Button>
+          <UploadProfile />
+        </>
       )}
     </>
   );

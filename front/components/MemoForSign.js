@@ -1,15 +1,17 @@
-import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
+import React, { memo } from "react";
+
 import TextField from "@material-ui/core/TextField";
-import { SignUpError } from "../styles/SigniningStyle";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 
+import { SignUpError } from "../styles/SigniningStyle";
+
 export const MemoEmail = memo(function MemoEmail({
   handleChange,
   email,
-  emailError
+  emailError,
 }) {
   return (
     <>
@@ -37,7 +39,7 @@ export const MemoEmail = memo(function MemoEmail({
 export const MemoNickname = memo(function MemoNickname({
   handleChange,
   nickname,
-  nicknameError
+  nicknameError,
 }) {
   return (
     <>
@@ -59,7 +61,7 @@ export const MemoNickname = memo(function MemoNickname({
 export const MemoPassword = memo(function MemoPassword({
   handleChange,
   password,
-  passwordError
+  passwordError,
 }) {
   return (
     <>
@@ -83,7 +85,7 @@ export const MemoPassword = memo(function MemoPassword({
 export const MemoPasswordCheck = memo(function MemoPasswordCheck({
   handleChange,
   passwordCheck,
-  passwordCheckError
+  passwordCheckError,
 }) {
   return (
     <>
@@ -108,7 +110,7 @@ export const MemoPasswordCheck = memo(function MemoPasswordCheck({
 export const MemoTerm = memo(function MemoTerm({
   handleChange,
   term,
-  termError
+  termError,
 }) {
   return (
     <>
@@ -131,7 +133,7 @@ export const MemoSubmit = memo(function MemoSubmit({
   onSubmit,
   className,
   isLoading,
-  text
+  text,
 }) {
   return (
     <>

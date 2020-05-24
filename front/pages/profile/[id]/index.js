@@ -1,5 +1,6 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { useRouter } from "next/router";
 
 import { ProfileStyle } from "../../../styles/profileStyle";
 import HideBar from "../../../containers/HideBar";
@@ -10,8 +11,6 @@ import {
   NULLIFY_CHANGE_PASSWORD_SUCCESS,
   NULLIFY_EDIT_NICKNAME_SUCCESS,
   NULLIFY_EDIT_DESCRIPTION_SUCCESS,
-  UNFOLLOW_USER_REQUEST,
-  REMOVE_FOLLOWER_REQUEST,
   LOAD_FOLLOWINGS_REQUEST,
   LOAD_FOLLOWERS_REQUEST,
   LOAD_USER_REQUEST,
@@ -20,6 +19,8 @@ import { LOAD_USER_VIDEOS_REQUEST } from "../../../reducers/video";
 
 const Profile = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const queryId = router.query.id;
 
   const {
     nickname,
@@ -27,9 +28,11 @@ const Profile = () => {
     editNicknameSuccess,
     editDescriptionSuccess,
     me,
+    id,
     profilePhoto,
   } = useSelector((state) => {
     return {
+      id: state.user.userInfo.id,
       profilePhoto: state.user.userInfo.profilePhoto,
       nickname: state.user.userInfo.nickname,
       editNicknameSuccess: state.user.editNicknameSuccess,
@@ -38,6 +41,8 @@ const Profile = () => {
       me: state.user.me,
     };
   }, shallowEqual);
+
+  const profileOwner = me && me.id === id && id === parseInt(queryId, 10);
 
   useEffect(() => {
     setTimeout(() => {
@@ -56,11 +61,13 @@ const Profile = () => {
       <HideBar />
 
       <main>
-        <Card />
+        <Card profileOwner={profileOwner} />
 
         <RelatedVideos
           profilePhoto={profilePhoto}
-          headers={`${nickname}'s other streamings`}
+          headers={`${
+            profileOwner ? me.nickname : nickname
+          }'s other streamings`}
         />
       </main>
       {(changePasswordSuccess ||

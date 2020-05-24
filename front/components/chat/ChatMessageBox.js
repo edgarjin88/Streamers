@@ -1,7 +1,8 @@
-import React, { useState, useEffect, Children } from "react";
+import React from "react";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+
 import moment from "moment";
 
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { StyledChatMessageBox } from "../../styles/MessageStyle";
 import { URL } from "../../config/config";
 

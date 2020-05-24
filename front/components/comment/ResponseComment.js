@@ -1,22 +1,7 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
-
-import styled from "styled-components";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import DeleteIcon from "@material-ui/icons/Delete";
-import {
-  LIKE_COMMENT_REQUEST,
-  DISLIKE_COMMENT_REQUEST,
-  UNLIKE_COMMENT_REQUEST,
-  UNDISLIKE_COMMENT_REQUEST,
-  REMOVE_COMMENT_REQUEST,
-} from "../../reducers/video";
-import CommentForm from "../../containers/comment/CommentForm";
-import ReplyCommentForm from "../../containers/comment/ReplyCommentForm";
-import { URL } from "../../config/config";
-
+import { useSelector, shallowEqual } from "react-redux";
 import moment from "moment";
+
+import { URL } from "../../config/config";
 import CommentEditBox from "../../containers/comment/CommentEditBox";
 moment.locale("en");
 

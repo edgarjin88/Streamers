@@ -1,18 +1,7 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import SubscriptionsIcon from "@material-ui/icons/Subscriptions";
-import StopScreenShareIcon from "@material-ui/icons/StopScreenShare";
-import { URL } from "../config/config";
-import { FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST } from "../reducers/user";
+
 import Link from "next/link";
-import {
-  UNDISLIKE_VIDEO_REQUEST,
-  DISLIKE_VIDEO_REQUEST,
-  LOAD_VIDEO_REQUEST,
-  UNLIKE_VIDEO_REQUEST,
-  LIKE_VIDEO_REQUEST,
-} from "../reducers/video";
-import styled from "styled-components";
 
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
@@ -20,6 +9,16 @@ import ShareIcon from "@material-ui/icons/Share";
 import ReportIcon from "@material-ui/icons/Report";
 import EditAndDeleteBox from "../containers/EditAndDeleteBox";
 import FollowButton from "../containers/FollowButton";
+
+import { URL } from "../config/config";
+
+import {
+  UNDISLIKE_VIDEO_REQUEST,
+  DISLIKE_VIDEO_REQUEST,
+  LOAD_VIDEO_REQUEST,
+  UNLIKE_VIDEO_REQUEST,
+  LIKE_VIDEO_REQUEST,
+} from "../reducers/video";
 
 import VideoDescription from "./Hashtag";
 

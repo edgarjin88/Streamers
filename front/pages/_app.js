@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
+import Head from "next/head";
+
 import withRedux from "next-redux-wrapper";
 import withReduxSaga from "next-redux-saga";
 import { applyMiddleware, compose, createStore } from "redux";
-import { Provider, useSelector, shallowEqual } from "react-redux";
+import { Provider } from "react-redux";
 import createSagaMiddleware from "redux-saga";
 import axios from "axios";
-import Helmet from "react-helmet";
 import SimpleModal from "../containers/CreateChannel";
 
 //set up helmet later.
@@ -28,6 +29,11 @@ const Front = ({ Component, pageProps, store }) => {
   }, []);
   return (
     <Provider store={store}>
+      <Head>
+        <title>Streamers.com</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="shortcut icon" href="/static/favicon.ico" />
+      </Head>
       <Component {...pageProps} />
       <SimpleModal />
       <WrapperComponent />
@@ -41,7 +47,7 @@ Front.getInitialProps = async (context) => {
   const { ctx, Component } = context;
   let pageProps = {};
   const state = ctx.store.getState(); //
-  const cookie = ctx.isServer ? ctx.req.headers.cookie : ""; //cookies는 여기
+  const cookie = ctx.isServer ? ctx.req.headers.cookie : "";
   axios.defaults.headers.Cookie = "";
   if (ctx.isServer && cookie) {
     axios.defaults.headers.Cookie = cookie;
@@ -55,7 +61,6 @@ Front.getInitialProps = async (context) => {
   if (Component.getInitialProps) {
     pageProps = (await Component.getInitialProps(ctx)) || {};
   }
-  // console.log('this is pageProps result', pageProps);
   return { pageProps }; //
 };
 

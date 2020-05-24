@@ -1,6 +1,4 @@
 import React, { useState, useCallback, Children } from "react";
-import moment from "moment";
-
 import { useSelector, shallowEqual } from "react-redux";
 
 import { StyledChatForm } from "../../styles/MessageStyle";

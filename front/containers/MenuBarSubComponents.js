@@ -1,10 +1,9 @@
-import React, { memo, useState, useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 
+import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
-
 import MenuIcon from "@material-ui/icons/Menu";
 
 // import { useStyles } from "../styles/HideBarStyle";

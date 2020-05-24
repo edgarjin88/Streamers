@@ -1,16 +1,17 @@
-import React, { memo, useState, useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import Menu from "@material-ui/core/Menu";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import Link from "next/link";
 
+import Menu from "@material-ui/core/Menu";
 import { useStyles } from "../styles/HideBarStyle";
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import styled from "styled-components";
+
 import {
   DELETE_NOTIFICATION_REQUEST,
   DELETE_SINGLE_NOTIFICATION_REQUEST,
 } from "../reducers/user";
-import Link from "next/link";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import { URL } from "../config/config";
-import styled from "styled-components";
 
 const StyledMenuItem = styled.div`
   ul,
