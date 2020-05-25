@@ -14,7 +14,8 @@ const Filter = require("bad-words");
 const socketList = {};
 
 const webSocket = (server, app, sessionMiddleware) => {
-  const io = SocketIO(server, { path: "/socket.io" });
+  const io = SocketIO(server);
+  // const io = SocketIO(server, { path: "/socket.io" });
   app.set("io", io);
 
   io.use((socket, next) => {
