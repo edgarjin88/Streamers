@@ -22,7 +22,54 @@ import {
 } from "../reducers/user";
 import { URL } from "../config/config";
 import { OPEN_MODAL } from "../reducers/menu";
+const StyledMenuItem = styled.div`
+  ul,
+  li {
+    &:active {
+      outline: none;
+    }
+  }
+  svg {
+    font-size: 3rem;
+    margin-right: 0.5rem;
+    :hover {
+      cursor: pointer;
+      color: rgb(220, 20, 60);
+    }
+    :active {
+      transform: translateY(2px);
+    }
+  }
+  :hover {
+    background-color: #eee;
+  }
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(136, 136, 136, 0.4);
+  }
+  strong {
+    font-size: 1.5rem;
+  }
+  .notificationItem {
+    outline: none;
+    display: flex;
+    column-gap: 0.5rem;
+    max-width: 35rem;
+    font-size: 1.4rem;
+    height: 100%;
+    align-items: center;
+    padding: 1rem 0;
 
+    margin: 0;
+  }
+  .notificationItem > a {
+    margin: 0 1rem;
+    align-items: center;
+  }
+  .notificationItem img {
+    width: 3.4rem;
+    height: 3.4rem;
+  }
+`;
 export const MemoMenuItems = memo(function MemoMenuItems() {
   const classes = useStyles();
 
@@ -102,55 +149,6 @@ export const MemoMenuItems = memo(function MemoMenuItems() {
   const { notificationList } = useSelector(({ user }) => {
     return { notificationList: user.notificationList };
   }, shallowEqual);
-
-  const StyledMenuItem = styled.div`
-    ul,
-    li {
-      &:active {
-        outline: none;
-      }
-    }
-    svg {
-      font-size: 3rem;
-      margin-right: 0.5rem;
-      :hover {
-        cursor: pointer;
-        color: rgb(220, 20, 60);
-      }
-      :active {
-        transform: translateY(2px);
-      }
-    }
-    :hover {
-      background-color: #eee;
-    }
-    &:not(:last-child) {
-      border-bottom: 1px solid rgba(136, 136, 136, 0.4);
-    }
-    strong {
-      font-size: 1.5rem;
-    }
-    .notificationItem {
-      outline: none;
-      display: flex;
-      column-gap: 0.5rem;
-      max-width: 35rem;
-      font-size: 1.4rem;
-      height: 100%;
-      align-items: center;
-      padding: 1rem 0;
-
-      margin: 0;
-    }
-    .notificationItem > a {
-      margin: 0 1rem;
-      align-items: center;
-    }
-    .notificationItem img {
-      width: 3.4rem;
-      height: 3.4rem;
-    }
-  `;
 
   const deleteSingleNotification = (notificationId) => (e) => {
     dispatch({

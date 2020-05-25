@@ -1,4 +1,7 @@
 import React, { useEffect } from "react";
+import Head from "next/head";
+import Router from "next/router";
+
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 
 import { IndexGlobalStyle } from "../styles/indexStyle";
@@ -6,12 +9,19 @@ import { IndexGlobalStyle } from "../styles/indexStyle";
 import HideBar from "../containers/HideBar";
 import RelatedVideos from "../components/RelatedVideos";
 import { LOAD_FAVORITE_VIDEOS_REQUEST } from "../reducers/video";
-import Router from "next/router";
+import { URL, FRONTURL } from "../config/config";
+
 const Favorite = () => {
-  const { userVideos, me } = useSelector((state) => {
+  const { me, videoImage } = useSelector((state) => {
     return {
-      userVideos: state.video.userVideos,
       me: state.user && state.user.me,
+      videoImage:
+        state.video &&
+        state.video.mainVideos &&
+        state.video.mainVideos[0] &&
+        state.video.mainVideos[0].Images &&
+        state.video.mainVideos[0].Images[0] &&
+        state.video.mainVideos[0].Images[0].src,
     };
   }, shallowEqual);
   useEffect(() => {
@@ -22,6 +32,21 @@ const Favorite = () => {
   }, []);
   return (
     <div className="container">
+      <Head>
+        <title>Your Favorite channels </title>
+        <meta
+          name="description"
+          content="Your favorite channels. You can find all channels you liked here"
+        />
+        <meta property="og:title" content={"Your Favorite channels"} />
+        <meta
+          property="og:description"
+          content="Your favorite channels. You can find all channels you liked here"
+        />
+        <meta property="og:url" content={`${FRONTURL}/favorite`} />
+        <meta property="og:image" content={`${URL}/${videoImage}`} />
+        <link rel="canonical" href={`${FRONTURL}/favorite`} />
+      </Head>
       <IndexGlobalStyle />
       <HideBar style={{ zIndex: 3000 }} />
       <main>

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { ProfileStyle } from "../../../styles/profileStyle";
@@ -16,6 +17,8 @@ import {
   LOAD_USER_REQUEST,
 } from "../../../reducers/user";
 import { LOAD_USER_VIDEOS_REQUEST } from "../../../reducers/video";
+
+import { FRONTURL, URL } from "../../../config/config";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -55,8 +58,26 @@ const Profile = () => {
       });
     }, 1000);
   }, [changePasswordSuccess, editNicknameSuccess, editDescriptionSuccess, me]);
+  console.log("user  profile :", profilePhoto);
   return (
     <div className="container">
+      <Head>
+        <title>Title : {nickname}'s profile</title>
+        <meta
+          name="description"
+          content={`${nickname}'s profile page. You can find the user description and user's other video channels here.`}
+        />
+        <meta property="og:title" content={`${nickname}'s profile`} />
+
+        <meta
+          property="og:description"
+          content={`${nickname}'s profile page. You can find the user description and user's other video channels here.`}
+        />
+
+        <meta property="og:url" content={`${FRONTURL}/profile/${queryId}`} />
+        <meta property="og:image" content={`${URL}/${profilePhoto}`} />
+        <link rel="canonical" href={`${FRONTURL}/profile/${queryId}`} />
+      </Head>
       <ProfileStyle />
       <HideBar />
 
