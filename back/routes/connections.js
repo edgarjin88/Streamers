@@ -13,11 +13,12 @@ const {
 } = require("../controllers/webrtc");
 
 router.get(`/:type`, isLoggedIn, getWebRTCConnection);
-router.post(`/:type/:room`, isLoggedIn, createWebRTCConnection);
 router.delete(`/:type/:id/:room`, isLoggedIn, deleteConnection);
 router.get(`/:type/:id`, isLoggedIn, getWebRTCConnectionWithId);
 router.get(`/:type/:id/local-description`, isLoggedIn, getLocalDescription);
 router.get(`/:type/:id/remote-description`, isLoggedIn, getRemoteDescription);
+
+router.post(`/:type/:room`, isLoggedIn, createWebRTCConnection);
 router.post(
   `/:type/:id/remote-description`,
   isLoggedIn,

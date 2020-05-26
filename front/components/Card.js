@@ -162,7 +162,6 @@ const UserCard = ({ profileOwner }) => {
               />
             </IconButton>
             <h1> &nbsp; User Details </h1>
-            <hr />{" "}
           </>
         )}
       </CardActions>

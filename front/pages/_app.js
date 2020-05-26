@@ -49,7 +49,9 @@ Front.getInitialProps = async (context) => {
   const state = ctx.store.getState(); //
   const cookie = ctx.isServer ? ctx.req.headers.cookie : "";
   axios.defaults.headers.Cookie = "";
+  console.log("axios common:", axios.defaults.headers.common);
   if (ctx.isServer && cookie) {
+    console.log("is server? :", ctx.isServer);
     axios.defaults.headers.Cookie = cookie;
   }
 

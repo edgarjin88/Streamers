@@ -36,7 +36,7 @@ ErrorPage.defaultProps = {
 };
 
 ErrorPage.getInitialProps = async (context) => {
-  const statusCode = context.res
+  const statusCode = (await context.res)
     ? context.res.statusCode
     : context.err
     ? context.err.statusCode
