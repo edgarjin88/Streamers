@@ -40,12 +40,28 @@ const WrapperComponent = () => {
 
   //socketLogic
   useEffect(() => {
-    Notification.requestPermission().then(function (result) {});
-    if (me) {
-      socket.emit("loginInfo", me.id);
+    if (window) {
+      const userAgent = window.navigator.userAgent;
+      if (
+        userAgent.toLowerCase().includes("android") ||
+        userAgent.toLowerCase().includes("iphone")
+      ) {
+        return;
+      } else {
+        Notification.requestPermission()
+          .then((result) => {
+            console.log("request result :", result);
+            // return result
+          })
+          .catch((e) => {
+            console.log("error getting notification :", e);
+          });
+        if (me) {
+          socket.emit("loginInfo", me.id);
+        }
+      }
     }
   }, [me]);
-
   useEffect(() => {
     socket.on("eventSentFromServer", (data) => {
       dispatch({ type: UPDATE_NOTIFICATION });
