@@ -35,11 +35,11 @@ const VideoComments = () => {
 
   const renderCommentHeader = () => {
     return (
-      <header>
+      <header onClick={handleBoolean}>
         <h2>Comments &middot; {currentVideoComments.length}</h2>
         {showComment ? (
           <img
-            onClick={handleBoolean}
+            // onClick={handleBoolean}
             name="showComment"
             id="comment-uptick"
             src="../static/images/icons/up-tick.svg"
@@ -47,7 +47,7 @@ const VideoComments = () => {
           />
         ) : (
           <img
-            onClick={handleBoolean}
+            // onClick={handleBoolean}
             name="showComment"
             id="comment-downtick"
             src="../static/images/icons/down-tick.svg"
