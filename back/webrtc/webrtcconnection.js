@@ -30,10 +30,15 @@ class WebRtcConnection extends Connection {
       timeToConnected,
       timeToReconnected,
     } = options;
-
-    const peerConnection = new RTCPeerConnection({
+    const config = {
       sdpSemantics: "unified-plan",
-    });
+    };
+
+    // config.iceServers = [
+    //   { urls: ["stun:stun.l.google.com:19302?transport=tcp"] },
+    // ];
+
+    const peerConnection = new RTCPeerConnection(config);
 
     // peerConnection.room = room
 

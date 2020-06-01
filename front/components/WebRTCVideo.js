@@ -49,6 +49,7 @@ const WebRTCVideo = () => {
       const remoteStream = new MediaStream(
         peerConnection.getReceivers().map((receiver) => receiver.track)
       );
+      console.log("remoteStream :", remoteStream);
       if (videoRef.current) {
         videoRef.current.srcObject = remoteStream;
       }

@@ -49,9 +49,19 @@ class ConnectionClient {
 
       console.log("remotePeerConnection :", remotePeerConnection);
       const { id } = remotePeerConnection;
-      const localPeerConnection = new RTCPeerConnection({
+
+      const config = {
         sdpSemantics: "unified-plan",
-      });
+      };
+
+      config.iceServers = [
+        { urls: ["stun:stun.l.google.com:19302?transport=tcp"] },
+      ];
+      const localPeerConnection = new RTCPeerConnection(config);
+
+      // config.iceServers = [
+      //   { urls: ["stun:stun.l.google.com:19302?transport=tcp"] },
+      // ];
 
       localPeerConnection.close = async function (videoId) {
         StoreExported.dispatch({

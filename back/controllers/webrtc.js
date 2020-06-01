@@ -17,13 +17,13 @@ exports.createRemoteDescription = async (req, res) => {
 
   try {
     const connection = connectionManager.getConnection(id);
-
+    console.log("connection exist : ", connection);
     if (!connection) {
       console.log("connection does not exist");
       res.sendStatus(404);
       return;
     }
-    await connection.applyAnswer(req.body);
+    await connection.applyAnswer(JSON.parse(req.body.body));
     res.send(connection.toJSON().remoteDescription);
   } catch (e) {
     console.log(
