@@ -1,9 +1,31 @@
 "use strict";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useSelector, shallowEqual } from "react-redux";
-import WebRTCController from "../webrtc/browser/WebRTCController";
+import OwnerWebRTCController from "../webrtc/browser/OwnerWebRTCController";
+import ViewerWebRTCController from "../webrtc/browser/ViewerWebRTCController";
 import styled from "styled-components";
+import { socket } from "./socket/socket";
+
+const StyledVideoComponent = styled.div`
+position: relative;
+
+& video {
+  position: relative;
+  width: 100%;
+
+  max-height: calc(100vh / 2);
+  object-fit: cover;
+}
+
+& > div {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.5rem;
+  z-index: 33;d
+}
+`;
+
 const WebRTCVideo = () => {
   const videoRef = useRef();
 
@@ -16,72 +38,10 @@ const WebRTCVideo = () => {
   }, shallowEqual);
 
   const type = myId === videoOwnerId ? "broadcaster" : "viwer";
+  const owner = myId === videoOwnerId
 
-  const typeFunction = async (peerConnection) => {
-    if (type === "broadcaster") {
-      try {
-        const localStream = await window.navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
+  let streamingData;
 
-        localStream
-          .getTracks()
-          .forEach((track) => peerConnection.addTrack(track, localStream));
-
-        videoRef.current.srcObject = localStream;
-
-        const { close } = peerConnection;
-        peerConnection.close = function () {
-          if (videoRef.current) {
-            videoRef.current.srcObject = null;
-          }
-
-          localStream.getTracks().forEach((track) => track.stop());
-
-          return close.apply(this, arguments);
-        };
-      } catch (e) {
-        alert("You need a camera to start broadcasting");
-        console.error("error while accessing media device :", e);
-      }
-    } else {
-      const remoteStream = new MediaStream(
-        peerConnection.getReceivers().map((receiver) => receiver.track)
-      );
-      console.log("remoteStream :", remoteStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = remoteStream;
-      }
-
-      const { close } = peerConnection;
-      peerConnection.close = function () {
-        videoRef.current.srcObject = null;
-        return close.apply(this, arguments);
-      };
-    }
-  };
-
-  const beforeAnswer = typeFunction;
-
-  const StyledVideoComponent = styled.div`
-    position: relative;
-
-    & video {
-      position: relative;
-      width: 100%;
-
-      max-height: calc(100vh / 2);
-      object-fit: cover;
-    }
-
-    & > div {
-      position: absolute;
-      right: 1rem;
-      bottom: 0.5rem;
-      z-index: 33;
-    }
-  `;
 
   const { streamingOn, currentVideoId } = useSelector(({ video }) => {
     return {
@@ -90,6 +50,40 @@ const WebRTCVideo = () => {
     };
   }, shallowEqual);
 
+  const handlePlay = ()=>{
+
+    // console.log('before handleplay :', streamingData)
+    // navigator.mediaDevices
+    // .getUserMedia({
+    //   audio: false,
+    //   video: true,
+    // })
+    // .then((stream) => {
+    //   if (videoRef.current) {
+    //     streamingData = stream
+    //     console.log('after handleplay :', streamingData)
+    //     videoRef.current.srcObject = streamingData}
+    // });
+  }
+
+  
+
+  useEffect(()=>{
+    if(streamingOn && type === "broadcaster"){
+      handlePlay()
+    }
+    if(!streamingOn && videoRef.current){
+      videoRef.current.srcObject = null;
+    }
+    
+  },[streamingOn])
+const addStreamingDataToVideo= (arg)=>{
+  if (videoRef.current) {
+    // streamingData = stream
+    console.log('objeaddStreamingDataToVideo fired :');
+    videoRef.current.srcObject = arg}
+
+}
   return (
     <StyledVideoComponent>
       <video
@@ -100,12 +94,26 @@ const WebRTCVideo = () => {
         muted={true}
       ></video>
 
-      {me && (
-        <WebRTCController
+      {me && owner && (
+        <OwnerWebRTCController ref={videoRef}
+        streamingData={streamingData}
           className="controller"
           type={type}
-          options={beforeAnswer}
+          // options={beforeAnswer}
           currentVideoId={currentVideoId}
+          addStreamingDataToVideo={addStreamingDataToVideo}
+          // peerConnection={peerConnection}
+        />
+      )}
+      {me && !owner && (
+        <ViewerWebRTCController ref={videoRef}
+        streamingData={streamingData}
+          className="controller"
+          type={type}
+          // options={beforeAnswer}
+          currentVideoId={currentVideoId}
+          addStreamingDataToVideo={addStreamingDataToVideo}
+          // peerConnection={peerConnection}
         />
       )}
     </StyledVideoComponent>

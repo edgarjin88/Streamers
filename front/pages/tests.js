@@ -23,6 +23,7 @@ const test = () => {
   };
 
   const startSignaling = () => {
+    // debugger
     displaySignalMessage("starting signaling...");
     socket.emit("newPeerConnection", {signal_room:roomName})
 
@@ -47,16 +48,16 @@ const test = () => {
       displaySignalMessage("going to add their stream...");
       theirVideoArea.current.srcObject = evt.streams[0];
     };
-    // navigator.mediaDevices
-    //   .getUserMedia({
-    //     audio: true,
-    //     video: true,
-    //   })
-    //   .then((stream) => {
-    //     displaySignalMessage("going to display my stream...");
-    //     if (myVideoArea.current) myVideoArea.current.srcObject = stream;
-    //     rtcPeerConn.addStream(stream);
-    //   });
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+        video: true,
+      })
+      .then((stream) => {
+        displaySignalMessage("going to display my stream...");
+        if (myVideoArea.current) myVideoArea.current.srcObject = stream;
+        rtcPeerConn.addStream(stream);
+      });
   };
 
   const sendLocalDesc = (desc) => {
@@ -121,6 +122,8 @@ const test = () => {
             logError
           );
         } else {
+          console.log('icecandidate fired on viewer side');
+
           rtcPeerConn.addIceCandidate(new RTCIceCandidate(message.candidate));
         }
       }

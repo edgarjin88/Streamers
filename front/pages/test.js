@@ -45,6 +45,7 @@ const test = () => {
   };
 
   const startSignaling = (signalRoomName) => {
+    debugger
     displaySignalMessage("starting signaling...");
     const rtcPeerConn = new RTCPeerConnection(configuration);
 
@@ -103,6 +104,8 @@ const test = () => {
             logError
           );
         } else {
+          console.log('icecandidate fired on viewer side');
+
           rtcPeerConn.addIceCandidate(new RTCIceCandidate(message.candidate));
         }
       }
