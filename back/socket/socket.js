@@ -1,5 +1,4 @@
 const SocketIO = require("socket.io");
-
 const { generateMessage } = require("./messages");
 const {
   addUser,
@@ -12,6 +11,8 @@ const {
 const Filter = require("bad-words");
 
 const socketList = {};
+
+const RTCList = {};
 
 const webSocket = (server, app, sessionMiddleware) => {
   const io = SocketIO(server);
@@ -28,13 +29,48 @@ const webSocket = (server, app, sessionMiddleware) => {
     //////rtc
     //////rtc
 
+    // Pathnames of the SSL key and certificate files to use for
+    // HTTPS connections.
 
-    
+    // client joinNewRTCConnection
+    // -userName
+    // -userId
+    // -roomName
+    // -videoId
+    // -description
+    // -data type
+    // client send
 
-    //////rtc
-    //////rtc
-    //////rtc
-    //////rtc
+    socket.on("new_viewer_join_RTCConnection", (data) => {
+      const connectionId = data.connectionId;
+      console.log("newRTCConnection fired. connectionId :", connectionId);
+
+      if (!RTCList[connectionId]) {
+        RTCList[connectionId] = [];
+      }
+      RTCList[connectionId].push(data.userId);
+      socket.join(data.connectionId);
+      console.log("updated RTCList :", RTCList);
+      soekt.emit("invite_broadcaster", data);
+    });
+    socket.on("new_broadcaster_join_RTCConnection", (data) => {
+      console.log("newRTCConnection fired. received Data :", data);
+      const connectionId = data.connectionId;
+      RTCList[connectionId].push(data.userId);
+      socket.join(data.connectionId);
+      console.log("updated RTCList :", RTCList);
+    });
+
+    socket.on("message_from_viewer", (data) => {
+      console.log("message_from_viewer :", data);
+
+      socket.broadcast.to(data.room).emit("message_from_viewer", {});
+    });
+    socket.on("message_from_broadcaster", (data) => {
+      console.log("message_from_broadcaster :", data);
+      socket.broadcast.to(data.room).emit("message_from_broadcaster", {});
+    });
+
     //////rtc
     //////rtc
     const req = socket.request;

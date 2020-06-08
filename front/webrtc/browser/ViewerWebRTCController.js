@@ -12,7 +12,7 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
-uuid to besed for each rtc myPeerConnection id. 
+uuid to besed for each rtc myPeerConnection id.  + receiver option for here
 const WebRTCController =forwardRef( ({currentVideoId, addStreamingDataToVideo }, ref) => {
 
   
