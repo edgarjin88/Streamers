@@ -4,7 +4,7 @@ import { socket } from "../components/socket/socket";
 const test = () => {
   const myVideoArea = useRef();
   const theirVideoArea = useRef();
-  const [roomName, setRoomName] = useState(''); 
+  const [roomName, setRoomName] = useState("");
 
   if (myVideoArea.current) myVideoArea.current.srcObject = null;
   if (myVideoArea.current) myVideoArea.current.srcObject = null;
@@ -25,7 +25,7 @@ const test = () => {
   const startSignaling = () => {
     // debugger
     displaySignalMessage("starting signaling...");
-    socket.emit("newPeerConnection", {signal_room:roomName})
+    socket.emit("newPeerConnection", { signal_room: roomName });
 
     rtcPeerConn = new RTCPeerConnection(configuration);
 
@@ -79,7 +79,7 @@ const test = () => {
     displaySignalMessage(error.name + ": " + error.message);
   };
 
-  const testSocket = (name) => {  
+  const testSocket = (name) => {
     socket.on("connect", () => {
       // socket.emit('ready', 'haha')
       console.log("ready message fired");
@@ -90,19 +90,15 @@ const test = () => {
       signal_room: name,
     });
 
-
-
     socket.emit("viewer_signal", {
       type: "user_here1",
       message: "Are you ready for a call?",
       room: "chatroom1",
-      signal_room:name 
+      signal_room: name,
     });
     startSignaling();
 
-
     socket.on("broadcaster_signaling_message", (data) => {
-
       displaySignalMessage("Signal received: " + data.type);
 
       // if (!rtcPeerConn) startSignaling();
@@ -122,7 +118,7 @@ const test = () => {
             logError
           );
         } else {
-          console.log('icecandidate fired on viewer side');
+          console.log("icecandidate fired on viewer side");
 
           rtcPeerConn.addIceCandidate(new RTCIceCandidate(message.candidate));
         }
@@ -132,18 +128,17 @@ const test = () => {
 
   useEffect(() => {
     // testSocket();
-
   }, []);
   ///////webrtc
   ///////webrtc
-const handleJoin=()=>{
-  testSocket(roomName);
-  console.log('handljoin fired. roomName :', roomName);
-}
-const handleChange= (e)=>{
-  console.log('changed room name :', e.target.value)
-  setRoomName(e.target.value)
-}
+  const handleJoin = () => {
+    testSocket(roomName);
+    console.log("handljoin fired. roomName :", roomName);
+  };
+  const handleChange = (e) => {
+    console.log("changed room name :", e.target.value);
+    setRoomName(e.target.value);
+  };
   return (
     <div>
       <div>
@@ -173,7 +168,7 @@ const handleChange= (e)=>{
       </div>
       <button onClick={handleJoin}>join</button>
 
-      <input onChange={handleChange} value={roomName}/>
+      <input onChange={handleChange} value={roomName} />
     </div>
   );
 };

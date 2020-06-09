@@ -33,6 +33,7 @@ const Front = ({ Component, pageProps, store }) => {
         <title>Streamers.com</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="shortcut icon" href="/static/favicon.ico" />
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
       </Head>
       <Component {...pageProps} />
       <SimpleModal />

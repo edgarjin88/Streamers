@@ -38,10 +38,9 @@ const WebRTCVideo = () => {
   }, shallowEqual);
 
   const type = myId === videoOwnerId ? "broadcaster" : "viwer";
-  const owner = myId === videoOwnerId
+  const owner = myId === videoOwnerId;
 
   let streamingData;
-
 
   const { streamingOn, currentVideoId } = useSelector(({ video }) => {
     return {
@@ -50,8 +49,7 @@ const WebRTCVideo = () => {
     };
   }, shallowEqual);
 
-  const handlePlay = ()=>{
-
+  const handlePlay = () => {
     // console.log('before handleplay :', streamingData)
     // navigator.mediaDevices
     // .getUserMedia({
@@ -64,26 +62,23 @@ const WebRTCVideo = () => {
     //     console.log('after handleplay :', streamingData)
     //     videoRef.current.srcObject = streamingData}
     // });
-  }
+  };
 
-  
-
-  useEffect(()=>{
-    if(streamingOn && type === "broadcaster"){
-      handlePlay()
+  useEffect(() => {
+    if (streamingOn && type === "broadcaster") {
+      handlePlay();
     }
-    if(!streamingOn && videoRef.current){
-      videoRef.current.srcObject = null;
+    if (!streamingOn && videoRef.current) {
+      // videoRef.current.srcObject = null;
     }
-    
-  },[streamingOn])
-const addStreamingDataToVideo= (arg)=>{
-  if (videoRef.current) {
-    // streamingData = stream
-    console.log('objeaddStreamingDataToVideo fired :');
-    videoRef.current.srcObject = arg}
-
-}
+  }, [streamingOn]);
+  const addStreamingDataToVideo = (arg) => {
+    if (videoRef.current) {
+      // streamingData = stream
+      console.log("objeaddStreamingDataToVideo fired :");
+      videoRef.current.srcObject = arg;
+    }
+  };
   return (
     <StyledVideoComponent>
       <video
@@ -95,8 +90,9 @@ const addStreamingDataToVideo= (arg)=>{
       ></video>
 
       {me && owner && (
-        <OwnerWebRTCController ref={videoRef}
-        streamingData={streamingData}
+        <OwnerWebRTCController
+          ref={videoRef}
+          streamingData={streamingData}
           className="controller"
           type={type}
           // options={beforeAnswer}
@@ -106,8 +102,9 @@ const addStreamingDataToVideo= (arg)=>{
         />
       )}
       {me && !owner && (
-        <ViewerWebRTCController ref={videoRef}
-        streamingData={streamingData}
+        <ViewerWebRTCController
+          ref={videoRef}
+          streamingData={streamingData}
           className="controller"
           type={type}
           // options={beforeAnswer}

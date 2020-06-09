@@ -2,7 +2,7 @@ import { useEffect, useState, forwardRef } from "react";
 import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
-import uuid from 'react-uuid';
+import uuid from "react-uuid";
 import {
   START_STREAMING_REQUEST,
   STOP_STREAMING_REQUEST,
@@ -12,352 +12,379 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
-uuid to besed for each rtc myPeerConnection id.  + receiver option for here
-const WebRTCController =forwardRef( ({currentVideoId, addStreamingDataToVideo }, ref) => {
+// uuid to besed for each rtc myPeerConnection id.  + receiver option for here
 
-  
-  const dispatch = useDispatch();
-  const { streamingOn, currentVideoOwner, myId } = useSelector((state) => {
-    return {
-      streamingOn: state.video.streamingOn,
-      currentVideoOwner: state.video.currentVideo.UserId,
-      myId: state.user.me && state.user.me.id,
+const WebRTCController = forwardRef(
+  ({ currentVideoId, addStreamingDataToVideo }, ref) => {
+    const [signalRoomId, setSignalRoomId] = useState(uuid());
+
+    const log = (message, order) => {
+      console.log(`order [${order}]. message: ${message}`);
     };
-  }, shallowEqual);
-  const owner = myId === currentVideoOwner;
-  const Router = useRouter();
-  const queryId = Router.query.id;
 
+    const dispatch = useDispatch();
+    const { streamingOn, currentVideoOwner, me } = useSelector((state) => {
+      return {
+        streamingOn: state.video.streamingOn,
+        currentVideoOwner: state.video.currentVideo.UserId,
+        me: state.user && state.user.me,
+      };
+    }, shallowEqual);
+    const owner = me.id === currentVideoOwner;
+    const Router = useRouter();
+    const chatRoomId = "a" + Router.query.id;
 
-  useEffect(() => {
-    console.log('viewer controller fired')
-    return () => {
-      if (streamingOn) {
-        handleStop();
-      }
-    };
-  }, [streamingOn]);
+    useEffect(() => {
+      console.log("viewer controller fired");
+      return () => {
+        if (streamingOn) {
+          handleStop();
+        }
+      };
+    }, [streamingOn]);
 
-  
-  //streamingData 부분은 항상 webrtc와는 별개로 작동해야 한다. 
-  console.log('this is ref from viewer:', ref)
+    console.log("this is ref from viewer:", ref);
 
+    let rtcPeerConnection;
+    let inboundStream;
 
-  // connection이 들어오면, 여기다가 push 한다. 
-  //client 쪽에서는 uuid로 아이디를 만들어서 메시지를 보낼때 같이 보낸다. 
-  async function handleNegotiationNeededEvent() {
-    log("*** Negotiation needed");
-    try {
-      log("---> Creating offer");
-      const offer = await myPeerConnection.createOffer();
-  
-      if (myPeerConnection.signalingState != "stable") {
-        log("     -- The connection isn't stable yet; postponing...")
-        return;
-      }
-  
-      log("---> Setting local description to the offer");
-      await myPeerConnection.setLocalDescription(offer);
-  
-      log("---> Sending the offer to the remote peer");
-      sendToServer({
-        name: myUsername,
-        target: targetUsername,
-        type: "video-offer",
-        sdp: myPeerConnection.localDescription
-      });
-    } catch(err) {
-      log("*** The following error occurred while handling the negotiationneeded event:");
-      reportError(err);
-    };
-  }
+    // 다른점 uuid
+    // 리스트 없다는 점.
+    // video 받아야 한다는 점.
+    //constraint
+    //createOffer를 직접 만들어야 한다. negotiationneeded 부분을 그대로 쓰면 된다.
+    //offer to receiveaudio 를 써야 하고,
+    //letlocaldescription까지 해야 icecandidate이 발생한다.
 
-  async function addTrackToPeerConnection(peerId){
-    log(`this is peerid :${peerId}`)
-    if(streamingData && RTCList[peerId]){
-      
-      try {
-        streamingData.getTracks().forEach(
-          transceiver = track => RTCList[peerId].addTransceiver(track, {streams: [streamingData]}) // array
-        );
-      } catch(err) {
-        handleGetUserMediaError(err);
-      }
-    }
-  }
-  async function createPeerConnection() {
-    log("Setting up a connection...");
+    // let signalRoomId = uuid();
 
-    myPeerConnection = new RTCPeerConnection({
-      iceServers: [
-        {
-          url: "stun:stun.l.google.com:19302",
+    //description 부분
+    //icecandidate 부분
+    //행업 부분 이 파트로 나눠서 돌격해 보자.
+    const handleNegotiationNeededEvent = async () => {
+      var mediaConstraints = {
+        mandatory: {
+          OfferToReceiveAudio: true,
+          OfferToReceiveVideo: true,
         },
-      ],
-    });
-  
-    // Set up event handlers for the ICE negotiation process.
-  
-    myPeerConnection.onicecandidate = handleICECandidateEvent;
-    myPeerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
-    myPeerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
-    myPeerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
-    myPeerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
-    myPeerConnection.ontrack = handleTrackEvent;
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true,
+      };
+      // var mediaConstraints = {
+      //   mandatory: {
+      //     OfferToReceiveAudio: true,
+      //     OfferToReceiveVideo: true,
+      //   },
+      //   offerToReceiveAudio: true,
+      //   offerToReceiveVideo: true,
+      // };
 
-    
-  }
-  
+      log("*** Negotiation needed", 4);
+      try {
+        log("---> Creating offer");
+        const offer = await rtcPeerConnection.createOffer(mediaConstraints);
 
-  function handleTrackEvent(event) {
-    log("*** Track event");
-    document.getElementById("received_video").srcObject = event.streams[0];
-    document.getElementById("hangup-button").disabled = false;
-  }
-  function handleICECandidateEvent(event) {
-    if (event.candidate) {
-      log("*** Outgoing ICE candidate: " + event.candidate.candidate);
-  
-      sendToServer({
-        type: "new-ice-candidate",
-        target: targetUsername,
-        candidate: event.candidate
+        if (rtcPeerConnection.signalingState != "stable") {
+          log("     -- The connection isn't stable yet; postponing...");
+          return;
+        }
+
+        log("---> Setting local description to the offer");
+        await rtcPeerConnection.setLocalDescription(offer);
+        // icecandidate would be made at this point
+        log("---> Sending the offer to the remote peer");
+        sendToServer({
+          userName: me.nickname,
+          signalRoomId: signalRoomId,
+          type: "video-offer",
+          sdp: rtcPeerConnection.localDescription,
+        });
+      } catch (err) {
+        log(
+          "*** The following error occurred while handling the negotiationneeded event:"
+        );
+        reportError(err);
+      }
+    };
+
+    const createPeerConnection = () => {
+      log("createPeerConnection fired :Setting up a connection...", 2);
+
+      rtcPeerConnection = new RTCPeerConnection({
+        iceServers: [
+          {
+            url: "stun:stun.l.google.com:19302",
+          },
+        ],
       });
-    }
-  }
 
+      rtcPeerConnection.onicecandidate = handleICECandidateEvent;
 
-  function handleICEConnectionStateChangeEvent(event) {
-    log("*** ICE connection state changed to " + myPeerConnection.iceConnectionState);
-  
-    switch(myPeerConnection.iceConnectionState) {
-      case "closed":
-      case "failed":
-      case "disconnected":
-        closeVideoCall();
-        break;
-    }
-  }
-  
-  
-  function handleSignalingStateChangeEvent(event) {
-    log("*** WebRTC signaling state changed to: " + myPeerConnection.signalingState);
-    switch(myPeerConnection.signalingState) {
-      case "closed":
-        closeVideoCall();
-        break;
-    }
-  } // 이 부분도 broad caster 쪽에서만 필요하다. 
-  //peerconnection은 항상 scope 되어야 한다. 
+      rtcPeerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
+      rtcPeerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
+      rtcPeerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
+      rtcPeerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
 
-  function handleICEGatheringStateChangeEvent(event) {
-    log("*** ICE gathering state changed to: " + myPeerConnection.iceGatheringState);
-  }
-  
+      rtcPeerConnection.ontrack = handleTrackEvent;
 
-  function closeVideoCall() {
-    var localVideo = document.getElementById("local_video");
-  
-    log("Closing the call");
-  
-    // Close the RTCPeerConnection
-  
-    if (myPeerConnection) {
-      log("--> Closing the peer connection");
-  
-      // Disconnect all our event listeners; we don't want stray events
-      // to interfere with the hangup while it's ongoing.
-  
-      myPeerConnection.ontrack = null;
-      myPeerConnection.onnicecandidate = null;
-      myPeerConnection.oniceconnectionstatechange = null;
-      myPeerConnection.onsignalingstatechange = null;
-      myPeerConnection.onicegatheringstatechange = null;
-      myPeerConnection.onnotificationneeded = null;
-  
-      // Stop all transceivers on the connection
-  
-      //list의 transceiver를 만든 것을 가져와서 논다. 위의 트렌시버랑은 별개다. myPeerconnection 안에 있는 녀석들이다. 
-      myPeerConnection.getTransceivers().forEach(transceiver => {
-        transceiver.stop();
-      });
-  
-      // Stop the webcam preview as well by pausing the <video>
-      // element, then stopping each of the getUserMedia() tracks
-      // on it.
-  
-      if (localVideo.srcObject) {
-        // 왜 꼭 puase()를 먼저 해야만 하지?
-        localVideo.pause();
-        localVideo.srcObject.getTracks().forEach(track => {
-          track.stop();
+      log(`handleNegotiationNeeded fired for createPeerConnection :`, 3);
+      handleNegotiationNeededEvent();
+    };
+
+    // pc.ontrack = (ev) => {
+    //   if (ev.streams && ev.streams[0]) {
+    //     videoElem.srcObject = ev.streams[0];
+    //   } else {
+    //     if (!inboundStream) {
+    //       inboundStream = new MediaStream();
+    //       videoElem.srcObject = inboundStream;
+    //     }
+    //     inboundStream.addTrack(ev.track);
+    //   }
+    // };
+    const handleTrackEvent = (event) => {
+      log("*** Track event");
+      console.log("ref.current :", ref.current);
+      console.log("event :", event);
+      console.log(" event.streams[0]:", event.streams[0]);
+      if (ref.current) {
+        // if (!inboundStream) {
+        ref.current.srcObject = event.streams[0];
+      }
+    };
+    console.log("signal before handleIcecandidate :", signalRoomId);
+
+    const handleICECandidateEvent = (event) => {
+      console.log("signal room :", signalRoomId);
+      if (event.candidate) {
+        log("*** Outgoing ICE candidate: " + event.candidate.candidate, 4);
+
+        sendToServer({
+          type: "new-ice-candidate",
+          signalRoomId: signalRoomId,
+          candidate: event.candidate,
         });
       }
-  
-      // Close the peer connection
-      //가장 마지막에 클로징 하네. 
-      myPeerConnection.close();
-      myPeerConnection = null;
-      webcamStream = null;
-    }
-    
-    document.getElementById("hangup-button").disabled = true;
-    targetUsername = null;
-  }
+    };
 
-  function handleHangUpMsg(msg) {
-    log("*** Received hang up notification from other peer");
-  
-    closeVideoCall();
-  }
+    const handleICEConnectionStateChangeEvent = (event) => {
+      log("*** rtcPeerConnection empty? " + rtcPeerConnection);
 
-  
-function hangUpCall() {
-  closeVideoCall();
+      log(
+        "*** ICE connection state changed to " +
+          rtcPeerConnection.iceConnectionState
+      );
 
-  sendToServer({
-    name: myUsername,
-    target: targetUsername,
-    type: "hang-up"
-  });
-}
+      switch (rtcPeerConnection.iceConnectionState) {
+        case "closed":
+        case "failed":
+        case "disconnected":
+          closeVideoCall();
+          break;
+      }
+    };
 
-function handleGetUserMediaError(e) {
-  log_error(e);
-  switch(e.name) {
-    case "NotFoundError":
-      alert("Unable to open your call because no camera and/or microphone" +
-            "were found.");
-      break;
-    case "SecurityError":
-    case "PermissionDeniedError":
-      break;
-    default:
-      alert("Error opening your camera and/or microphone: " + e.message);
-      break;
-  }
+    const handleSignalingStateChangeEvent = (event) => {
+      log("*** rtcPeerConnection empty? " + rtcPeerConnection);
 
+      log(
+        "*** WebRTC signaling state changed to: " +
+          rtcPeerConnection.signalingState
+      );
+      switch (rtcPeerConnection.signalingState) {
+        case "closed":
+          closeVideoCall(rtcPeerConnection);
+          break;
+      }
+    };
 
-  closeVideoCall();
-}
+    const handleICEGatheringStateChangeEvent = (event) => {
+      log(
+        "*** ICE gathering state changed to: " +
+          rtcPeerConnection.iceGatheringState
+      );
+    };
 
-function reportError(errMessage) {
-  log_error(`Error ${errMessage.name}: ${errMessage.message}`);
-}
+    const closeVideoCall = (rtcPeerConnection) => {
+      log("Closing the call");
+      // Close the RTCPeerConnection
+      if (rtcPeerConnection) {
+        log("--> Closing the peer connection");
 
-  //   var msgJSON = JSON.stringify(msg); 등으로 메시지를 보내도록 하자. 
-  socket.on('video-offer', (evt)=>{ var msg = JSON.parse(evt.data)
-    handleVideoOfferMsg(msg)})
-  socket.on('video-answer',(evt)=>{ var msg = JSON.parse(evt.data)
-    handleVideoAnswerMsg(msg);})
-  socket.on('new-ice-candidate',(evt)=>{ var msg = JSON.parse(evt.data)
-    handleNewICECandidateMsg(msg);
-  })
-  socket.on('hang-up', (evt)=>{ var msg = JSON.parse(evt.data)
-    handleHangUpMsg(msg)})
-  useEffect(()=>{
+        // Disconnect all our event listeners; we don't want stray events
+        // to interfere with the hangup while it's ongoing.
+        rtcPeerConnection.ontrack = null;
+        rtcPeerConnection.onnicecandidate = null;
+        rtcPeerConnection.oniceconnectionstatechange = null;
+        rtcPeerConnection.onsignalingstatechange = null;
+        rtcPeerConnection.onicegatheringstatechange = null;
+        rtcPeerConnection.onnotificationneeded = null;
 
-  }, [])
-  
-  async function handleVideoOfferMsg(msg) {
-    targetUsername = msg.name;
-  
-    log("Received video chat offer from " + targetUsername);
-    if (!myPeerConnection) {
-      createPeerConnection();
-    }
-  
-  // o the caller.
-  
-    var desc = new RTCSessionDescription(msg.sdp);
+        // Stop all transceivers on the connection
 
-  
-    if (myPeerConnection.signalingState != "stable") {
-      log("  - But the signaling state isn't stable, so triggering rollback");
-      await Promise.all([
-        myPeerConnection.setLocalDescription({type: "rollback"}),
-        myPeerConnection.setRemoteDescription(desc)
-      ]);
-      return;
-    } else {
-      log ("  - Setting remote description");
-      await myPeerConnection.setRemoteDescription(desc);
-    }
-  
-  
-    if (!webcamStream) {
-      try {
-        webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      } catch(err) {
-        handleGetUserMediaError(err);
+        //list의 transceiver를 만든 것을 가져와서 논다. 위의 트렌시버랑은 별개다. rtcPeerConnection 안에 있는 녀석들이다.
+        rtcPeerConnection.getTransceivers().forEach((transceiver) => {
+          transceiver.stop();
+        });
+
+        rtcPeerConnection.close();
+        rtcPeerConnection = null;
+      }
+
+      // Disable the hangup button
+
+      // document.getElementById("hangup-button").disabled = true;
+      // targetUsername = null;
+    };
+
+    const handleHangUpMsg = (msg) => {
+      log("*** Received hang up notification from other peer");
+      // 이 부분이 달라져야 할듯.원본 참조 하고,
+      //   내가 상대방의 콜을 끊을 자격은 없게 하자.
+
+      closeVideoCall();
+    };
+
+    const hangUpCall = () => {
+      log("hangup call fired. video would be removed");
+      var localVideo = ref.current;
+      if (localVideo.srcObject) {
+        localVideo.pause();
+        localVideo.srcObject.getTracks().forEach((track) => {
+          track.stop();
+        });
+        streamingData = null;
+      }
+      closeVideoCall();
+    };
+
+    const reportError = (errMessage) => {
+      log_error(`Error ${errMessage.name}: ${errMessage.message}`);
+    };
+    const log_error = (text) => {
+      var time = new Date();
+
+      console.trace("[" + time.toLocaleTimeString() + "] " + text);
+    };
+
+    //   var msgJSON = JSON.stringify(msg); 등으로 메시지를 보내도록 하자.
+
+    // client can only send offer to receive
+    // each message should have signal room id
+
+    const handleVideoOfferMsg = async (msg) => {
+      log("Received video chat offer from broadcaster");
+      const signalRoomId = msg.signalRoomId;
+      if (!rtcPeerConnection) {
+        createPeerConnection(signalRoomId);
+      }
+      log(`rtcPeerConnection empty? : ${rtcPeerConnection}`);
+
+      var desc = new RTCSessionDescription(msg.sdp);
+      if (rtcPeerConnection.signalingState != "stable") {
+        log("  - But the signaling state isn't stable, so triggering rollback");
+        await Promise.all([
+          rtcPeerConnection.setLocalDescription({ type: "rollback" }),
+          rtcPeerConnection.setRemoteDescription(desc),
+        ]);
+
         return;
+      } else {
+        log("  -signal stable.  Setting remote description");
+        await rtcPeerConnection.setRemoteDescription(desc);
       }
-  
-      document.getElementById("local_video").srcObject = webcamStream;
-  
-  
+
+      log("---> Creating and sending answer to caller");
+      await rtcPeerConnection.setLocalDescription(
+        await rtcPeerConnection.createAnswer()
+      );
+
+      sendToServer({
+        userName: me.nickname,
+        userId: me.id,
+        type: "video-answer",
+        signalRoomId: signalRoomId,
+        sdp: rtcPeerConnection.localDescription,
+      });
+    };
+
+    const handleVideoAnswerMsg = async (msg) => {
+      log("*** Call recipient has accepted our call");
+      console.log("handleVideoAnswerMsg: ", msg);
+      var desc = new RTCSessionDescription(msg.sdp);
+      await rtcPeerConnection.setRemoteDescription(desc).catch(reportError);
+      log(`rtcPeerConnection empty? : ${rtcPeerConnection}`);
+
+      log("  -signal stable.  Setting remote description");
+    };
+
+    const handleNewICECandidateMsg = async (msg) => {
+      var candidate = new RTCIceCandidate(msg.candidate);
+
+      console.log('"*** Adding received ICE candidate , :', candidate);
       try {
-        webcamStream.getTracks().forEach(
-          transceiver = track => myPeerConnection.addTransceiver(track, {streams: [webcamStream]})
-        );
-  
-      } catch(err) {
-        handleGetUserMediaError(err);
+        await rtcPeerConnection.addIceCandidate(candidate);
+      } catch (err) {
+        reportError(err);
       }
-    }
-  
-    log("---> Creating and sending answer to caller");
-  
-    await myPeerConnection.setLocalDescription(await myPeerConnection.createAnswer());
-  
-    sendToServer({
-      name: myUsername,
-      target: targetUsername,
-      type: "video-answer",
-      sdp: myPeerConnection.localDescription
-    });
-  }
-  
-  async function handleVideoAnswerMsg(msg) {
-    log("*** Call recipient has accepted our call");
-  
-    // Configure the remote description, which is the SDP payload
-    // in our "video-answer" message.
-  
-    var desc = new RTCSessionDescription(msg.sdp);
-    await myPeerConnection.setRemoteDescription(desc).catch(reportError);
-  }
-  
-  async function handleNewICECandidateMsg(msg) {
-    var candidate = new RTCIceCandidate(msg.candidate);
-  
-    log("*** Adding received ICE candidate: " + JSON.stringify(candidate));
-    try {
-      await myPeerConnection.addIceCandidate(candidate)
-    } catch(err) {
-      reportError(err);
-    }
-  }
+    };
 
-  const handleStart= ()=>{}
-  const handleStop= ()=>{}
+    const sendToServer = (data) => {
+      socket.emit("message_from_viewer", data);
+    };
 
-  return (
-    <div>
-      {!streamingOn ? (
-        <StyledButton1 size={"1.2rem"} color="orange" onClick={handleStart}>
-          <PlayCircleFilledIcon fontSize="large" />
-          {owner ? "Start Streaming" : "Join Streaming"}
-        </StyledButton1>
-      ) : (
-        <StyledButton1 size={"1.2rem"} color="red" onClick={handleStop}>
-          <StopIcon fontSize="large" />
+    const handleStart = () => {
+      socket.emit("new_viewer_join_RTCConnection", {
+        userName: me.nickname,
+        userId: me.id,
+        chatRoom: chatRoomId,
+        signalRoomId: signalRoomId,
+        type: "offer_to_signal_room",
+      });
+    };
 
-          {owner ? "Stop Streaming" : "Quit Streaming"}
-        </StyledButton1>
-      )}
-    </div>
-  );
-})
+    useEffect(() => {
+      // setSignalRoomId(uuid());
+      socket.on("new_broadcaster_join_RTCConnection", (data) => {
+        console.log("new_broadcaster_join_RTCConnection fired ", data);
+        createPeerConnection(signalRoomId);
+      });
+      socket.on("message_from_broadcaster", (data) => {
+        var msg = data;
+        console.log("message_from_broadcaster type of data :", typeof msg);
+        log(`message_from_broadcaster data : ${data}, JSON msg :${msg}`);
+        if (msg.type === "video-offer") {
+          handleVideoOfferMsg(msg);
+        }
+        if (msg.type === "video-answer") {
+          handleVideoAnswerMsg(msg);
+        }
+        if (msg.type === "new-ice-candidate") {
+          handleNewICECandidateMsg(msg);
+        }
+        if (msg.type === "hang-up") {
+          handleHangUpMsg(msg);
+        }
+      });
+    }, []);
+    const handleStop = () => {};
+
+    return (
+      <div>
+        {!streamingOn ? (
+          <StyledButton1 size={"1.2rem"} color="orange" onClick={handleStart}>
+            <PlayCircleFilledIcon fontSize="large" />
+            Join Streaming
+          </StyledButton1>
+        ) : (
+          <StyledButton1 size={"1.2rem"} color="red" onClick={handleStop}>
+            <StopIcon fontSize="large" />
+            Quit Streaming
+          </StyledButton1>
+        )}
+      </div>
+    );
+  }
+);
 
 export default WebRTCController;

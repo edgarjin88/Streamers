@@ -9,16 +9,15 @@ const socket = socketIOClient(URL, {
   rejectUnauthorized: false,
 });
 
+// broadcaster 쪽의 peercon 리퀘스트 받을 때 마다 만들어 진다.
+// 모든 것을 큰 펑션 안에 스코프 시켜 버리자.
 
-// broadcaster 쪽의 peercon 리퀘스트 받을 때 마다 만들어 진다. 
-// 모든 것을 큰 펑션 안에 스코프 시켜 버리자. 
-
-//일단 video 만 따로 빼 놓자. video on off, 한다음 start signal 할 때만 붙이기. 
-// 그다음 start request가 올 때만 보내기. 
+//일단 video 만 따로 빼 놓자. video on off, 한다음 start signal 할 때만 붙이기.
+// 그다음 start request가 올 때만 보내기.
 
 // 방장과 유저만 있는 방을 만드는 게 가장 편한 방법인듯 하다. 정보는 어떻게 전달?
-// on request에, data channel 방만 따로 만든다. 처음에는 data channel 없이 가고, 
-// 나중에 유저 이름과 같이 가자. 
+// on request에, data channel 방만 따로 만든다. 처음에는 data channel 없이 가고,
+// 나중에 유저 이름과 같이 가자.
 const test = () => {
   const myVideoArea = useRef();
   const theirVideoArea = useRef();
@@ -27,7 +26,7 @@ const test = () => {
   if (myVideoArea.current) myVideoArea.current.srcObject = null;
   ///////webrtc
   ///////webrtc
-  let globalStream; 
+  let globalStream;
 
   const configuration = {
     iceServers: [
@@ -45,7 +44,7 @@ const test = () => {
   };
 
   const startSignaling = (signalRoomName) => {
-    debugger
+    debugger;
     displaySignalMessage("starting signaling...");
     const rtcPeerConn = new RTCPeerConnection(configuration);
 
@@ -58,7 +57,7 @@ const test = () => {
             type: "SDP",
             message: JSON.stringify({ sdp: rtcPeerConn.localDescription }),
             room: signalRoomName,
-          }); 
+          });
         },
         logError
       );
@@ -84,7 +83,6 @@ const test = () => {
       // theirVideoArea.current.srcObject = evt.streams[0];
     };
     socket.on("viewer_signaling_message", (data) => {
-
       displaySignalMessage("Signal received: " + data.type);
 
       // if (!rtcPeerConn) startSignaling();
@@ -104,22 +102,18 @@ const test = () => {
             logError
           );
         } else {
-          console.log('icecandidate fired on viewer side');
+          console.log("icecandidate fired on viewer side");
 
           rtcPeerConn.addIceCandidate(new RTCIceCandidate(message.candidate));
         }
       }
     });
-    if(globalStream) {rtcPeerConn.addStream(globalStream)}
-
+    if (globalStream) {
+      rtcPeerConn.addStream(globalStream);
+    }
   };
 
-
-
-  const testSocket = () => {
-
-  };
-
+  const testSocket = () => {};
 
   // emit 자체가 순서대로 파이어는 안하는 건가? multiple은 안되는 건가?
   useEffect(() => {
@@ -127,12 +121,10 @@ const test = () => {
       console.log("ready message fired");
     });
 
-    
     socket.emit("broadcaster_signal", {
       type: "user_here",
       message: "Are you ready for a call?",
       room: "chatroom1",
-
     });
 
     socket.emit("ready", {
@@ -140,54 +132,46 @@ const test = () => {
       signal_room: "room1",
     });
 
+    // 단 한번만 쏴 주면 될듯.
+    socket.on("newPeerConnectionRequest", ({ signal_room }) => {
+      displaySignalMessage(
+        "new peer connection fired from signal room " + signal_room
+      );
 
-    // 단 한번만 쏴 주면 될듯. 
-    socket.on("newPeerConnectionRequest", ({signal_room}) => {
-
-      displaySignalMessage("new peer connection fired from signal room " + signal_room);
-
-      socket.emit('joinNewSignalRoom', {signal_room})
-        
-
-
+      socket.emit("joinNewSignalRoom", { signal_room });
     });
 
-    socket.on("connectWebRTC", ({signal_room})=>{
-      console.log('connectWebRTC fired');
+    socket.on("connectWebRTC", ({ signal_room }) => {
+      console.log("connectWebRTC fired");
       startSignaling(signal_room);
-    })
-    
+    });
   }, []);
   ///////webrtc
   ///////webrtc
 
-  const handleStreaming = ()=>{
+  const handleStreaming = () => {
     testSocket();
-  }
+  };
 
-const handlePlay = ()=>{
-
-  navigator.mediaDevices
-  .getUserMedia({
-    audio: false,
-    video: true,
-  })
-  .then((stream) => {
-    displaySignalMessage("going to display my stream...");
-    globalStream = stream
-    if (myVideoArea.current) myVideoArea.current.srcObject = globalStream;
-    // if(rtcPeerConn)
-    // rtcPeerConn.addStream(globalStream);
-  });
-
-}
+  const handlePlay = () => {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: false,
+        video: true,
+      })
+      .then((stream) => {
+        displaySignalMessage("going to display my stream...");
+        globalStream = stream;
+        if (myVideoArea.current) myVideoArea.current.srcObject = globalStream;
+        // if(rtcPeerConn)
+        // rtcPeerConn.addStream(globalStream);
+      });
+  };
   return (
     <div>
       <div>
         <video
-        
-        autoPlay={true}
-
+          autoPlay={true}
           ref={myVideoArea}
           style={{
             height: "400px",

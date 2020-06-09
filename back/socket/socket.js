@@ -35,40 +35,48 @@ const webSocket = (server, app, sessionMiddleware) => {
     // client joinNewRTCConnection
     // -userName
     // -userId
-    // -roomName
     // -videoId
     // -description
     // -data type
     // client send
 
     socket.on("new_viewer_join_RTCConnection", (data) => {
-      const connectionId = data.connectionId;
-      console.log("newRTCConnection fired. connectionId :", connectionId);
+      const signalRoomId = data.signalRoomId;
+      const chatRoom = data.chatRoom;
+      console.log("newRTCConnection fired. connectionId :", signalRoomId);
 
-      if (!RTCList[connectionId]) {
-        RTCList[connectionId] = [];
+      if (!RTCList[signalRoomId]) {
+        RTCList[signalRoomId] = [];
       }
-      RTCList[connectionId].push(data.userId);
-      socket.join(data.connectionId);
+      RTCList[signalRoomId].push(data.userId);
+      socket.join(data.signalRoomId);
       console.log("updated RTCList :", RTCList);
-      soekt.emit("invite_broadcaster", data);
+      socket.broadcast.to(chatRoom).emit("invite_broadcaster", data);
     });
+
     socket.on("new_broadcaster_join_RTCConnection", (data) => {
       console.log("newRTCConnection fired. received Data :", data);
-      const connectionId = data.connectionId;
-      RTCList[connectionId].push(data.userId);
-      socket.join(data.connectionId);
+      const signalRoomId = data.signalRoomId;
+      RTCList[signalRoomId].push(data.userId);
+      socket.join(data.signalRoomId);
       console.log("updated RTCList :", RTCList);
+      socket.broadcast
+        .to(signalRoomId)
+        .emit("new_broadcaster_join_RTCConnection", data);
+
+      socket.to(signalRoomId).emit("broadcaster_join_completed", data);
     });
 
     socket.on("message_from_viewer", (data) => {
       console.log("message_from_viewer :", data);
 
-      socket.broadcast.to(data.room).emit("message_from_viewer", {});
+      socket.broadcast.to(data.signalRoomId).emit("message_from_viewer", data);
     });
     socket.on("message_from_broadcaster", (data) => {
       console.log("message_from_broadcaster :", data);
-      socket.broadcast.to(data.room).emit("message_from_broadcaster", {});
+      socket.broadcast
+        .to(data.signalRoomId)
+        .emit("message_from_broadcaster", data);
     });
 
     //////rtc
