@@ -62,14 +62,6 @@ const WebRTCController = forwardRef(
     //icecandidate 부분
     //행업 부분 이 파트로 나눠서 돌격해 보자.
     const handleNegotiationNeededEvent = async () => {
-      var mediaConstraints = {
-        mandatory: {
-          OfferToReceiveAudio: true,
-          OfferToReceiveVideo: true,
-        },
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true,
-      };
       // var mediaConstraints = {
       //   mandatory: {
       //     OfferToReceiveAudio: true,
@@ -78,11 +70,19 @@ const WebRTCController = forwardRef(
       //   offerToReceiveAudio: true,
       //   offerToReceiveVideo: true,
       // };
+      // // var mediaConstraints = {
+      // //   mandatory: {
+      // //     OfferToReceiveAudio: true,
+      // //     OfferToReceiveVideo: true,
+      // //   },
+      // //   offerToReceiveAudio: true,
+      // //   offerToReceiveVideo: true,
+      // // };
 
       log("*** Negotiation needed", 4);
       try {
         log("---> Creating offer");
-        const offer = await rtcPeerConnection.createOffer(mediaConstraints);
+        const offer = await rtcPeerConnection.createOffer();
 
         if (rtcPeerConnection.signalingState != "stable") {
           log("     -- The connection isn't stable yet; postponing...");
@@ -111,6 +111,7 @@ const WebRTCController = forwardRef(
       log("createPeerConnection fired :Setting up a connection...", 2);
 
       rtcPeerConnection = new RTCPeerConnection({
+        sdpSemantics: "unified-plan",
         iceServers: [
           {
             url: "stun:stun.l.google.com:19302",
@@ -142,16 +143,31 @@ const WebRTCController = forwardRef(
     //     inboundStream.addTrack(ev.track);
     //   }
     // };
+
+    //   async function beforeAnswer(peerConnection) {
+    // const remoteStream = new MediaStream(
+    //   peerConnection.getReceivers().map((receiver) => receiver.track)
+    // );
+    //     remoteVideo.srcObject = remoteStream;
+
     const handleTrackEvent = (event) => {
       log("*** Track event");
       console.log("ref.current :", ref.current);
       console.log("event :", event);
+      console.log("event :", JSON.stringify(event));
       console.log(" event.streams[0]:", event.streams[0]);
-      if (ref.current) {
-        // if (!inboundStream) {
-        ref.current.srcObject = event.streams[0];
-      }
     };
+
+    // const handleTrackEvent = (event) => {
+    //   log("*** Track event");
+    //   console.log("ref.current :", ref.current);
+    //   console.log("event :", event);
+    //   console.log(" event.streams[0]:", event.streams[0]);
+    //   if (ref.current) {
+    //     // if (!inboundStream) {
+    //     ref.current.srcObject = event.streams[0];
+    //   }
+    // };
     console.log("signal before handleIcecandidate :", signalRoomId);
 
     const handleICECandidateEvent = (event) => {

@@ -109,7 +109,26 @@ const WebRTCController = forwardRef(
       if (streamingData && RTCList[signalRoomId]) {
         console.log("we have stream here: ", streamingData);
         try {
-          RTCList[signalRoomId].addStream(streamingData);
+          // RTCList[signalRoomId].addStream(streamingData);
+          // let camTransceiver = pc1.addTransceiver(camTrack, {
+          //   direction: "inactive",
+          // });
+
+          RTCList[signalRoomId].addTransceiver(
+            streamingData.getVideoTracks()[0],
+            {
+              direction: "sendonly",
+              streams: [streamingData],
+            }
+          );
+
+          RTCList[signalRoomId].addTransceiver(
+            streamingData.getAudioTracks()[0],
+            {
+              direction: "sendonly",
+              streams: [streamingData],
+            }
+          );
         } catch (err) {
           handleGetUserMediaError(err);
         }
@@ -120,6 +139,7 @@ const WebRTCController = forwardRef(
       log("createPeerConnection fired :Setting up a connection...", 2);
       const signalRoomId = data.signalRoomId;
       RTCList[signalRoomId] = new RTCPeerConnection({
+        sdpSemantics: "unified-plan",
         iceServers: [
           {
             url: "stun:stun.l.google.com:19302",
