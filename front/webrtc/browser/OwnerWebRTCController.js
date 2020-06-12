@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef, useRef } from "react";
+import { useEffect, useState, useCallback, forwardRef, useRef } from "react";
 import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual, connect } from "react-redux";
 import { useRouter } from "next/router";
@@ -12,6 +12,8 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
+rtc 정보도 전부 스테이트에다가 넣자. 
+이게 답인듯. 
 const WebRTCController = forwardRef(
   ({ currentVideoId, addStreamingDataToVideo }, ref) => {
     // forwardref 사용하기
@@ -31,20 +33,19 @@ const WebRTCController = forwardRef(
     const owner = me.id === currentVideoOwner;
     const Router = useRouter();
     const queryId = Router.query.id;
-    var transceiver = null;
-
+    let RTCList = useRef({});
+    let RTCListKeys = Object.keys(RTCList);
     //streamingData 부분은 항상 webrtc와는 별개로 작동해야 한다.
     let streamingData;
     const transceiverList = useRef({});
     console.log("this is ref :", ref);
 
-    // const webRTCList = {};
     const handlePlay = async () => {
       log("userMedia fired");
       navigator.mediaDevices
         .getUserMedia({
-          audio: false,
-          video: true,
+          audio: true,
+          video: { width: 1280, height: 720 },
         })
         .then((stream) => {
           if (ref.current) {
@@ -56,13 +57,21 @@ const WebRTCController = forwardRef(
           console.log("error getting usermedia :", e);
           handleGetUserMediaError(e);
         });
+
+      // const RTCListKeys = Object.keys(RTCList);
+      // console.log("RTCListKeys :", RTCListKeys);
+      // console.log("RTCList :", RTCList);
+      // if (RTCListKeys.length > 0) {
+      //   RTCListKeys.forEach((el) => {
+      //     console.log("RTCList[el] is :", RTCList[el]);
+
+      //     // RTCList[el]
+      //     addTrackToPeerConnection(el);
+      //   });
+      // }
     };
 
-    ///rtc start
-
-    let RTCList = {};
-    // connection이 들어오면, 여기다가 push 한다.
-    //client 쪽에서는 uuid로 아이디를 만들어서 메시지를 보낼때 같이 보낸다.
+    ///
 
     const sendToServer = (data) => {
       socket.emit("message_from_broadcaster", data);
@@ -101,7 +110,8 @@ const WebRTCController = forwardRef(
       }
     };
 
-    const addTrackToPeerConnection = (signalRoomId) => {
+    // 문제가, 위에서 포워드 레프 하면 위의 컴퍼넌트가 변화되서 아래도 리렌더 되는 거임.
+    const addTrackToPeerConnection = async (signalRoomId) => {
       log(
         `addTrackToPeerConnection fired. is signalRoomId :${signalRoomId}`,
         3
@@ -109,32 +119,25 @@ const WebRTCController = forwardRef(
       if (streamingData && RTCList[signalRoomId]) {
         console.log("we have stream here: ", streamingData);
         try {
-          // RTCList[signalRoomId].addStream(streamingData);
-          // let camTransceiver = pc1.addTransceiver(camTrack, {
-          //   direction: "inactive",
-          // });
+          let audio = await streamingData.getAudioTracks()[0];
+          let video = await streamingData.getVideoTracks()[0];
+          console.log("mediastream track :", audio);
+          console.log("mediastream track :", video);
 
-          RTCList[signalRoomId].addTransceiver(
-            streamingData.getVideoTracks()[0],
-            {
-              direction: "sendonly",
-              streams: [streamingData],
-            }
-          );
+          RTCList[signalRoomId].addTransceiver(audio, {
+            direction: "sendonly",
+            streams: [streamingData],
+          });
 
-          RTCList[signalRoomId].addTransceiver(
-            streamingData.getAudioTracks()[0],
-            {
-              direction: "sendonly",
-              streams: [streamingData],
-            }
-          );
+          RTCList[signalRoomId].addTransceiver(video, {
+            direction: "sendonly",
+            streams: [streamingData],
+          });
         } catch (err) {
           handleGetUserMediaError(err);
         }
       }
     };
-
     const createPeerConnection = (data) => {
       log("createPeerConnection fired :Setting up a connection...", 2);
       const signalRoomId = data.signalRoomId;
@@ -181,7 +184,7 @@ const WebRTCController = forwardRef(
       rtcPeerConnection.onnegotiationneeded = (event) => {
         log(`handleNegotiationNeededEvent fired. signalRoomId :`, 4);
         console.log("nothing to happend for onnegotiationneded on owner side");
-        // handleNegotiationNeededEvent(event, signalRoomId, rtcPeerConnection);
+        handleNegotiationNeededEvent(event, signalRoomId, rtcPeerConnection);
       };
       rtcPeerConnection.ontrack = (event) => {
         log(`ontrack fired. signalRoomId :`, 4);
@@ -250,7 +253,7 @@ const WebRTCController = forwardRef(
       log("Closing the call");
       // Close the RTCPeerConnection
       if (rtcPeerConnection) {
-        log("--> Closing the peer connection");
+        log("--> Closing the peer connection fired :");
 
         // Disconnect all our event listeners; we don't want stray events
         // to interfere with the hangup while it's ongoing.
@@ -261,10 +264,9 @@ const WebRTCController = forwardRef(
         rtcPeerConnection.onicegatheringstatechange = null;
         rtcPeerConnection.onnotificationneeded = null;
 
-        // Stop all transceivers on the connection
-
         //list의 transceiver를 만든 것을 가져와서 논다. 위의 트렌시버랑은 별개다. rtcPeerConnection 안에 있는 녀석들이다.
         rtcPeerConnection.getTransceivers().forEach((transceiver) => {
+          console.log("transiver fired :");
           transceiver.stop();
         });
 
@@ -300,14 +302,15 @@ const WebRTCController = forwardRef(
     };
 
     const sendHangUpMessageToEveryone = () => {
-      const RTCListKeys = Object.keys(RTCList);
-      console.log("RTCListKeys :", RTCListKeys);
-      RTCListKeys.forEach((el) => {
-        log("to signal room :" + el);
-        socket.emit("hang_up_message", { signalRoomId: el, type: "hang-up" });
-      });
+      if (RTCListKeys.length > 0) {
+        console.log("RTCListKeys :", RTCListKeys);
+        RTCListKeys.forEach((el) => {
+          log("to signal room :" + el);
+          socket.emit("hang_up_message", { signalRoomId: el, type: "hang-up" });
+        });
 
-      RTCList = useRef([]); //empty the rtc list here
+        RTCList = useRef({}); //empty the rtc list here
+      }
     };
     const handleGetUserMediaError = (e) => {
       log_error(e);
@@ -421,11 +424,24 @@ const WebRTCController = forwardRef(
       handlePlay();
       // 나중에 dispatch로 조절하자.
     };
-    const handleStop = () => {
+
+    
+    const handleStop = useCallback(() => {
+      // console.log("handle stop fired");
+      const RTCListKeys = Object.keys(RTCList);
+      console.log("handle stop fired :", RTCListKeys);
+      if (RTCListKeys.length > 0) {
+        RTCListKeys.forEach((el) => {
+          console.log("this is el :", el);
+          closeVideoCall(RTCList[el]);
+        });
+        sendHangUpMessageToEveryone();
+      }
       dispatch({
         type: STOP_STREAMING_REQUEST,
       });
-    };
+    }, [RTCList]);
+
     useEffect(() => {
       socket.on("broadcaster_join_completed", (data) => {
         console.log("broadcaster_join_completed fired :", data);
@@ -469,7 +485,7 @@ const WebRTCController = forwardRef(
           handleStop();
         }
       };
-    }, [streamingOn]);
+    }, []);
     return (
       <div>
         {!streamingOn ? (
