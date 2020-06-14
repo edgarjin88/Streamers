@@ -13,6 +13,7 @@ import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
 let RTCList = {};
+let streamingData;
 
 const WebRTCController = forwardRef(
   ({ currentVideoId, addStreamingDataToVideo }, ref) => {
@@ -31,7 +32,6 @@ const WebRTCController = forwardRef(
     const owner = me.id === currentVideoOwner;
     const Router = useRouter();
     const queryId = Router.query.id;
-    let streamingData;
     let videoRef = ref;
     console.log("this is ref :", videoRef);
 
@@ -45,6 +45,7 @@ const WebRTCController = forwardRef(
         .then((stream) => {
           if (videoRef.current) {
             streamingData = stream;
+            console.log("streaming data here : ", streamingData);
             videoRef.current.srcObject = streamingData;
           }
         })
@@ -53,6 +54,12 @@ const WebRTCController = forwardRef(
           handleGetUserMediaError(e);
         });
     };
+
+    console.log("streaming data here outside : ", streamingData);
+    console.log(
+      "streaming data here outside id: ",
+      streamingData ? streamingData.id : streamingData
+    );
 
     const sendToServer = (data) => {
       socket.emit("message_from_broadcaster", data);
@@ -91,7 +98,6 @@ const WebRTCController = forwardRef(
       }
     };
 
-    // 문제가, 위에서 포워드 레프 하면 위의 컴퍼넌트가 변화되서 아래도 리렌더 되는 거임.
     const addTrackToPeerConnection = async (signalRoomId) => {
       log(
         `addTrackToPeerConnection fired. is signalRoomId :${signalRoomId}`,
@@ -118,6 +124,8 @@ const WebRTCController = forwardRef(
       }
     };
     const createPeerConnection = (data) => {
+      console.log("streaming data here inside peerconnection: ", streamingData);
+
       log("createPeerConnection fired :Setting up a connection...", 2);
       const signalRoomId = data.signalRoomId;
       RTCList[signalRoomId] = new RTCPeerConnection({
@@ -200,7 +208,7 @@ const WebRTCController = forwardRef(
         case "closed":
         case "failed":
         case "disconnected":
-          // closeVideoCall();
+          closeVideoCall();
           break;
       }
     };
@@ -232,8 +240,6 @@ const WebRTCController = forwardRef(
       if (rtcPeerConnection) {
         log("--> Closing the peer connection fired :");
 
-        // Disconnect all our event listeners; we don't want stray events
-        // to interfere with the hangup while it's ongoing.
         rtcPeerConnection.ontrack = null;
         rtcPeerConnection.onnicecandidate = null;
         rtcPeerConnection.oniceconnectionstatechange = null;
@@ -245,21 +251,6 @@ const WebRTCController = forwardRef(
         rtcPeerConnection = null;
       }
     };
-
-    // const hangUpCall = () => {
-    //   log("hangup call fired. video would be removed");
-    //   var localVideo = ref.current;
-    //   if (localVideo.srcObject) {
-    //     // pause first
-    //     localVideo.pause();
-    //     localVideo.srcObject.getTracks().forEach((track) => {
-    //       track.stop();
-    //     });
-    //     streamingData = null;
-    //   }
-    //   closeVideoCall();
-    //   sendHangUpMessageToEveryone();
-    // };
 
     const sendHangUpMessageToEveryone = () => {
       const RTCListKeys = Object.keys(RTCList);
@@ -296,7 +287,6 @@ const WebRTCController = forwardRef(
       // ready to try again.
 
       closeVideoCall();
-      // hangUpCall();
       sendHangUpMessageToEveryone();
     };
 
@@ -310,20 +300,11 @@ const WebRTCController = forwardRef(
       console.trace("[" + time.toLocaleTimeString() + "] " + text);
     };
 
-    //   var msgJSON = JSON.stringify(msg); 등으로 메시지를 보내도록 하자.
-
-    // client can only send offer to receive
-    // each message should have signal room id
-
     const handleVideoOfferMsg = async (msg) => {
-      // log("Received video chat offer from viewer")
       console.log("handleVideoOfferMsg :", msg);
       const signalRoomId = msg.signalRoomId;
       if (!RTCList[signalRoomId]) {
         createPeerConnection(msg);
-        console.log(
-          "과연 싱크로너스 하게 흘러갈까? after Received video chat offer from viewer "
-        );
       }
       const rtcPeerConnection = RTCList[signalRoomId];
       log(`rtcPeerConnection empty? : ${rtcPeerConnection}`);
@@ -331,6 +312,8 @@ const WebRTCController = forwardRef(
       var desc = new RTCSessionDescription(msg.sdp);
       if (rtcPeerConnection.signalingState != "stable") {
         log("  - But the signaling state isn't stable, so triggering rollback");
+        console.log("rtc List !!!: ", RTCList);
+
         await Promise.all([
           rtcPeerConnection.setLocalDescription({ type: "rollback" }),
           rtcPeerConnection.setRemoteDescription(desc),
@@ -338,11 +321,12 @@ const WebRTCController = forwardRef(
 
         return;
       } else {
+        console.log("rtc List !!!: ", RTCList);
+
         log("  -signal stable.  Setting remote description");
         await rtcPeerConnection.setRemoteDescription(desc);
       }
 
-      // addTrackToPeerConnection(signalRoomId);
       log("---> Creating and sending answer to caller");
       const answer = await rtcPeerConnection.createAnswer();
       await rtcPeerConnection.setLocalDescription(answer);
@@ -358,6 +342,8 @@ const WebRTCController = forwardRef(
 
     const handleVideoAnswerMsg = async (msg) => {
       log("*** Call recipient has accepted our call");
+      console.log("rtc List !!!: ", RTCList);
+
       var desc = new RTCSessionDescription(msg.sdp);
       await RTCList[msg.signalRoomId]
         .setRemoteDescription(desc)
@@ -365,6 +351,8 @@ const WebRTCController = forwardRef(
     };
 
     const handleNewICECandidateMsg = async (msg) => {
+      console.log("rtc List !!!: ", RTCList);
+
       var candidate = new RTCIceCandidate(msg.candidate);
 
       console.log('"*** Adding received ICE candidate , :', candidate);
@@ -378,6 +366,8 @@ const WebRTCController = forwardRef(
         reportError(err);
       }
     };
+
+    console.log("rtc List !!!: ", RTCList);
 
     const handleStart = () => {
       dispatch({
@@ -393,6 +383,11 @@ const WebRTCController = forwardRef(
         RTCListKeys.forEach((el) => {
           console.log("this is el :", el);
           closeVideoCall(RTCList[el]);
+
+          socket.emit("broadcaster_left_room", {
+            userName: me.nickname,
+            signalRoomId: el,
+          });
         });
         sendHangUpMessageToEveryone();
       }
@@ -403,12 +398,25 @@ const WebRTCController = forwardRef(
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
         console.log("after :", videoRef.current.srcObject);
       }
+
       dispatch({
         type: STOP_STREAMING_REQUEST,
       });
     }, [RTCList, streamingOn]);
 
     useEffect(() => {
+      socket.on("viewer_left_room", (data) => {
+        const signalRoomId = data.signalRoomId;
+        socket.emit("broadcaster_left_room", {
+          userName: me.nickname,
+          signalRoomId: data.signalRoomId,
+        });
+        console.log("before delete :", RTCList);
+        if (RTCList[signalRoomId]) {
+          delete RTCList[signalRoomId];
+          console.log("after delete :", RTCList);
+        }
+      });
       socket.on("broadcaster_join_completed", (data) => {
         console.log("broadcaster_join_completed fired :", data);
         createPeerConnection(data);
@@ -440,7 +448,7 @@ const WebRTCController = forwardRef(
           // handleHangUpMsg(msg);
         }
       });
-    }, []);
+    }, [streamingData, RTCList]);
 
     useEffect(() => {
       return () => {

@@ -16,6 +16,17 @@ const RTCList = {};
 
 const webSocket = (server, app, sessionMiddleware) => {
   const io = SocketIO(server);
+
+  function getRoomClients(room) {
+    return new Promise((resolve, reject) => {
+      io.of("/")
+        .in(room)
+        .clients((error, clients) => {
+          resolve(clients);
+        });
+    });
+  }
+
   // const io = SocketIO(server, { path: "/socket.io" });
   app.set("io", io);
 
@@ -29,21 +40,36 @@ const webSocket = (server, app, sessionMiddleware) => {
     //////rtc
     //////rtc
 
-    // Pathnames of the SSL key and certificate files to use for
-    // HTTPS connections.
+    socket.on("viewer_left_room", async (data) => {
+      socket.broadcast.to(data.signalRoomId).emit("viewer_left_room", data);
+      socket.leave(data.signalRoomId);
+      console.log("viewer_left_room fire");
+      console.log("viewer socket :", socket.id);
+      const clients = await getRoomClients(data.signalRoomId);
+      console.log("client list in the current signalroom ", clients);
+    });
 
-    // client joinNewRTCConnection
-    // -userName
-    // -userId
-    // -videoId
-    // -description
-    // -data type
-    // client send
+    socket.on("broadcaster_left_room", async (data) => {
+      socket.broadcast
+        .to(data.signalRoomId)
+        .emit("broadcaster_left_room", data);
+      socket.leave(data.signalRoomId);
 
-    socket.on("new_viewer_join_RTCConnection", (data) => {
+      console.log("broadcaster_left_room fire");
+      console.log("broadcaster socket :", socket.id);
+
+      const clients = await getRoomClients(data.signalRoomId);
+      console.log("client list in the current signalroom ", clients);
+    });
+
+    socket.on("new_viewer_join_RTCConnection", async (data) => {
       const signalRoomId = data.signalRoomId;
       const chatRoom = data.chatRoom;
       console.log("newRTCConnection fired. connectionId :", signalRoomId);
+
+      console.log("new_viewer_join_RTCConnection fire");
+      const clients = await getRoomClients(data.signalRoomId);
+      console.log("client list in the current signalroom ", clients);
 
       if (!RTCList[signalRoomId]) {
         RTCList[signalRoomId] = [];
@@ -54,12 +80,16 @@ const webSocket = (server, app, sessionMiddleware) => {
       socket.broadcast.to(chatRoom).emit("invite_broadcaster", data);
     });
 
-    socket.on("new_broadcaster_join_RTCConnection", (data) => {
+    socket.on("new_broadcaster_join_RTCConnection", async (data) => {
       console.log("newRTCConnection fired. received Data :", data);
       const signalRoomId = data.signalRoomId;
       RTCList[signalRoomId].push(data.userId);
       socket.join(data.signalRoomId);
       console.log("updated RTCList :", RTCList);
+
+      console.log("new_broadcaster_join_RTCConnection fire");
+      const clients = await getRoomClients(data.signalRoomId);
+      console.log("client list in the current signalroom ", clients);
       socket.broadcast
         .to(signalRoomId)
         .emit("new_broadcaster_join_RTCConnection", data);
@@ -68,12 +98,12 @@ const webSocket = (server, app, sessionMiddleware) => {
     });
 
     socket.on("message_from_viewer", (data) => {
-      console.log("message_from_viewer :", data);
+      // console.log("message_from_viewer :", data);
 
       socket.broadcast.to(data.signalRoomId).emit("message_from_viewer", data);
     });
     socket.on("message_from_broadcaster", (data) => {
-      console.log("message_from_broadcaster :", data);
+      // console.log("message_from_broadcaster :", data);
       socket.broadcast
         .to(data.signalRoomId)
         .emit("message_from_broadcaster", data);

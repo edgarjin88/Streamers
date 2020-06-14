@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, forwardRef } from "react";
+import { useEffect, useState, useRef, forwardRef, useCallback } from "react";
 import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
@@ -12,16 +12,12 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
+const signalRoomId = uuid();
 let rtcPeerConnection;
-let inboundStream;
-let audio;
-let video;
 
 const WebRTCController = forwardRef(
   ({ currentVideoId, addStreamingDataToVideo }, ref) => {
-    const [signalRoomId, setSignalRoomId] = useState(uuid());
-
-    const videoRef = useRef();
+    const videoRef = ref;
     const log = (message, order) => {
       console.log(`order [${order}]. message: ${message}`);
     };
@@ -34,8 +30,7 @@ const WebRTCController = forwardRef(
         me: state.user && state.user.me,
       };
     }, shallowEqual);
-
-    const owner = me.id === currentVideoOwner;
+    console.log("rtcPeerConnection :", rtcPeerConnection);
     const Router = useRouter();
     const chatRoomId = "a" + Router.query.id;
 
@@ -46,9 +41,9 @@ const WebRTCController = forwardRef(
           handleStop();
         }
       };
-    }, [streamingOn]);
+    }, []);
 
-    console.log("this is ref from viewer:", ref);
+    console.log("this is ref from viewer:", videoRef);
 
     const handleNegotiationNeededEvent = async () => {
       log("*** Negotiation needed", 4);
@@ -81,23 +76,26 @@ const WebRTCController = forwardRef(
       }
     };
 
-    const createPeerConnection = () => {
+    const createPeerConnection = async () => {
       log("createPeerConnection fired :Setting up a connection...", 2);
 
       rtcPeerConnection = new RTCPeerConnection({
         sdpSemantics: "unified-plan",
-        iceServers: [
-          {
-            urls: "stun:stun.l.google.com:19302",
-          },
-        ],
       });
+      // rtcPeerConnection = new RTCPeerConnection({
+      //   sdpSemantics: "unified-plan",
+      //   iceServers: [
+      //     {
+      //       urls: "stun:stun.l.google.com:19302",
+      //     },
+      //   ],
+      // });
 
-      audio = rtcPeerConnection.addTransceiver("audio", {
+      rtcPeerConnection.addTransceiver("audio", {
         direction: "recvonly",
       });
 
-      video = rtcPeerConnection.addTransceiver("video", {
+      rtcPeerConnection.addTransceiver("video", {
         direction: "recvonly",
       });
 
@@ -111,12 +109,12 @@ const WebRTCController = forwardRef(
       rtcPeerConnection.ontrack = handleTrackEvent;
 
       log(`handleNegotiationNeeded fired for createPeerConnection :`, 3);
-      handleNegotiationNeededEvent();
+      // handleNegotiationNeededEvent();
     };
 
     const handleTrackEvent = ({ transceiver, streams: [stream] }) => {
       log("*** Track event");
-      console.log("ref.current :", ref.current);
+      console.log("ref.current :", videoRef);
       console.log("transceiver.receiver.track :", transceiver.receiver.track);
 
       transceiver.receiver.track.onunmute = () => {
@@ -192,35 +190,13 @@ const WebRTCController = forwardRef(
         rtcPeerConnection.onicegatheringstatechange = null;
         rtcPeerConnection.onnotificationneeded = null;
 
-        rtcPeerConnection.getTransceivers().forEach((transceiver) => {
-          transceiver.stop();
-        });
-
         rtcPeerConnection.close();
         rtcPeerConnection = null;
       }
-
-      // Disable the hangup button
-
-      // document.getElementById("hangup-button").disabled = true;
-      // targetUsername = null;
     };
 
     const handleHangUpMsg = (msg) => {
       log("*** Received hang up notification from other peer");
-      closeVideoCall();
-    };
-
-    const hangUpCall = () => {
-      log("hangup call fired. video would be removed");
-      var localVideo = ref.current;
-      if (localVideo.srcObject) {
-        localVideo.pause();
-        localVideo.srcObject.getTracks().forEach((track) => {
-          track.stop();
-        });
-        streamingData = null;
-      }
       closeVideoCall();
     };
 
@@ -233,14 +209,11 @@ const WebRTCController = forwardRef(
       console.trace("[" + time.toLocaleTimeString() + "] " + text);
     };
 
-    // client can only send offer to receive
-    // each message should have signal room id
-
     const handleVideoOfferMsg = async (msg) => {
       log("Received video chat offer from broadcaster");
       const signalRoomId = msg.signalRoomId;
       if (!rtcPeerConnection) {
-        createPeerConnection(signalRoomId);
+        createPeerConnection();
       }
       log(`rtcPeerConnection empty? : ${rtcPeerConnection}`);
 
@@ -298,9 +271,17 @@ const WebRTCController = forwardRef(
     };
 
     useEffect(() => {
+      socket.on("broadcaster_left_room", (data) => {
+        // socket.emit("viewer_left_room", {
+        //   userName: me.nickname,
+        //   signalRoomId: signalRoomId,
+        // });
+
+        handleStop();
+      });
       socket.on("new_broadcaster_join_RTCConnection", (data) => {
         console.log("new_broadcaster_join_RTCConnection fired ", data);
-        createPeerConnection(signalRoomId);
+        createPeerConnection();
       });
       socket.on("message_from_broadcaster", (data) => {
         var msg = data;
@@ -319,7 +300,7 @@ const WebRTCController = forwardRef(
           handleHangUpMsg(msg);
         }
       });
-    }, []);
+    }, [signalRoomId, rtcPeerConnection]);
 
     const handleStart = () => {
       dispatch({
@@ -334,11 +315,25 @@ const WebRTCController = forwardRef(
       });
     };
 
-    const handleStop = () => {
+    const handleStop = useCallback(() => {
+      closeVideoCall(rtcPeerConnection);
+
+      console.log("before :", videoRef.current.srcObject);
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.pause();
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        console.log("after :", videoRef.current.srcObject);
+        videoRef.current.srcObject = null;
+      }
+      socket.emit("viewer_left_room", {
+        userName: me.nickname,
+        signalRoomId: signalRoomId,
+      });
+
       dispatch({
         type: STOP_STREAMING_REQUEST,
       });
-    };
+    }, [streamingOn, rtcPeerConnection]);
 
     useEffect(() => {
       return () => {

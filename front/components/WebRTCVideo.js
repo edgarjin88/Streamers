@@ -76,6 +76,7 @@ const WebRTCVideo = () => {
     if (videoRef.current) {
       // streamingData = stream
       console.log("objeaddStreamingDataToVideo fired :");
+      console.log("arg is :", arg);
       videoRef.current.srcObject = arg;
     }
   };
