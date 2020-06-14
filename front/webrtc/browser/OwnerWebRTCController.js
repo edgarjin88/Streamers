@@ -12,12 +12,10 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
-rtc 정보도 전부 스테이트에다가 넣자. 
-이게 답인듯. 
+let RTCList = {};
+
 const WebRTCController = forwardRef(
   ({ currentVideoId, addStreamingDataToVideo }, ref) => {
-    // forwardref 사용하기
-
     const log = (message, order) => {
       console.log(`order [${order}]. message: ${message}`);
     };
@@ -33,12 +31,9 @@ const WebRTCController = forwardRef(
     const owner = me.id === currentVideoOwner;
     const Router = useRouter();
     const queryId = Router.query.id;
-    let RTCList = useRef({});
-    let RTCListKeys = Object.keys(RTCList);
-    //streamingData 부분은 항상 webrtc와는 별개로 작동해야 한다.
     let streamingData;
-    const transceiverList = useRef({});
-    console.log("this is ref :", ref);
+    let videoRef = ref;
+    console.log("this is ref :", videoRef);
 
     const handlePlay = async () => {
       log("userMedia fired");
@@ -48,30 +43,16 @@ const WebRTCController = forwardRef(
           video: { width: 1280, height: 720 },
         })
         .then((stream) => {
-          if (ref.current) {
+          if (videoRef.current) {
             streamingData = stream;
-            ref.current.srcObject = streamingData;
+            videoRef.current.srcObject = streamingData;
           }
         })
         .catch((e) => {
           console.log("error getting usermedia :", e);
           handleGetUserMediaError(e);
         });
-
-      // const RTCListKeys = Object.keys(RTCList);
-      // console.log("RTCListKeys :", RTCListKeys);
-      // console.log("RTCList :", RTCList);
-      // if (RTCListKeys.length > 0) {
-      //   RTCListKeys.forEach((el) => {
-      //     console.log("RTCList[el] is :", RTCList[el]);
-
-      //     // RTCList[el]
-      //     addTrackToPeerConnection(el);
-      //   });
-      // }
     };
-
-    ///
 
     const sendToServer = (data) => {
       socket.emit("message_from_broadcaster", data);
@@ -121,8 +102,6 @@ const WebRTCController = forwardRef(
         try {
           let audio = await streamingData.getAudioTracks()[0];
           let video = await streamingData.getVideoTracks()[0];
-          console.log("mediastream track :", audio);
-          console.log("mediastream track :", video);
 
           RTCList[signalRoomId].addTransceiver(audio, {
             direction: "sendonly",
@@ -145,12 +124,13 @@ const WebRTCController = forwardRef(
         sdpSemantics: "unified-plan",
         iceServers: [
           {
-            url: "stun:stun.l.google.com:19302",
+            urls: "stun:stun.l.google.com:19302",
           },
         ],
       });
 
       const rtcPeerConnection = RTCList[signalRoomId];
+      addTrackToPeerConnection(signalRoomId);
 
       rtcPeerConnection.onicecandidate = (event) => {
         log(`onicecandidate fired. signalRoomId : ${signalRoomId}`, 5);
@@ -183,16 +163,13 @@ const WebRTCController = forwardRef(
 
       rtcPeerConnection.onnegotiationneeded = (event) => {
         log(`handleNegotiationNeededEvent fired. signalRoomId :`, 4);
-        console.log("nothing to happend for onnegotiationneded on owner side");
         handleNegotiationNeededEvent(event, signalRoomId, rtcPeerConnection);
       };
       rtcPeerConnection.ontrack = (event) => {
         log(`ontrack fired. signalRoomId :`, 4);
 
-        handleTrackEvent(event, signalRoomId);
+        handleTrackEvent(event);
       };
-
-      addTrackToPeerConnection(signalRoomId);
     };
 
     const handleTrackEvent = (event) => {
@@ -223,7 +200,7 @@ const WebRTCController = forwardRef(
         case "closed":
         case "failed":
         case "disconnected":
-          closeVideoCall();
+          // closeVideoCall();
           break;
       }
     };
@@ -240,8 +217,8 @@ const WebRTCController = forwardRef(
           closeVideoCall(rtcPeerConnection);
           break;
       }
-    }; // 이 부분도 broad caster 쪽에서만 필요하다.
-    //peerconnection은 항상 scope 되어야 한다.
+    };
+
     const handleICEGatheringStateChangeEvent = (event, rtcPeerConnection) => {
       log(
         "*** ICE gathering state changed to: " +
@@ -264,44 +241,29 @@ const WebRTCController = forwardRef(
         rtcPeerConnection.onicegatheringstatechange = null;
         rtcPeerConnection.onnotificationneeded = null;
 
-        //list의 transceiver를 만든 것을 가져와서 논다. 위의 트렌시버랑은 별개다. rtcPeerConnection 안에 있는 녀석들이다.
-        rtcPeerConnection.getTransceivers().forEach((transceiver) => {
-          console.log("transiver fired :");
-          transceiver.stop();
-        });
-
         rtcPeerConnection.close();
         rtcPeerConnection = null;
       }
-
-      // Disable the hangup button
-
-      // document.getElementById("hangup-button").disabled = true;
-      // targetUsername = null;
     };
 
-    const handleHangUpMsg = (msg) => {
-      log("*** Received hang up notification from other peer");
-
-      closeVideoCall();
-    };
-
-    const hangUpCall = () => {
-      log("hangup call fired. video would be removed");
-      var localVideo = ref.current;
-      if (localVideo.srcObject) {
-        // pause first
-        localVideo.pause();
-        localVideo.srcObject.getTracks().forEach((track) => {
-          track.stop();
-        });
-        streamingData = null;
-      }
-      closeVideoCall();
-      sendHangUpMessageToEveryone();
-    };
+    // const hangUpCall = () => {
+    //   log("hangup call fired. video would be removed");
+    //   var localVideo = ref.current;
+    //   if (localVideo.srcObject) {
+    //     // pause first
+    //     localVideo.pause();
+    //     localVideo.srcObject.getTracks().forEach((track) => {
+    //       track.stop();
+    //     });
+    //     streamingData = null;
+    //   }
+    //   closeVideoCall();
+    //   sendHangUpMessageToEveryone();
+    // };
 
     const sendHangUpMessageToEveryone = () => {
+      const RTCListKeys = Object.keys(RTCList);
+
       if (RTCListKeys.length > 0) {
         console.log("RTCListKeys :", RTCListKeys);
         RTCListKeys.forEach((el) => {
@@ -309,7 +271,7 @@ const WebRTCController = forwardRef(
           socket.emit("hang_up_message", { signalRoomId: el, type: "hang-up" });
         });
 
-        RTCList = useRef({}); //empty the rtc list here
+        RTCList = {}; //empty the rtc list here
       }
     };
     const handleGetUserMediaError = (e) => {
@@ -334,7 +296,7 @@ const WebRTCController = forwardRef(
       // ready to try again.
 
       closeVideoCall();
-      hangUpCall();
+      // hangUpCall();
       sendHangUpMessageToEveryone();
     };
 
@@ -422,12 +384,9 @@ const WebRTCController = forwardRef(
         type: START_STREAMING_REQUEST,
       });
       handlePlay();
-      // 나중에 dispatch로 조절하자.
     };
 
-    
     const handleStop = useCallback(() => {
-      // console.log("handle stop fired");
       const RTCListKeys = Object.keys(RTCList);
       console.log("handle stop fired :", RTCListKeys);
       if (RTCListKeys.length > 0) {
@@ -437,10 +396,17 @@ const WebRTCController = forwardRef(
         });
         sendHangUpMessageToEveryone();
       }
+
+      if (videoRef.current.srcObject) {
+        console.log("inside ");
+        videoRef.current.pause();
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        console.log("after :", videoRef.current.srcObject);
+      }
       dispatch({
         type: STOP_STREAMING_REQUEST,
       });
-    }, [RTCList]);
+    }, [RTCList, streamingOn]);
 
     useEffect(() => {
       socket.on("broadcaster_join_completed", (data) => {
@@ -449,8 +415,6 @@ const WebRTCController = forwardRef(
       });
       socket.on("invite_broadcaster", (data) => {
         console.log("data :", data);
-        // const dota = JSON.parse(data);
-        // console.log("data1 :", dota);
         log(`invite_brodcaster  fired data ${data}`);
         socket.emit("new_broadcaster_join_RTCConnection", {
           userName: me.nickname,
@@ -463,7 +427,6 @@ const WebRTCController = forwardRef(
         var msg = data;
         console.log("message_from_viewer type of data :", typeof msg);
         console.log(" message_from_viewer data: ", data);
-        // log(`message from viewer data : ${data}, JSON msg :${msg}`);
         if (msg.type === "video-offer") {
           handleVideoOfferMsg(msg);
         }
@@ -474,7 +437,7 @@ const WebRTCController = forwardRef(
           handleNewICECandidateMsg(msg);
         }
         if (msg.type === "hang-up") {
-          handleHangUpMsg(msg);
+          // handleHangUpMsg(msg);
         }
       });
     }, []);

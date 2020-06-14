@@ -12,6 +12,11 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
 import { socket } from "../../components/socket/socket";
 
+let rtcPeerConnection;
+let inboundStream;
+let audio;
+let video;
+
 const WebRTCController = forwardRef(
   ({ currentVideoId, addStreamingDataToVideo }, ref) => {
     const [signalRoomId, setSignalRoomId] = useState(uuid());
@@ -29,6 +34,7 @@ const WebRTCController = forwardRef(
         me: state.user && state.user.me,
       };
     }, shallowEqual);
+
     const owner = me.id === currentVideoOwner;
     const Router = useRouter();
     const chatRoomId = "a" + Router.query.id;
@@ -43,11 +49,6 @@ const WebRTCController = forwardRef(
     }, [streamingOn]);
 
     console.log("this is ref from viewer:", ref);
-
-    let rtcPeerConnection;
-    let inboundStream;
-    let audio;
-    let video;
 
     const handleNegotiationNeededEvent = async () => {
       log("*** Negotiation needed", 4);
@@ -87,7 +88,7 @@ const WebRTCController = forwardRef(
         sdpSemantics: "unified-plan",
         iceServers: [
           {
-            url: "stun:stun.l.google.com:19302",
+            urls: "stun:stun.l.google.com:19302",
           },
         ],
       });
@@ -96,11 +97,9 @@ const WebRTCController = forwardRef(
         direction: "recvonly",
       });
 
-      console.log("audio :", audio);
       video = rtcPeerConnection.addTransceiver("video", {
         direction: "recvonly",
       });
-      console.log("audio :", audio);
 
       rtcPeerConnection.onicecandidate = handleICECandidateEvent;
 

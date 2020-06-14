@@ -54,9 +54,6 @@ Index.getInitialProps = async (context) => {
   await context.store.dispatch({
     type: LOAD_MAIN_VIDEOS_REQUEST,
   });
-  await context.store.dispatch({
-    type: LOAD_MAIN_VIDEOS_REQUEST,
-  });
 };
 
 export default Index;

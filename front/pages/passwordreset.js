@@ -20,7 +20,6 @@ import { SocialLinks } from "../containers/SocialIconLinksFlat";
 
 export default function SignInSide() {
   const classes = useStyles();
-  /////Logic //////////
   const { resetPasswordErrorReason, resetPasswordSuccess } = useSelector(
     ({ user }) => {
       return {
