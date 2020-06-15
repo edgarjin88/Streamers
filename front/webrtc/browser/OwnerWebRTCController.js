@@ -372,6 +372,8 @@ const WebRTCController = forwardRef(
     const handleStart = () => {
       dispatch({
         type: START_STREAMING_REQUEST,
+        videoId: currentVideoId,
+        data: "ON",
       });
       handlePlay();
     };
@@ -392,15 +394,15 @@ const WebRTCController = forwardRef(
         sendHangUpMessageToEveryone();
       }
 
-      if (videoRef.current.srcObject) {
-        console.log("inside ");
+      if (videoRef.current && videoRef.current.srcObject) {
         videoRef.current.pause();
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-        console.log("after :", videoRef.current.srcObject);
       }
 
       dispatch({
         type: STOP_STREAMING_REQUEST,
+        videoId: currentVideoId,
+        data: "OFF",
       });
     }, [RTCList, streamingOn]);
 
@@ -448,15 +450,18 @@ const WebRTCController = forwardRef(
           // handleHangUpMsg(msg);
         }
       });
-    }, [streamingData, RTCList]);
+    }, [streamingData, RTCList, queryId]);
 
     useEffect(() => {
       return () => {
-        if (streamingOn) {
-          handleStop();
-        }
+        console.log("cleanup code fired to stop streaming");
+        handleStop();
       };
     }, []);
+    useEffect(() => {
+      console.log("cleanup code fired to stop streaming");
+      handleStop();
+    }, [queryId]);
     return (
       <div>
         {!streamingOn ? (

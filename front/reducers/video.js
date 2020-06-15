@@ -135,6 +135,9 @@ export const STOP_STREAMING_SUCCESS = "STOP_STREAMING_SUCCESS";
 export const UPDATE_STREAMING_ON = "UPDATE_STREAMING_ON";
 export const UPDATE_STREAMING_OFF = "UPDATE_STREAMING_OFF";
 
+export const JOIN_STREAMING = "JOIN_STREAMING";
+export const QUIT_STREAMING = "QUIT_STREAMING";
+
 export const initialState = {
   currentCommentId: null,
   mainVideos: [],
@@ -170,6 +173,7 @@ export const initialState = {
   //chat message end
   sendChatMessage: true,
   streamingOn: false,
+  onList: [],
 };
 
 export default (state = initialState, action) => {
@@ -183,6 +187,11 @@ export default (state = initialState, action) => {
         });
 
         draft.mainVideos[index].streaming = "OFF";
+
+        const onListIndex = draft.onList.findIndex((eachVideo) => {
+          return eachVideo.id === parseInt(action.data, 10);
+        });
+        draft.onList.splice(onListIndex, 1);
         break;
       }
       case UPDATE_STREAMING_ON: {
@@ -192,14 +201,39 @@ export default (state = initialState, action) => {
         });
 
         draft.mainVideos[index].streaming = "ON";
+        draft.onList.push(parseInt(action.data, 10));
+
         break;
       }
-      case STOP_STREAMING_REQUEST: {
+
+      case JOIN_STREAMING: {
+        draft.streamingOn = true;
+        break;
+      }
+
+      case QUIT_STREAMING: {
         draft.streamingOn = false;
         break;
       }
-      case START_STREAMING_REQUEST: {
+      case STOP_STREAMING_SUCCESS: {
+        draft.streamingOn = false;
+        break;
+      }
+      case STOP_STREAMING_FAILURE: {
         draft.streamingOn = true;
+        break;
+      }
+      ///
+      case START_STREAMING_REQUEST: {
+        draft.streamingOn = false;
+        break;
+      }
+      case START_STREAMING_SUCCESS: {
+        draft.streamingOn = true;
+        break;
+      }
+      case START_STREAMING_FAILURE: {
+        draft.streamingOn = false;
         break;
       }
 

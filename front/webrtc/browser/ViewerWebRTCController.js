@@ -3,10 +3,7 @@ import { StyledButton1 } from "../../components/CustomButtons";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
 import uuid from "react-uuid";
-import {
-  START_STREAMING_REQUEST,
-  STOP_STREAMING_REQUEST,
-} from "../../reducers/video";
+import { JOIN_STREAMING, QUIT_STREAMING } from "../../reducers/video";
 
 import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import StopIcon from "@material-ui/icons/Stop";
@@ -23,28 +20,25 @@ const WebRTCController = forwardRef(
     };
 
     const dispatch = useDispatch();
-    const { streamingOn, currentVideoOwner, me } = useSelector((state) => {
-      return {
-        streamingOn: state.video.streamingOn,
-        currentVideoOwner: state.video.currentVideo.UserId,
-        me: state.user && state.user.me,
-      };
-    }, shallowEqual);
-    console.log("rtcPeerConnection :", rtcPeerConnection);
+    const { streamingOn, currentVideoOwner, me, onList } = useSelector(
+      (state) => {
+        return {
+          onList: state.video.onList,
+          streamingOn: state.video.streamingOn,
+          currentVideoOwner: state.video.currentVideo.UserId,
+          me: state.user && state.user.me,
+        };
+      },
+      shallowEqual
+    );
+
     const Router = useRouter();
     const chatRoomId = "a" + Router.query.id;
 
-    useEffect(() => {
-      console.log("viewer controller fired");
-      return () => {
-        if (streamingOn) {
-          handleStop();
-        }
-      };
-    }, []);
-
-    console.log("this is ref from viewer:", videoRef);
-
+    const streaming = onList.includes(currentVideoId);
+    console.log("streaming :", streaming);
+    console.log("onList :", onList);
+    console.log("currentVideoId :", currentVideoId);
     const handleNegotiationNeededEvent = async () => {
       log("*** Negotiation needed", 4);
       try {
@@ -183,6 +177,7 @@ const WebRTCController = forwardRef(
       if (rtcPeerConnection) {
         log("--> Closing the peer connection");
 
+        console.log("rtc before :", rtcPeerConnection);
         rtcPeerConnection.ontrack = null;
         rtcPeerConnection.onnicecandidate = null;
         rtcPeerConnection.oniceconnectionstatechange = null;
@@ -192,6 +187,7 @@ const WebRTCController = forwardRef(
 
         rtcPeerConnection.close();
         rtcPeerConnection = null;
+        console.log("rtc after :", rtcPeerConnection);
       }
     };
 
@@ -272,11 +268,7 @@ const WebRTCController = forwardRef(
 
     useEffect(() => {
       socket.on("broadcaster_left_room", (data) => {
-        // socket.emit("viewer_left_room", {
-        //   userName: me.nickname,
-        //   signalRoomId: signalRoomId,
-        // });
-
+        console.log("broadcaster_left_room fired");
         handleStop();
       });
       socket.on("new_broadcaster_join_RTCConnection", (data) => {
@@ -302,24 +294,29 @@ const WebRTCController = forwardRef(
       });
     }, [signalRoomId, rtcPeerConnection]);
 
-    const handleStart = () => {
-      dispatch({
-        type: START_STREAMING_REQUEST,
-      });
-      socket.emit("new_viewer_join_RTCConnection", {
-        userName: me.nickname,
-        userId: me.id,
-        chatRoom: chatRoomId,
-        signalRoomId: signalRoomId,
-        type: "offer_to_signal_room",
-      });
-    };
+    const handleStart = useCallback(() => {
+      if (streaming === true) {
+        dispatch({
+          type: JOIN_STREAMING,
+        });
+        socket.emit("new_viewer_join_RTCConnection", {
+          userName: me.nickname,
+          userId: me.id,
+          chatRoom: chatRoomId,
+          signalRoomId: signalRoomId,
+          type: "offer_to_signal_room",
+        });
+      } else {
+        alert("Currently this channel is not on live");
+      }
+    }, [streaming]);
 
     const handleStop = useCallback(() => {
+      // console.log("usecallback  peerconnection : ", rtcPeerConnection);
       closeVideoCall(rtcPeerConnection);
 
-      console.log("before :", videoRef.current.srcObject);
       if (videoRef.current && videoRef.current.srcObject) {
+        console.log("video src stopping");
         videoRef.current.pause();
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
         console.log("after :", videoRef.current.srcObject);
@@ -331,9 +328,9 @@ const WebRTCController = forwardRef(
       });
 
       dispatch({
-        type: STOP_STREAMING_REQUEST,
+        type: QUIT_STREAMING,
       });
-    }, [streamingOn, rtcPeerConnection]);
+    }, [rtcPeerConnection]);
 
     useEffect(() => {
       return () => {

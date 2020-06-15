@@ -73,6 +73,12 @@ import {
   UPLOAD_VIDEO_IMAGE_FAILURE,
   UPLOAD_VIDEO_IMAGE_REQUEST,
   UPLOAD_VIDEO_IMAGE_SUCCESS,
+  START_STREAMING_SUCCESS,
+  START_STREAMING_FAILURE,
+  START_STREAMING_REQUEST,
+  STOP_STREAMING_SUCCESS,
+  STOP_STREAMING_FAILURE,
+  STOP_STREAMING_REQUEST,
 } from "../reducers/video";
 
 import { ADD_VIDEO_TO_ME, REMOVE_VIDEO_FROM_ME } from "../reducers/user";
@@ -851,8 +857,78 @@ function* watchLoadFavoriteVideos() {
   yield throttle(2000, LOAD_FAVORITE_VIDEOS_REQUEST, loadFavoriteVideos);
 }
 
+/// streaming on off update
+
+function startStreamingAPI(videoId, videoData) {
+  return axios.patch(
+    `/video/${videoId}/updateStreaming`,
+    { streaming: videoData },
+    {
+      httpsAgent,
+      withCredentials: true,
+    }
+  );
+}
+
+function* startStreaming(action) {
+  try {
+    const result = yield call(startStreamingAPI, action.videoId, action.data);
+    yield put({
+      type: START_STREAMING_SUCCESS,
+      data: action.data,
+      videoId: action.videoId,
+    });
+  } catch (e) {
+    yield put({
+      type: START_STREAMING_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchStartStreaming() {
+  yield takeLatest(START_STREAMING_REQUEST, startStreaming);
+}
+
+///
+
+function stopStreamingAPI(videoId, videoData) {
+  return axios.patch(
+    `/video/${videoId}/updateStreaming`,
+    { streaming: videoData },
+    {
+      httpsAgent,
+      withCredentials: true,
+    }
+  );
+}
+
+function* stopStreaming(action) {
+  try {
+    const result = yield call(stopStreamingAPI, action.videoId, action.data);
+    yield put({
+      type: STOP_STREAMING_SUCCESS,
+      data: action.data,
+      videoId: action.videoId,
+    });
+  } catch (e) {
+    yield put({
+      type: STOP_STREAMING_FAILURE,
+      error: e,
+    });
+  }
+}
+
+function* watchStoptreaming() {
+  yield takeLatest(STOP_STREAMING_REQUEST, stopStreaming);
+}
+
+// redux는 나누고, 라우터는 더하자.
+
 export default function* videoSaga() {
   yield all([
+    fork(watchStoptreaming),
+    fork(watchStartStreaming),
     fork(watchRemoveComment),
     fork(watchLikeComment),
     fork(watchUnlikeComment),

@@ -23,8 +23,6 @@ import { LogoAndName } from "../components/MenuComponents";
 
 export default function SignInSide() {
   //make sure only accessible when not logged in
-  //make sure only accessible when not logged in
-
   const classes = useStyles();
   /////////Logic //////////
   const { me } = useSelector((state) => state.user);

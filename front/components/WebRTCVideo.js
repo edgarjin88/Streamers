@@ -40,8 +40,6 @@ const WebRTCVideo = () => {
   const type = myId === videoOwnerId ? "broadcaster" : "viwer";
   const owner = myId === videoOwnerId;
 
-  let streamingData;
-
   const { streamingOn, currentVideoId } = useSelector(({ video }) => {
     return {
       streamingOn: video.streamingOn,
@@ -49,29 +47,6 @@ const WebRTCVideo = () => {
     };
   }, shallowEqual);
 
-  const handlePlay = () => {
-    // console.log('before handleplay :', streamingData)
-    // navigator.mediaDevices
-    // .getUserMedia({
-    //   audio: false,
-    //   video: true,
-    // })
-    // .then((stream) => {
-    //   if (videoRef.current) {
-    //     streamingData = stream
-    //     console.log('after handleplay :', streamingData)
-    //     videoRef.current.srcObject = streamingData}
-    // });
-  };
-
-  useEffect(() => {
-    if (streamingOn && type === "broadcaster") {
-      handlePlay();
-    }
-    if (!streamingOn && videoRef.current) {
-      // videoRef.current.srcObject = null;
-    }
-  }, [streamingOn]);
   const addStreamingDataToVideo = (arg) => {
     if (videoRef.current) {
       // streamingData = stream
@@ -93,7 +68,6 @@ const WebRTCVideo = () => {
       {me && owner && (
         <OwnerWebRTCController
           ref={videoRef}
-          streamingData={streamingData}
           className="controller"
           type={type}
           // options={beforeAnswer}
@@ -105,7 +79,6 @@ const WebRTCVideo = () => {
       {me && !owner && (
         <ViewerWebRTCController
           ref={videoRef}
-          streamingData={streamingData}
           className="controller"
           type={type}
           // options={beforeAnswer}
