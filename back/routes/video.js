@@ -20,8 +20,10 @@ const {
   removeRecomment,
   dislikeComment,
   removeDislikeComment,
+  updateVideoStreaming,
 } = require("../controllers/video");
 
+router.patch("/:id/updateStreaming", isLoggedIn, updateVideoStreaming);
 router.patch("/:id", isLoggedIn, updateVideo);
 router.get("/:id", getVideo);
 router.delete("/:id", isLoggedIn, deleteVideo);

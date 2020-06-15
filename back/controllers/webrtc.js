@@ -6,6 +6,8 @@ const broadcasterConnectionManager = WebRtcConnectionManager.create(
   broadCasterServer
 );
 
+//The logic in this file not in use at the moment. This is only for media server.
+
 const db = require("../models");
 
 exports.createRemoteDescription = async (req, res) => {

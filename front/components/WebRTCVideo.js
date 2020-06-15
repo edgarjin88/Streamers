@@ -62,7 +62,8 @@ const WebRTCVideo = () => {
         className="main-content"
         ref={videoRef}
         autoPlay={true}
-        muted={true}
+        muted={false}
+        controls
       ></video>
 
       {me && owner && (

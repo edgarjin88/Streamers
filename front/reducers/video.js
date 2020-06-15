@@ -182,27 +182,41 @@ export default (state = initialState, action) => {
     switch (action.type) {
       case UPDATE_STREAMING_OFF: {
         // debugger;
+        const targetId = parseInt(action.data, 10);
+        const currentId = draft.currentVideo.id;
+
         const index = draft.mainVideos.findIndex((eachVideo) => {
-          return eachVideo.id === parseInt(action.data, 10);
+          return eachVideo.id === targetId;
         });
 
         draft.mainVideos[index].streaming = "OFF";
 
         const onListIndex = draft.onList.findIndex((eachVideo) => {
-          return eachVideo.id === parseInt(action.data, 10);
+          return eachVideo.id === targetId;
         });
+
         draft.onList.splice(onListIndex, 1);
+        if (currentId === targetId) {
+          draft.currentVideo.streaming = "OFF";
+        }
         break;
       }
+
       case UPDATE_STREAMING_ON: {
         // debugger;
+        const targetId = parseInt(action.data, 10);
+        const currentId = draft.currentVideo.id;
+
         const index = draft.mainVideos.findIndex((eachVideo) => {
-          return eachVideo.id === parseInt(action.data, 10);
+          return eachVideo.id === targetId;
         });
 
         draft.mainVideos[index].streaming = "ON";
-        draft.onList.push(parseInt(action.data, 10));
+        draft.onList.push(targetId);
 
+        if (targetId === currentId) {
+          draft.currentVideo.streaming = "ON";
+        }
         break;
       }
 

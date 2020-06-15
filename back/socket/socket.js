@@ -43,8 +43,6 @@ const webSocket = (server, app, sessionMiddleware) => {
     socket.on("viewer_left_room", async (data) => {
       socket.broadcast.to(data.signalRoomId).emit("viewer_left_room", data);
       socket.leave(data.signalRoomId);
-      console.log("viewer_left_room fire");
-      console.log("viewer socket :", socket.id);
       const clients = await getRoomClients(data.signalRoomId);
       console.log("client list in the current signalroom ", clients);
     });
@@ -55,9 +53,6 @@ const webSocket = (server, app, sessionMiddleware) => {
         .emit("broadcaster_left_room", data);
       socket.leave(data.signalRoomId);
 
-      console.log("broadcaster_left_room fire");
-      console.log("broadcaster socket :", socket.id);
-
       const clients = await getRoomClients(data.signalRoomId);
       console.log("client list in the current signalroom ", clients);
     });
@@ -65,7 +60,6 @@ const webSocket = (server, app, sessionMiddleware) => {
     socket.on("new_viewer_join_RTCConnection", async (data) => {
       const signalRoomId = data.signalRoomId;
       const chatRoom = data.chatRoom;
-      console.log("newRTCConnection fired. connectionId :", signalRoomId);
 
       console.log("new_viewer_join_RTCConnection fire");
       const clients = await getRoomClients(data.signalRoomId);
@@ -81,7 +75,6 @@ const webSocket = (server, app, sessionMiddleware) => {
     });
 
     socket.on("new_broadcaster_join_RTCConnection", async (data) => {
-      console.log("newRTCConnection fired. received Data :", data);
       const signalRoomId = data.signalRoomId;
       RTCList[signalRoomId].push(data.userId);
       socket.join(data.signalRoomId);

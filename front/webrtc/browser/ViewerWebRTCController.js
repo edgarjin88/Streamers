@@ -20,10 +20,14 @@ const WebRTCController = forwardRef(
     };
 
     const dispatch = useDispatch();
-    const { streamingOn, currentVideoOwner, me, onList } = useSelector(
+
+    const { streamingOn, currentVideoOwner, me, streaming } = useSelector(
       (state) => {
         return {
-          onList: state.video.onList,
+          streaming:
+            state.video &&
+            state.video.currentVideo &&
+            state.video.currentVideo.streaming,
           streamingOn: state.video.streamingOn,
           currentVideoOwner: state.video.currentVideo.UserId,
           me: state.user && state.user.me,
@@ -33,14 +37,11 @@ const WebRTCController = forwardRef(
     );
 
     const Router = useRouter();
-    const chatRoomId = "a" + Router.query.id;
+    const queryId = Router.query.id;
 
-    const streaming = onList.includes(currentVideoId);
-    console.log("streaming :", streaming);
-    console.log("onList :", onList);
-    console.log("currentVideoId :", currentVideoId);
+    const chatRoomId = "a" + queryId;
+
     const handleNegotiationNeededEvent = async () => {
-      log("*** Negotiation needed", 4);
       try {
         log("---> Creating offer");
 
@@ -52,7 +53,7 @@ const WebRTCController = forwardRef(
         }
 
         log("---> Setting local description to the offer");
-        console.log("negotiationneeded signalroom  :", signalRoomId);
+        // console.log("negotiationneeded signalroom  :", signalRoomId);
         await rtcPeerConnection.setLocalDescription(offer);
         // icecandidate would be made at this point
         log("---> Sending the offer to the remote peer");
@@ -71,19 +72,14 @@ const WebRTCController = forwardRef(
     };
 
     const createPeerConnection = async () => {
-      log("createPeerConnection fired :Setting up a connection...", 2);
-
       rtcPeerConnection = new RTCPeerConnection({
         sdpSemantics: "unified-plan",
+        iceServers: [
+          {
+            urls: "stun:stun.l.google.com:19302",
+          },
+        ],
       });
-      // rtcPeerConnection = new RTCPeerConnection({
-      //   sdpSemantics: "unified-plan",
-      //   iceServers: [
-      //     {
-      //       urls: "stun:stun.l.google.com:19302",
-      //     },
-      //   ],
-      // });
 
       rtcPeerConnection.addTransceiver("audio", {
         direction: "recvonly",
@@ -101,28 +97,17 @@ const WebRTCController = forwardRef(
       rtcPeerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
 
       rtcPeerConnection.ontrack = handleTrackEvent;
-
-      log(`handleNegotiationNeeded fired for createPeerConnection :`, 3);
-      // handleNegotiationNeededEvent();
     };
 
     const handleTrackEvent = ({ transceiver, streams: [stream] }) => {
-      log("*** Track event");
-      console.log("ref.current :", videoRef);
-      console.log("transceiver.receiver.track :", transceiver.receiver.track);
-
       transceiver.receiver.track.onunmute = () => {
         log("transceiver.receiver.track.onunmute");
         // ref.current.srcObject = stream;
         addStreamingDataToVideo(stream);
-        // ref.current.srcObject = stream;
       };
     };
 
-    console.log("signal before handleIcecandidate :", signalRoomId);
-
     const handleICECandidateEvent = (event) => {
-      console.log("signal room :", signalRoomId);
       if (event.candidate) {
         log("*** Outgoing ICE candidate: " + event.candidate.candidate, 4);
         sendToServer({
@@ -134,13 +119,6 @@ const WebRTCController = forwardRef(
     };
 
     const handleICEConnectionStateChangeEvent = (event) => {
-      log("*** rtcPeerConnection empty? " + rtcPeerConnection);
-
-      log(
-        "*** ICE connection state changed to " +
-          rtcPeerConnection.iceConnectionState
-      );
-
       switch (rtcPeerConnection.iceConnectionState) {
         case "closed":
         case "failed":
@@ -151,12 +129,6 @@ const WebRTCController = forwardRef(
     };
 
     const handleSignalingStateChangeEvent = (event) => {
-      log("*** rtcPeerConnection empty? " + rtcPeerConnection);
-
-      log(
-        "*** WebRTC signaling state changed to: " +
-          rtcPeerConnection.signalingState
-      );
       switch (rtcPeerConnection.signalingState) {
         case "closed":
           closeVideoCall(rtcPeerConnection);
@@ -172,12 +144,9 @@ const WebRTCController = forwardRef(
     };
 
     const closeVideoCall = (rtcPeerConnection) => {
-      log("Closing the call");
       // Close the RTCPeerConnection
-      if (rtcPeerConnection) {
-        log("--> Closing the peer connection");
 
-        console.log("rtc before :", rtcPeerConnection);
+      if (rtcPeerConnection) {
         rtcPeerConnection.ontrack = null;
         rtcPeerConnection.onnicecandidate = null;
         rtcPeerConnection.oniceconnectionstatechange = null;
@@ -187,7 +156,6 @@ const WebRTCController = forwardRef(
 
         rtcPeerConnection.close();
         rtcPeerConnection = null;
-        console.log("rtc after :", rtcPeerConnection);
       }
     };
 
@@ -243,7 +211,6 @@ const WebRTCController = forwardRef(
 
     const handleVideoAnswerMsg = async (msg) => {
       log("*** Call recipient has accepted our call");
-      console.log("handleVideoAnswerMsg: ", msg);
       var desc = new RTCSessionDescription(msg.sdp);
       await rtcPeerConnection.setRemoteDescription(desc).catch(reportError);
       log(`rtcPeerConnection empty? : ${rtcPeerConnection}`);
@@ -254,7 +221,6 @@ const WebRTCController = forwardRef(
     const handleNewICECandidateMsg = async (msg) => {
       var candidate = new RTCIceCandidate(msg.candidate);
 
-      console.log('"*** Adding received ICE candidate , :', candidate);
       try {
         await rtcPeerConnection.addIceCandidate(candidate);
       } catch (err) {
@@ -268,17 +234,13 @@ const WebRTCController = forwardRef(
 
     useEffect(() => {
       socket.on("broadcaster_left_room", (data) => {
-        console.log("broadcaster_left_room fired");
         handleStop();
       });
       socket.on("new_broadcaster_join_RTCConnection", (data) => {
-        console.log("new_broadcaster_join_RTCConnection fired ", data);
         createPeerConnection();
       });
       socket.on("message_from_broadcaster", (data) => {
         var msg = data;
-        console.log("message_from_broadcaster type of data :", typeof msg);
-        log(`message_from_broadcaster data : ${data}, JSON msg :${msg}`);
         if (msg.type === "video-offer") {
           handleVideoOfferMsg(msg);
         }
@@ -295,7 +257,7 @@ const WebRTCController = forwardRef(
     }, [signalRoomId, rtcPeerConnection]);
 
     const handleStart = useCallback(() => {
-      if (streaming === true) {
+      if (streaming === "ON") {
         dispatch({
           type: JOIN_STREAMING,
         });
@@ -312,14 +274,10 @@ const WebRTCController = forwardRef(
     }, [streaming]);
 
     const handleStop = useCallback(() => {
-      // console.log("usecallback  peerconnection : ", rtcPeerConnection);
       closeVideoCall(rtcPeerConnection);
 
       if (videoRef.current && videoRef.current.srcObject) {
-        console.log("video src stopping");
-        videoRef.current.pause();
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-        console.log("after :", videoRef.current.srcObject);
         videoRef.current.srcObject = null;
       }
       socket.emit("viewer_left_room", {
@@ -330,13 +288,19 @@ const WebRTCController = forwardRef(
       dispatch({
         type: QUIT_STREAMING,
       });
-    }, [rtcPeerConnection]);
+    }, []);
 
     useEffect(() => {
+      if (streaming === "OFF") {
+        handleStop();
+      }
+    }, [streaming]);
+    useEffect(() => {
+      handleStop();
+    }, [queryId]);
+    useEffect(() => {
       return () => {
-        if (streamingOn) {
-          handleStop();
-        }
+        handleStop();
       };
     }, []);
 

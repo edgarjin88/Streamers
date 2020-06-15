@@ -2,9 +2,6 @@ const db = require("../models");
 const { socketList } = require("../socket/socket");
 
 // exports.updateVideo = async (req, res, next) => { }
-// exports.updateVideo = async (req, res, next) => { }
-// exports.updateVideo = async (req, res, next) => { }
-
 exports.getVideos = async (req, res, next) => {
   try {
     let where = {}; //two different "wheres"
@@ -649,6 +646,36 @@ exports.getVideo = async (req, res, next) => {
   }
 };
 
+exports.updateVideoStreaming = async (req, res, next) => {
+  console.log("body update streaming :", req.body);
+  const videoId = req.params.id;
+  const io = req.app.get("io");
+  const streaming = req.body.streaming;
+  try {
+    const exVideo = await db.Video.findOne({
+      where: { id: videoId },
+    });
+
+    if (!exVideo) {
+      return res.status(404).send("video does not exist.");
+    }
+
+    await exVideo.update({
+      streaming: streaming,
+    });
+
+    if (streaming === "ON") {
+      io.sockets.emit("streamingOn", { id: videoId });
+    } else {
+      io.sockets.emit("streamingOff", { id: videoId });
+    }
+
+    res.status(200).send("Successfully started streaming.");
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+};
 exports.updateVideo = async (req, res, next) => {
   try {
     const exVideo = await db.Video.findOne({

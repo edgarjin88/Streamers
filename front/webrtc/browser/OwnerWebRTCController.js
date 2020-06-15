@@ -33,7 +33,6 @@ const WebRTCController = forwardRef(
     const Router = useRouter();
     const queryId = Router.query.id;
     let videoRef = ref;
-    console.log("this is ref :", videoRef);
 
     const handlePlay = async () => {
       log("userMedia fired");
@@ -45,21 +44,15 @@ const WebRTCController = forwardRef(
         .then((stream) => {
           if (videoRef.current) {
             streamingData = stream;
-            console.log("streaming data here : ", streamingData);
+            // console.log("streaming data here : ", streamingData);
             videoRef.current.srcObject = streamingData;
           }
         })
         .catch((e) => {
-          console.log("error getting usermedia :", e);
+          // console.log("error getting usermedia :", e);
           handleGetUserMediaError(e);
         });
     };
-
-    console.log("streaming data here outside : ", streamingData);
-    console.log(
-      "streaming data here outside id: ",
-      streamingData ? streamingData.id : streamingData
-    );
 
     const sendToServer = (data) => {
       socket.emit("message_from_broadcaster", data);
@@ -104,7 +97,6 @@ const WebRTCController = forwardRef(
         3
       );
       if (streamingData && RTCList[signalRoomId]) {
-        console.log("we have stream here: ", streamingData);
         try {
           let audio = await streamingData.getAudioTracks()[0];
           let video = await streamingData.getVideoTracks()[0];
@@ -124,7 +116,7 @@ const WebRTCController = forwardRef(
       }
     };
     const createPeerConnection = (data) => {
-      console.log("streaming data here inside peerconnection: ", streamingData);
+      // console.log("streaming data here inside peerconnection: ", streamingData);
 
       log("createPeerConnection fired :Setting up a connection...", 2);
       const signalRoomId = data.signalRoomId;
@@ -142,7 +134,6 @@ const WebRTCController = forwardRef(
 
       rtcPeerConnection.onicecandidate = (event) => {
         log(`onicecandidate fired. signalRoomId : ${signalRoomId}`, 5);
-        console.log("onicecandidate fired. signalRoomId", event);
         handleICECandidateEvent(event, signalRoomId);
       };
       rtcPeerConnection.oniceconnectionstatechange = (event) => {
@@ -256,7 +247,7 @@ const WebRTCController = forwardRef(
       const RTCListKeys = Object.keys(RTCList);
 
       if (RTCListKeys.length > 0) {
-        console.log("RTCListKeys :", RTCListKeys);
+        // console.log("RTCListKeys :", RTCListKeys);
         RTCListKeys.forEach((el) => {
           log("to signal room :" + el);
           socket.emit("hang_up_message", { signalRoomId: el, type: "hang-up" });
@@ -301,7 +292,7 @@ const WebRTCController = forwardRef(
     };
 
     const handleVideoOfferMsg = async (msg) => {
-      console.log("handleVideoOfferMsg :", msg);
+      // console.log("handleVideoOfferMsg :", msg);
       const signalRoomId = msg.signalRoomId;
       if (!RTCList[signalRoomId]) {
         createPeerConnection(msg);
@@ -312,7 +303,6 @@ const WebRTCController = forwardRef(
       var desc = new RTCSessionDescription(msg.sdp);
       if (rtcPeerConnection.signalingState != "stable") {
         log("  - But the signaling state isn't stable, so triggering rollback");
-        console.log("rtc List !!!: ", RTCList);
 
         await Promise.all([
           rtcPeerConnection.setLocalDescription({ type: "rollback" }),
@@ -321,8 +311,6 @@ const WebRTCController = forwardRef(
 
         return;
       } else {
-        console.log("rtc List !!!: ", RTCList);
-
         log("  -signal stable.  Setting remote description");
         await rtcPeerConnection.setRemoteDescription(desc);
       }
@@ -342,7 +330,7 @@ const WebRTCController = forwardRef(
 
     const handleVideoAnswerMsg = async (msg) => {
       log("*** Call recipient has accepted our call");
-      console.log("rtc List !!!: ", RTCList);
+      // console.log("rtc List !!!: ", RTCList);
 
       var desc = new RTCSessionDescription(msg.sdp);
       await RTCList[msg.signalRoomId]
@@ -351,23 +339,21 @@ const WebRTCController = forwardRef(
     };
 
     const handleNewICECandidateMsg = async (msg) => {
-      console.log("rtc List !!!: ", RTCList);
+      // console.log("rtc List !!!: ", RTCList);
 
       var candidate = new RTCIceCandidate(msg.candidate);
 
-      console.log('"*** Adding received ICE candidate , :', candidate);
-      console.log(
-        '"*** RTCList[msg.signalRoomId] , :',
-        RTCList[msg.signalRoomId]
-      );
+      // console.log('"*** Adding received ICE candidate , :', candidate);
+      // console.log(
+      //   '"*** RTCList[msg.signalRoomId] , :',
+      //   RTCList[msg.signalRoomId]
+      // );
       try {
         await RTCList[msg.signalRoomId].addIceCandidate(candidate);
       } catch (err) {
         reportError(err);
       }
     };
-
-    console.log("rtc List !!!: ", RTCList);
 
     const handleStart = () => {
       dispatch({
@@ -380,10 +366,8 @@ const WebRTCController = forwardRef(
 
     const handleStop = useCallback(() => {
       const RTCListKeys = Object.keys(RTCList);
-      console.log("handle stop fired :", RTCListKeys);
       if (RTCListKeys.length > 0) {
         RTCListKeys.forEach((el) => {
-          console.log("this is el :", el);
           closeVideoCall(RTCList[el]);
 
           socket.emit("broadcaster_left_room", {
@@ -394,9 +378,8 @@ const WebRTCController = forwardRef(
         sendHangUpMessageToEveryone();
       }
 
-      if (videoRef.current && videoRef.current.srcObject) {
-        videoRef.current.pause();
-        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+      if (streamingData) {
+        streamingData.getTracks().forEach((track) => track.stop());
       }
 
       dispatch({
@@ -413,19 +396,16 @@ const WebRTCController = forwardRef(
           userName: me.nickname,
           signalRoomId: data.signalRoomId,
         });
-        console.log("before delete :", RTCList);
+
         if (RTCList[signalRoomId]) {
+          closeVideoCall(RTCList[signalRoomId]);
           delete RTCList[signalRoomId];
-          console.log("after delete :", RTCList);
         }
       });
       socket.on("broadcaster_join_completed", (data) => {
-        console.log("broadcaster_join_completed fired :", data);
         createPeerConnection(data);
       });
       socket.on("invite_broadcaster", (data) => {
-        console.log("data :", data);
-        log(`invite_brodcaster  fired data ${data}`);
         socket.emit("new_broadcaster_join_RTCConnection", {
           userName: me.nickname,
           userId: me.id,
@@ -435,8 +415,6 @@ const WebRTCController = forwardRef(
       });
       socket.on("message_from_viewer", (data) => {
         var msg = data;
-        console.log("message_from_viewer type of data :", typeof msg);
-        console.log(" message_from_viewer data: ", data);
         if (msg.type === "video-offer") {
           handleVideoOfferMsg(msg);
         }
@@ -454,12 +432,10 @@ const WebRTCController = forwardRef(
 
     useEffect(() => {
       return () => {
-        console.log("cleanup code fired to stop streaming");
         handleStop();
       };
     }, []);
     useEffect(() => {
-      console.log("cleanup code fired to stop streaming");
       handleStop();
     }, [queryId]);
     return (

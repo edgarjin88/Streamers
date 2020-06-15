@@ -19,7 +19,10 @@ export const StyledChatForm = styled.div`
 
   #chat-form > img {
     cursor: pointer;
-    /* background-color: white; */
+    width: 3rem;
+    height: 3rem;
+    padding: 0.2rem;
+    /* background-color: red; */
   }
   #chat-form input {
     z-index: 10;
