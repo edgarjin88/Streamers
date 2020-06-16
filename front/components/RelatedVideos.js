@@ -79,11 +79,24 @@ const RelatedVideo = ({
 
   const onScroll = useCallback(
     (e) => {
-      if (
+      const wheel = e.type === "wheel";
+      const touchmove = e.type === "touchmove";
+      const heightCondition =
         window.scrollY + document.documentElement.clientHeight >
-          document.documentElement.scrollHeight - 350 &&
-        e.deltaY > 0
+        document.documentElement.scrollHeight - 350;
+      const deltaYCondition = e.deltaY > 0;
+
+      if (
+        (wheel && heightCondition && deltaYCondition) ||
+        (touchmove && heightCondition)
       ) {
+        // const wheel = e.type === "wheel"
+        // const heightCondition =
+        // if (
+        //   window.scrollY + document.documentElement.clientHeight >
+        //     document.documentElement.scrollHeight - 350 &&
+        //   e.deltaY > 0
+        // ) {
         if (hasMoreVideos) {
           const lastId =
             mainVideos &&
@@ -161,9 +174,11 @@ const RelatedVideo = ({
 
   useEffect(() => {
     window.addEventListener("wheel", onScroll);
+    window.addEventListener("touchmove", onScroll);
     // wheel event used to prevent scroll up event before unmount. Even though clean up code fires, scroll event still fire before unmount.
     return () => {
       window.removeEventListener("wheel", onScroll);
+      window.removeEventListener("touchmove", onScroll);
     };
   }, [mainVideos.length]);
 
@@ -204,7 +219,10 @@ const RelatedVideo = ({
                       </strong>
                     </div>
 
-                    <p>3/5 joined</p>
+                    <p>
+                      Created by{" "}
+                      {videoInfo && videoInfo.User && videoInfo.User.nickname}
+                    </p>
                     <p>
                       {videoInfo && videoInfo.viewCount
                         ? videoInfo.viewCount

@@ -260,6 +260,7 @@ main {
   grid-row: span 3;
   height: 100%;
   width: 100%;
+  object-fit : cover
 }
 
 #related-videos > ul > li h4 {
@@ -471,7 +472,7 @@ main {
     height: 17.5vw;
     min-height: 131px;
     max-height: inherit;
-
+    object-fit:cover;
   }
 }
 
@@ -516,6 +517,7 @@ main {
     height: 135px;
     min-height: inherit;
     max-height: inherit;
+    object-fit:cover
   }
 
   #video-comments {
