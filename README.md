@@ -34,6 +34,7 @@ Full stack streaming website. Broadcasters can send streaming video to multiple 
 - Oauth2.0 Authentication(Google, Facebook, LinkedIn, Kakao)
 - Push notification(not for mobile)
 - Around 60 API end points.
+- 13 data tables(including juntion tables)
 - General social media features(e.g post, edit, delete, comment, reply to comment, like, dislike, lazy scrolling) and all connected via websocket for real-time update and push notification
 
 ### Challenging points
