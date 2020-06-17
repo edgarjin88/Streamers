@@ -2,7 +2,7 @@
 
 ## Demo website: [https://lemonstreaming.com/ ](https://lemonstreaming.com/)
 
-Full stack streaming website. Broadcasters can send streaming video to multiple viewers via WebRTC protocol. Backend server initially designed as a media server so that broadcaster can send stable streaming without consuming too much data, but in vinal version, I changed it to P2P connection. The previous verion code still there but not in use.
+Full stack streaming website. Broadcasters can send streaming video to multiple viewers via WebRTC protocol. Backend server initially designed as a media server so that broadcaster can send stable streaming without consuming too much data, but in the final version, I changed it to P2P connection becuase the back-end was not stable to handle multiple streaming data. The previous verion code is still there, but not in use.
 
 ## Main libraries and frameworks used for Front-End
 
@@ -44,8 +44,8 @@ Full stack streaming website. Broadcasters can send streaming video to multiple 
 
 ### Things to improve
 
--Design pattern
--Reusability
--CSS
--General refactoring
--Not all async functions are in try catch blocks.
+- Design pattern
+- Reusability
+- CSS
+- General refactoring
+- Not all async functions are in try catch blocks.
