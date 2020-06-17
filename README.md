@@ -7,6 +7,8 @@ Full stack streaming website. Broadcasters can send streaming video to multiple 
 ## Main libraries and frameworks used for Front-End
 
 - Next.js
+- Redux
+- Redux Saga
 - WebRTC(broweser native code)
 - Socket.IO
 - Styled Components
