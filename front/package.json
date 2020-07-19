@@ -26,7 +26,7 @@
     "draft-js": "^0.11.5",
     "immer": "^6.0.5",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "material-table": "^1.57.2",
     "material-ui-icons": "^1.0.0-beta.36",
     "moment": "^2.25.3",
